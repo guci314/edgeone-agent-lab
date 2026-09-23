@@ -1,0 +1,17 @@
+{
+  "name": "edgeone-feishu-bridge",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "飞书长连接 → EdgeOne Makers agent 路由的桥接进程（本机/服务器常驻，不参与 EdgeOne 部署）",
+  "scripts": {
+    "start": "node --env-file=.env index.mjs",
+    "sync-env": "node tools/sync-env.mjs"
+  },
+  "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.74.0"
+  },
+  "devDependencies": {
+    "@edgeone/makers-sdk": "^0.1.0"
+  }
+}

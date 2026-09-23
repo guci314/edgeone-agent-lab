@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  macOS 常驻配置：开机自启 + 挂了自动拉起。
+
+  安装（只做一次）：
+    cp com.guci.feishu-bridge.plist ~/Library/LaunchAgents/
+    launchctl load -w ~/Library/LaunchAgents/com.guci.feishu-bridge.plist
+
+  常用命令：
+    launchctl list | grep feishu-bridge     # 看在不在跑
+    launchctl kickstart -k gui/$UID/com.guci.feishu-bridge   # 重启
+    launchctl unload -w ~/Library/LaunchAgents/com.guci.feishu-bridge.plist  # 停用
+    tail -f /tmp/feishu-bridge.log          # 看日志
+
+  ⚠️ 两个绝对路径要改（如果你换机器/换 node）：
+    · NODE_ABS  → 用 `which node` 查，node 版本 ≥18（要支持 --env-file）
+    · BRIDGE_DIR → 本仓库里 bridge/ 的绝对路径
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.guci.feishu-bridge</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/guci/.workbuddy-ai/binaries/node/versions/22.22.2-2/bin/node</string>
+    <string>--env-file=/Users/guci/work/edgeone-agent-lab/bridge/.env</string>
+    <string>/Users/guci/work/edgeone-agent-lab/bridge/index.mjs</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/guci/work/edgeone-agent-lab/bridge</string>
+
+  <!-- 开机/登录后自动起 -->
+  <key>RunAtLoad</key>
+  <true/>
+  <!-- 进程退出就重新拉起：飞书长连接断了要能自己回来 -->
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/feishu-bridge.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/feishu-bridge.log</string>
+
+  <!-- 环境变量不在这里配，走 .env（免得把密钥写进 plist） -->
+  <key>ProcessType</key>
+  <string>Background</string>
+</dict>
+</plist>

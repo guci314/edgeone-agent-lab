@@ -64,6 +64,7 @@ export async function onRequest(context: any) {
   // 「第一个请求已经结束了，它启动的后台任务还在不在」。
   if (probe === "start") return probeStart(context, url);
   if (probe === "check") return probeCheck(context, url);
+  if (probe === "env") return probeEnv(context);
 
   if (method !== "POST") {
     return json({ error: "只接受 POST" }, 405);
@@ -80,7 +81,15 @@ export async function onRequest(context: any) {
       503,
     );
   }
-  const got = String(request?.headers?.get?.("x-internal-token") ?? "");
+  // 先读 body —— 令牌可以放在 body 里（见下），所以顺序不能反
+  let body: any;
+  try {
+    body = await readJson(request);
+  } catch {
+    return json({ error: "请求体不是合法 JSON" }, 400);
+  }
+
+  const got = readInternalToken(request, body);
   if (got !== token) {
     return json({ error: "内部令牌不匹配" }, 401);
   }
@@ -91,13 +100,6 @@ export async function onRequest(context: any) {
       { error: "缺少 Makers-Conversation-Id 请求头", how: "这个路由只能由 cloud-functions/feishu/webhook.ts 转发调用。" },
       400,
     );
-  }
-
-  let body: any;
-  try {
-    body = await readJson(request);
-  } catch {
-    return json({ error: "请求体不是合法 JSON" }, 400);
   }
 
   const evt = normalizeEvent(body);
@@ -178,6 +180,56 @@ const PROBE_KEY = "probe.bg";
  * 为什么要 15 秒而不是 1 秒：太短的话任务可能在响应发出**之前**就跑完了，
  * 那样测出来的是「同步能跑」，而不是「后台能跑」—— 假的通过。
  */
+/**
+ * env 诊断端点：`GET /feishu?probe=env`
+ *
+ * ── 为什么需要它 ──────────────────────────────────────────────────
+ * 实测发现：**改云端项目环境变量不会实时生效**，跑着的 agent 用的是
+ * 部署时打包进去的快照。改了 INTERNAL_TOKEN 之后请求照样 401，光看
+ * 控制台根本判断不出是"值不对"还是"没生效"。
+ *
+ * 所以这里回显 env 的 key 列表 + INTERNAL_TOKEN 的**长度和前 4 位**
+ * （不回显完整值，免得把密钥从公网漏出去）。拿它和控制台里显示的
+ * 值比一下，就能分清：
+ *   · key 里根本没有 INTERNAL_TOKEN → 平台没注入 / 名字写错
+ *   · 指纹和控制台一致 → 值对，是调用方传错了
+ *   · 指纹和控制台不一致 → 部署快照，重新部署才能生效
+ */
+async function probeEnv(context: any): Promise<Response> {
+  const env = (context?.env ?? {}) as Record<string, unknown>;
+  const v = String(env.INTERNAL_TOKEN ?? "");
+  const req = context?.request;
+  // 请求头是不是**真的**穿过平台网关到了 agent —— 之前 401 查了半天，
+  // 最后发现是自定义头在网关侧就被剥掉了，env 那边根本没问题。
+  const headers: Record<string, string> = {};
+  try {
+    req?.headers?.forEach?.((val: string, key: string) => {
+      headers[key] = String(val).slice(0, 60);
+    });
+  } catch {}
+  const h = req?.headers;
+  const gotHeader = readInternalToken(req, null);
+  return json({
+    ok: true,
+    envKeys: Object.keys(env).filter((k) => /FEISHU|INTERNAL|AI_|AGENT|SANDBOX/.test(k)).sort(),
+    internalToken: v ? { len: v.length, head: v.slice(0, 4), tail: v.slice(-4) } : null,
+    requestShape: {
+      ctor: req?.constructor?.name ?? null,
+      keys: Object.keys(req ?? {}).slice(0, 30),
+      headersType: h === undefined ? "undefined" : h === null ? "null" : typeof h,
+      headersCtor: h?.constructor?.name ?? null,
+      headersIsHeaders: typeof h?.get === "function",
+      headersKeys: h && typeof h === "object" ? Object.keys(h).slice(0, 30) : [],
+    },
+    headerPairs: headers,
+    gotInternalToken: gotHeader
+      ? { len: gotHeader.length, head: gotHeader.slice(0, 4), tail: gotHeader.slice(-4) }
+      : null,
+    match: gotHeader === v,
+    hint: "看 requestShape.headersIsHeaders：false 说明不是标准 Headers，只能靠 body 传令牌。",
+  });
+}
+
 async function probeStart(context: any, url: URL): Promise<Response> {
   const kv = makeStateKv(context);
   if (!kv) return json({ error: "拿不到 context.store.state" }, 503);
@@ -300,6 +352,32 @@ function makeSnapshotStore(context: any, conversationId: string): RepoSnapshotSt
  * `context.request` 是标准 Web Request（有 `.text()` / `.json()`）。
  * 两种都认，免得平台换实现时整条链路静默失效。
  */
+/**
+ * 取 `x-internal-token`。
+ *
+ * ── 为什么写得这么绕 ──────────────────────────────────────────────
+ * 实测：这个 runtime 里的 `context.request.headers` **不是标准 Headers 实例**
+ * （`typeof headers.get` 是 undefined，`forEach` 也没有）。原来的
+ * `request.headers.get("x-internal-token")` 恒等于 ""，
+ * 于是所有转发一律 401 —— 而报错文案只会说"不匹配"，看不出是根本取不到。
+ *
+ * 所以这里三种形态都试：标准 Headers、普通对象（含大小写变体）、以及 body。
+ * 放 body 里是兜底：header 这条路在平台侧不可控，body 一定能到。
+ */
+function readInternalToken(request: any, body: any): string {
+  const h = request?.headers;
+  if (typeof h?.get === "function") {
+    const v = h.get("x-internal-token") ?? h.get("X-Internal-Token");
+    if (v) return String(v);
+  }
+  if (h && typeof h === "object") {
+    const v = h["x-internal-token"] ?? h["X-Internal-Token"] ?? h["x-internal-Token"];
+    if (v) return String(v);
+  }
+  // 兜底：body 里的 token 字段。bridge 两个都发，哪个到了都能过。
+  return String(body?.token ?? "");
+}
+
 async function readJson(request: any): Promise<any> {
   if (request?.body && typeof request.body === "object") return request.body;
   if (typeof request?.text === "function") {

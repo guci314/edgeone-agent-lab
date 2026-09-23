@@ -1239,6 +1239,18 @@ await describe("J. 云文档授权（纯函数）", async () => {
       token: "Sh",
       sheetId: "sid1",
     });
+    // 知识库链接一样会带子标识：新建的多维表格/电子表格默认就落在知识库，
+    // 用户从地址栏拷下来的正是这个形状
+    eq(parseDocUrl("https://x.feishu.cn/wiki/Wk?table=tbl1&view=v1"), {
+      kind: "wiki",
+      token: "Wk",
+      tableId: "tbl1",
+    });
+    eq(parseDocUrl("https://x.feishu.cn/wiki/Wk?sheet=sid1"), {
+      kind: "wiki",
+      token: "Wk",
+      sheetId: "sid1",
+    });
   });
 
   await it("parseDocUrl 认其他租户前缀和 lark 域名", () => {
@@ -1561,6 +1573,10 @@ await describe("L. 云文档工具族", async () => {
     if (url.includes("/docx/v1/documents/DOC1/raw_content")) return json({ data: { content: DOC_TEXT } });
     if (url.includes("/docx/v1/documents/DOC1")) return json({ data: { document: { title: "设计文档" } } });
 
+    // wiki 节点：node token 是 WKBT，底层其实是多维表格 BT1
+    if (url.includes("/wiki/v2/spaces/get_node") && url.includes("WKBT")) {
+      return json({ data: { node: { obj_token: "BT1", obj_type: "bitable" } } });
+    }
     // wiki 节点：node token 是 WKNODE，底层其实是 DOC1
     if (url.includes("/wiki/v2/spaces/get_node")) return json({ data: { node: { obj_token: "DOC1", obj_type: "docx" } } });
 
@@ -1613,6 +1629,14 @@ await describe("L. 云文档工具族", async () => {
 
     if (url.includes("/bitable/v1/apps/BT1/tables?") || url.endsWith("/bitable/v1/apps/BT1/tables")) {
       return json({ data: { items: [{ table_id: "tbl1", name: "任务表" }, { table_id: "tbl2", name: "人表" }] } });
+    }
+    // 实测存在「链接里的 table 参数不是 OpenAPI 的 table_id」这种情况：
+    // 从地址栏拷的链接、表格停在「页面」侧栏时，那个值是另一套 id
+    if (url.includes("/bitable/v1/apps/BT1/tables/notatable/records")) {
+      return new Response(JSON.stringify({ code: 1254005, msg: "TableIdNotFound" }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
     }
     if (url.includes("/bitable/v1/apps/BT1/tables/tbl1/records")) {
       return json({
@@ -1789,6 +1813,39 @@ await describe("L. 云文档工具族", async () => {
     });
     eq(r.count, 2, "应直接读到记录");
     ok(!calls.some((c) => c.url.includes("/tables?page_size")), "不该再去列一次数据表");
+  });
+
+  await it("wiki 形态的多维表格链接：解引用之后也要带上 ?table=", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_bitable_read, {
+      url: "https://x.feishu.cn/wiki/WKBT?table=tbl1&view=v1",
+    });
+    eq(r.count, 2, "wiki 解出是 bitable，就该直接读到记录");
+    eq(r.records[0].fields["任务"], "写文档");
+    // 新建的多维表格默认落在知识库，所以这条不是边缘场景 —— 少了它每次都白跑一轮
+    ok(!calls.some((c) => c.url.includes("/tables?page_size")), "不该再去列一次数据表");
+  });
+
+  await it("链接里的 table 参数不可用：退回列表，而不是把报错丢给模型", async () => {
+    const t = await tools();
+    stubFetch(docStub);
+    const r = await callTool(t.feishu_bitable_read, {
+      url: "https://x.feishu.cn/wiki/WKBT?table=notatable",
+    });
+    eq(r.tableList?.length, 2, "应退回「先列出有哪些数据表」");
+    eq(r.records, undefined);
+    eq(r.error, undefined, "能兜住就别报错");
+  });
+
+  await it("模型自己给的 table_id 写错了就照实报错，不兜底", async () => {
+    const t = await tools();
+    stubFetch(docStub);
+    const r = await callTool(t.feishu_bitable_read, {
+      url: "https://x.feishu.cn/base/BT1",
+      table_id: "notatable",
+    });
+    ok(typeof r.error === "string" && r.error.length > 0, "该让它看见错误，而不是偷偷换成别的表");
   });
 
   await it("没授权时给的是「发 /login」的可执行提示，而且不发任何请求", async () => {

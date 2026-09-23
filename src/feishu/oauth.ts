@@ -283,7 +283,7 @@ export function tokenFresh(
 
 export type DocRef =
   | { kind: "docx"; token: string }
-  | { kind: "wiki"; token: string }
+  | { kind: "wiki"; token: string; tableId?: string; sheetId?: string }
   | { kind: "bitable"; token: string; tableId?: string }
   | { kind: "sheets"; token: string; sheetId?: string }
   | { kind: "unknown"; reason: string };
@@ -298,7 +298,7 @@ export type DocRef =
  * 兼容的形态（都是实测见过的）：
  *   /docx/<id>            新版文档
  *   /docs/<id>            旧版文档（飞书会重定向到 /docx）
- *   /wiki/<node>          知识库节点
+ *   /wiki/<node>          知识库节点（非文档的节点还可能带 ?table= / ?sheet=）
  *   /base/<app_token>     多维表格，可带 ?table=<table_id>&view=<view_id>
  *   /sheets/<token>       电子表格，可带 ?sheet=<sheet_id>
  * 域名带任意租户前缀（xxx.feishu.cn），也认 larksuite.com / larkoffice.com。
@@ -330,8 +330,20 @@ export function parseDocUrl(raw: string): DocRef {
     case "docx":
     case "docs":
       return { kind: "docx", token };
-    case "wiki":
-      return { kind: "wiki", token };
+    case "wiki": {
+      // 知识库链接同样可能带 ?table= / ?sheet=。别看着它挂的是 /wiki/ 就丢掉：
+      // 飞书里**新建的多维表格和电子表格默认就落在知识库**，用户从地址栏拷下来的
+      // 链接大多是这个形状。这两个参数要留到解出节点、知道底层是什么之后再用
+      // （见 docs.ts 的 resolveLink）。
+      const tableId = u.searchParams.get("table") ?? undefined;
+      const sheetId = u.searchParams.get("sheet") ?? undefined;
+      return {
+        kind: "wiki",
+        token,
+        ...(tableId ? { tableId } : {}),
+        ...(sheetId ? { sheetId } : {}),
+      };
+    }
     case "base": {
       const tableId = u.searchParams.get("table") ?? undefined;
       return tableId ? { kind: "bitable", token, tableId } : { kind: "bitable", token };

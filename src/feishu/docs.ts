@@ -177,11 +177,21 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
       case "docx":
       case "doc":
         return { kind: "docx", token: node.obj_token };
-      // 知识库里的表格/多维表格，`obj_type` 的名字和 URL 里的不一样
+      // 知识库里的表格/多维表格，`obj_type` 的名字和 URL 里的不一样。
+      // 原始链接里的 ?table= / ?sheet= 要一并带过去 —— 新建的多维表格默认就落在
+      // 知识库，链接里那个 table 参数能省掉「先列表、再读记录」的一轮往返。
       case "bitable":
-        return { kind: "bitable", token: node.obj_token };
+        return {
+          kind: "bitable",
+          token: node.obj_token,
+          ...(ref.tableId ? { tableId: ref.tableId } : {}),
+        };
       case "sheet":
-        return { kind: "sheets", token: node.obj_token };
+        return {
+          kind: "sheets",
+          token: node.obj_token,
+          ...(ref.sheetId ? { sheetId: ref.sheetId } : {}),
+        };
       default:
         return {
           kind: "unknown",
@@ -465,51 +475,66 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
           if (ref.kind !== "bitable") return wrongKind(ref, "feishu_bitable_read");
 
           const app = encodeURIComponent(ref.token);
-          // 链接里可能带了 ?table=<id>，那就直接用它
-          let tableId = table_id?.trim() || ref.tableId || "";
+          // 链接里可能带了 ?table=<id>（/base/ 的 query，或 wiki 链接解引用后带过来的），
+          // 那就直接用它
+          const tableId = table_id?.trim() || ref.tableId || "";
+          // 这个 id 是**链接里带过来的**，不是模型自己挑的 —— 所以下面出错要兜底
+          const fromLink = !table_id?.trim() && !!ref.tableId;
 
-          if (!tableId) {
+          /** 先列出有哪些数据表。没给 table_id，或链接里那个用不了时都走这儿 */
+          const listTables = async () => {
             const t = await callAs(tokens, "GET", `/bitable/v1/apps/${app}/tables?page_size=100`);
-            const items = (t.data?.items ?? []) as { table_id?: string; name?: string }[];
-            if (!items.length) {
+            const list = (t.data?.items ?? []) as { table_id?: string; name?: string }[];
+            if (!list.length) {
               return { error: "这个多维表格里没有数据表（或者没有阅读权限）。" };
             }
             return {
               kind: "bitable",
               appUrl: `https://feishu.cn/base/${ref.token}`,
-              tableList: items.map((x) => ({ table_id: x.table_id, name: x.name })),
+              tableList: list.map((x) => ({ table_id: x.table_id, name: x.name })),
               note: "用 table_id 再调一次，才会返回记录。",
             };
+          };
+
+          if (tableId) {
+            const n = Math.min(
+              Math.max(Math.trunc(Number(limit) || BITABLE_DEFAULT_ROWS), 1),
+              BITABLE_MAX_ROWS,
+            );
+            try {
+              const r = await callAs(
+                tokens,
+                "GET",
+                `/bitable/v1/apps/${app}/tables/${encodeURIComponent(tableId)}/records?page_size=${n}`,
+              );
+              const items = (r.data?.items ?? []) as {
+                record_id?: string;
+                fields?: Record<string, unknown>;
+              }[];
+              const hasMore = !!r.data?.has_more;
+
+              return {
+                kind: "bitable",
+                appUrl: `https://feishu.cn/base/${ref.token}`,
+                table: { table_id: tableId, name: r.data?.table?.name ?? "" },
+                records: items.map((x) => ({
+                  record_id: x.record_id,
+                  fields: flattenFields(x.fields),
+                })),
+                count: items.length,
+                hasMore,
+                ...(hasMore ? { note: "还有更多记录，调大 limit 继续读。" } : {}),
+              };
+            } catch (e) {
+              // ⚠️ 链接里的 `table` 参数**不保证**是 OpenAPI 的 table_id —— 实测从
+              // 地址栏拷下来的链接，表格停在「页面」侧栏时那个值是另一套 id。
+              // 所以失败就退回「先列表」，别把一条模型看不懂的报错丢出去。
+              // 模型**自己**传的 table_id 不兜底：那是它的选择，写错了就该让它看见。
+              if (!fromLink) throw e;
+            }
           }
 
-          const n = Math.min(
-            Math.max(Math.trunc(Number(limit) || BITABLE_DEFAULT_ROWS), 1),
-            BITABLE_MAX_ROWS,
-          );
-          const r = await callAs(
-            tokens,
-            "GET",
-            `/bitable/v1/apps/${app}/tables/${encodeURIComponent(tableId)}/records?page_size=${n}`,
-          );
-
-          const items = (r.data?.items ?? []) as {
-            record_id?: string;
-            fields?: Record<string, unknown>;
-          }[];
-          const hasMore = !!r.data?.has_more;
-
-          return {
-            kind: "bitable",
-            appUrl: `https://feishu.cn/base/${ref.token}`,
-            table: { table_id: tableId, name: r.data?.table?.name ?? "" },
-            records: items.map((x) => ({
-              record_id: x.record_id,
-              fields: flattenFields(x.fields),
-            })),
-            count: items.length,
-            hasMore,
-            ...(hasMore ? { note: "还有更多记录，调大 limit 继续读。" } : {}),
-          };
+          return await listTables();
         }),
       ),
   });

@@ -109,9 +109,12 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
     // ⚠️ 用 OpenAIChatCompletionsModel 而不是默认的 Responses API：
     // OpenCode Go 只兼容 Chat Completions。用错模型类会得到 404 而不是
     // 「不支持这个端点」这种看得懂的错。
+    // ⚠️ 默认值必须带 `@makers/` 前缀。EdgeOne AI Gateway 的模型名**一律要求
+    // provider 前缀**，免费档是 `@makers/<model>`；写成裸 `deepseek-v4.1-flash`
+    // 会直接 404。移植前这里是 OpenCode Go 的默认值，前缀规则不同。
     model = new OpenAIChatCompletionsModel(
       client,
-      env.AI_GATEWAY_MODEL ?? "deepseek-v4.1-flash",
+      env.AI_GATEWAY_MODEL ?? "@makers/deepseek-v4.1-flash",
     );
     return model;
   };

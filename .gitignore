@@ -8,3 +8,4 @@ dist/
 .edgeone/
 .vercel/
 .npm-cache/
+*.zip

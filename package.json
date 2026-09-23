@@ -7,7 +7,8 @@
   "scripts": {
     "link": "edgeone makers link",
     "dev": "edgeone makers dev",
-    "deploy": "edgeone makers deploy",
+    "deploy": "npm run clean:zip && edgeone makers deploy",
+    "clean:zip": "rm -f edgeone-agent-lab.zip",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types test/smoke.ts"
   },

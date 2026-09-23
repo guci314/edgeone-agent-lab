@@ -13,6 +13,8 @@ export type Command =
   | { kind: "status" }
   | { kind: "compact" }
   | { kind: "clear" }
+  | { kind: "login" }
+  | { kind: "logout" }
   | { kind: "help" }
   | { kind: "error"; message: string };
 
@@ -24,6 +26,8 @@ export const HELP_TEXT = [
   "/status                 看当前导入了哪个仓库、多少文件",
   "/compact                把当前对话压成摘要，聊长了用一次，省上下文",
   "/clear                  清空当前会话的对话记忆（导入的仓库保留）",
+  "/login                  授权读取飞书云文档（点一次链接即可，之后能直接贴文档链接提问）",
+  "/logout                 撤销云文档授权",
   "/help                   看这一段",
   "",
   "每个飞书会话（单聊、每个群）各自独立：仓库和对话记忆互不影响。",
@@ -57,6 +61,12 @@ export function parseCommand(raw: string): Command {
     case "/clear":
     case "/清空":
       return { kind: "clear" };
+    case "/login":
+    case "/授权":
+      return { kind: "login" };
+    case "/logout":
+    case "/退出授权":
+      return { kind: "logout" };
     case "/help":
     case "/帮助":
     case "/?":

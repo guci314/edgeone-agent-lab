@@ -43,6 +43,15 @@ export interface FeishuTurnHost {
   compact(): Promise<string>;
   /** 清空当前会话的对话记忆，返回给用户看的回执。同上，不该抛 */
   clear(): Promise<string>;
+  /**
+   * 云文档授权链接。**由宿主生成、由这里原样发出** —— 不让模型转述。
+   *
+   * 模型复述 URL 会出错（截断、加空格、把 `/` 写成全角），而授权链接错一个
+   * 字符就是死路一条，用户看到的是飞书的一个报错页，完全不知道为什么。
+   */
+  loginUrl(): Promise<string>;
+  /** 撤销授权，返回给用户看的回执 */
+  logout(): Promise<string>;
 }
 
 /**
@@ -91,6 +100,14 @@ export async function runFeishuTurn(
 
     case "clear":
       await sendText(env, cache, evt.chatId, await safeReply(() => host.clear()));
+      break;
+
+    case "login":
+      await sendText(env, cache, evt.chatId, await safeReply(() => host.loginUrl()));
+      break;
+
+    case "logout":
+      await sendText(env, cache, evt.chatId, await safeReply(() => host.logout()));
       break;
 
     case "repo": {

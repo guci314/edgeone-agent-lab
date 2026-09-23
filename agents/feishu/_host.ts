@@ -32,8 +32,12 @@ import {
   renderTranscript,
   summaryItem,
 } from "../../src/feishu/compact.ts";
+import { authStateText, makeFeishuDocTools } from "../../src/feishu/docs.ts";
+import { buildAuthorizeUrl, signState, type OAuthEnv } from "../../src/feishu/oauth.ts";
+import type { StateKv } from "../../src/feishu/store.ts";
 import { FeishuStreamer } from "../../src/feishu/streamer.ts";
 import type { FeishuTurnHost } from "../../src/feishu/turn.ts";
+import { UserTokenManager, makeUserTokenStore } from "../../src/feishu/user-token.ts";
 import { makeWorkspaceTools } from "../../src/workspace/tools.ts";
 import type { WorkspaceRepo } from "../../src/workspace/repo.ts";
 import { serveIngest } from "../../src/workspace/serve-ingest.ts";
@@ -41,7 +45,7 @@ import { INSTRUCTIONS } from "./_instructions.ts";
 import { platformTools, summarizeToolOutput, toolFailed } from "./_tools.ts";
 
 /** 模型调用与平台密钥 */
-export interface AgentEnv extends FeishuEnv {
+export interface AgentEnv extends FeishuEnv, OAuthEnv {
   AI_GATEWAY_API_KEY?: string;
   AI_GATEWAY_BASE_URL?: string;
   AI_GATEWAY_MODEL?: string;
@@ -58,6 +62,14 @@ export interface AgentEnv extends FeishuEnv {
   INTERNAL_TOKEN?: string;
   /** `async`（默认）先回 202 再跑；`sync` 跑完才回。见 index.ts 的说明 */
   FEISHU_DISPATCH_MODE?: string;
+  /**
+   * 把「提前多久判 access token 过期」放大，专门用来**手工验续期链路**。
+   *
+   * 默认提前 5 分钟判过期，意味着想看到一次真实的 refresh 得等将近两小时 ——
+   * 这条最容易坏的路就成了「只能靠等」的路。设成 7200000（2 小时）之后，
+   * 随便发一条读文档的请求就会走到续期分支。**平时不要设。**
+   */
+  FEISHU_USER_TOKEN_SKEW_MS?: string;
 }
 
 /**
@@ -95,6 +107,12 @@ export interface HostDeps {
   context: any;
   repo: WorkspaceRepo;
   cache: TokenCache;
+  /** 按会话隔离的 KV，云文档令牌存这里。拿不到平台 state 时是 null（本地调试） */
+  kv: StateKv | null;
+  /** 这一轮的提问人。云文档授权**按人分槽**，见 user-token.ts 文件头 */
+  openId: string;
+  /** 这个会话的 chatId。授权 state 里要带它 —— 中转靠它算 conversation_id */
+  chatId: string;
 }
 
 export function createHost(deps: HostDeps): FeishuTurnHost {
@@ -184,6 +202,26 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
     return String(resp?.choices?.[0]?.message?.content ?? "").trim();
   };
 
+  /**
+   * 云文档令牌管理器。
+   *
+   * **每个回合建一个**（createHost 一次 = 一轮消息），工具族闭包捕获它 ——
+   * 于是同一轮里模型连着调三个文档工具时，它们共用同一个「内存副本 + 单飞续期」，
+   * 不会各续各的（见 user-token.ts 里 inflight 的注释）。
+   *
+   * 没有 kv 或没有 openId 时不建也不挂工具。挂一个永远回「未授权」的工具，
+   * 只会让模型把幻觉当成权限问题，白绕几圈。
+   */
+  const userTokens =
+    deps.kv && deps.openId
+      ? new UserTokenManager({
+          store: makeUserTokenStore(deps.kv, deps.openId),
+          env,
+          openId: deps.openId,
+          skewMs: Number(env.FEISHU_USER_TOKEN_SKEW_MS) || undefined,
+        })
+      : null;
+
   const buildAgent = (): Agent =>
     new Agent({
       name: "code-repo-reader",
@@ -192,6 +230,8 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
       modelSettings: { maxTokens: MAX_OUTPUT_TOKENS },
       tools: [
         ...makeWorkspaceTools(repo),
+        // 用户身份读飞书云文档。工具拿不到 context，只能靠闭包捕获上面的管理器
+        ...(userTokens ? (makeFeishuDocTools({ env, tokens: userTokens }) as any[]) : []),
         // 平台内置沙箱工具。类型是平台注入的「framework 适配对象」，
         // 拿不到官方 TS 类型，所以这里按 unknown[] 收进来
         ...(platformTools(context, env) as any[]),
@@ -288,17 +328,64 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
     },
 
     async statusText() {
+      const lines: string[] = [];
       const st = repo.status();
+
       if (st.activeGeneration === 0 || st.fileCount === 0) {
-        return "还没有导入仓库。发 `/repo owner/name` 导入一个 GitHub 仓库（也可以直接粘链接）。";
+        lines.push("还没有导入仓库。发 `/repo owner/name` 导入一个 GitHub 仓库（也可以直接粘链接）。");
+      } else {
+        lines.push(`当前仓库：${st.owner}/${st.name}@${st.ref}`);
+        lines.push(`文件数：${st.fileCount}`);
+        lines.push(`语料大小：${fmtBytes(st.totalBytes)}`);
+        if (st.capped) lines.push("⚠️ 语料只收了一部分");
       }
-      const lines = [
-        `当前仓库：${st.owner}/${st.name}@${st.ref}`,
-        `文件数：${st.fileCount}`,
-        `语料大小：${fmtBytes(st.totalBytes)}`,
-      ];
-      if (st.capped) lines.push("⚠️ 语料只收了一部分");
+
+      // 授权状态和仓库状态是**两件事**，各自独立 —— 没导仓库也可能授权过云文档
+      if (userTokens) lines.push(await authStateText(userTokens, deps.openId));
       return lines.join("\n");
+    },
+
+    async loginUrl() {
+      if (!userTokens) {
+        return "这个会话拿不到提问人身份，云文档授权用不了。";
+      }
+      // state 的签名密钥直接用 INTERNAL_TOKEN：中转那边有同一个值
+      // （EO_INTERNAL_TOKEN），所以两边都能验，不必再多分发一个密钥。
+      // 这个路由本身就是 fail-closed 的，走到这里必然已经有值。
+      const state = await signState(
+        {
+          chatId: deps.chatId,
+          openId: deps.openId,
+          nonce: crypto.randomUUID(),
+          issuedAt: Date.now(),
+        },
+        String(env.INTERNAL_TOKEN ?? ""),
+      );
+
+      // buildAuthorizeUrl 会在没配 FEISHU_OAUTH_REDIRECT_URI 时抛错。
+      // **故意不在这里兜成默认值**：回调地址错一个字符，用户看到的是飞书的
+      // 一个报错页，完全无从判断原因；宁可现在就说清楚是配置缺了。
+      const url = buildAuthorizeUrl(env, state);
+
+      // ⚠️ **不要在这段里用 Markdown**（加粗、反引号）。命令回执走的是
+      // `sendText`，发的是飞书**纯文本消息**——它不渲染 Markdown，`**x**`
+      // 会原样显示成星号。Markdown 只在流式卡片那条路上有得渲染，
+      // 别把两边的排版规则搞混。
+      return [
+        "点下面这条链接完成一次授权，之后就能直接贴飞书文档 / 知识库 / 多维表格 / 电子表格的链接提问了。",
+        "",
+        url,
+        "",
+        "权限是只读的，只能读你自己有权限的文档。随时发 /logout 撤销。",
+      ].join("\n");
+    },
+
+    async logout() {
+      if (!userTokens) return "这个会话没有云文档授权。";
+      const had = await userTokens.forget();
+      return had
+        ? "已撤销云文档授权。再读文档需要重新发 /login。"
+        : "本来就没有授权，没什么可撤销的。";
     },
 
     async compact() {

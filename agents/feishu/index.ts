@@ -34,9 +34,12 @@
 // `context.store.state` 是按 conversation_id 隔离的 JSON KV ——
 // 原版「一个 DO 实例一个 SQLite 库」正好等价于这个。
 
+import { sendText } from "../../src/feishu/api.ts";
+import { exchangeCode, redirectUri, verifyState } from "../../src/feishu/oauth.ts";
 import { MemoryKv, FeishuStore, type StateKv } from "../../src/feishu/store.ts";
 import { runFeishuTurn } from "../../src/feishu/turn.ts";
 import type { FeishuQueueEvent } from "../../src/feishu/types.ts";
+import { UserTokenManager, makeUserTokenStore } from "../../src/feishu/user-token.ts";
 import { WorkspaceRepo, type RepoSnapshot, type RepoSnapshotStore } from "../../src/workspace/repo.ts";
 import { createHost, type AgentEnv } from "./_host.ts";
 
@@ -102,6 +105,16 @@ export async function onRequest(context: any) {
     );
   }
 
+  // ── 云文档授权回调 ────────────────────────────────────────────────
+  // 这条**不是飞书消息**：它是浏览器跳转 → 中转（cf-agent-lab）转发过来的。
+  // 没有 messageId，也不该走去重/限流 —— 那两个是给用户消息用的，套在这儿
+  // 只会在用户重试时把第二次回调当成「重复」丢掉。
+  //
+  // 放在 claim 之前，且**同步返回**：中转那边的浏览器在等这个响应渲染结果页。
+  if (String(body?.op ?? "") === "oauth") {
+    return handleOAuthCallback(env, context, body);
+  }
+
   const evt = normalizeEvent(body);
   if (!evt) return json({ error: "缺少 messageId / chatId / text" }, 400);
 
@@ -131,6 +144,9 @@ export async function onRequest(context: any) {
     context,
     repo,
     cache: store.tokenCache(),
+    kv: makeStateKv(context),
+    openId: evt.openId,
+    chatId: evt.chatId,
   });
 
   // ── 调度模式 ──────────────────────────────────────────────────────
@@ -168,6 +184,95 @@ export async function onRequest(context: any) {
   });
 
   return json({ ok: true, mode: "async" }, 202);
+}
+
+// ── 云文档授权回调 ────────────────────────────────────────────────────
+
+/**
+ * 处理 OAuth 回调：用授权码换用户令牌，存进**该授权人**的槽，回飞书一条确认。
+ *
+ * ── 为什么回调落在这里而不是直接落在 agents 路由上 ────────────────
+ * `agents/` 路由强制要求 `Makers-Conversation-Id` 头，而浏览器跳转带不了自定义头。
+ * 所以飞书把浏览器重定向到中转（cf-agent-lab），由中转补上头、带上令牌再转发
+ * 到这里。本函数因此拿得到 `context.store.state`（它是按 conversation_id 隔离的）。
+ *
+ * ── 身份从哪来 ────────────────────────────────────────────────────
+ * 全从**签名过的 state** 里取（chatId / openId），不信 body 里的同名字段：
+ * body 是转发方拼的，而 state 是发起 /login 时我们自己签的。中转那边也验一遍
+ * 同样的签名（密钥同为 INTERNAL_TOKEN），两道关。
+ */
+async function handleOAuthCallback(
+  env: AgentEnv,
+  context: any,
+  body: any,
+): Promise<Response> {
+  const state = await verifyState(
+    String(body?.state ?? ""),
+    String(env.INTERNAL_TOKEN ?? ""),
+  );
+  if (!state) {
+    return json(
+      { error: "授权状态无效或已过期。请回飞书重新发 /login 拿一条新链接。" },
+      400,
+    );
+  }
+
+  // 用户在授权页点了「拒绝」——飞书会带着 error 回来，不带 code。
+  // 这不是故障，别报成故障
+  const code = String(body?.code ?? "");
+  if (!code) return json({ ok: true, denied: true }, 200);
+
+  const kv = makeStateKv(context);
+  if (!kv) return json({ error: "拿不到平台 state 存储，令牌无处可存" }, 503);
+
+  let tok;
+  try {
+    // ⚠️ redirect_uri 必须和发起授权时**完全一致**，差一个字符就换不到令牌。
+    // 两边都读同一个 env，所以天然一致 —— 别在这里手写字面量
+    tok = await exchangeCode(env, code, redirectUri(env));
+  } catch (e) {
+    const msg = (e as Error).message.slice(0, 200);
+    await notify(context, env, state.chatId, `云文档授权没成功：${msg}\n可以再发一次 /login 重试。`);
+    return json({ error: `换令牌失败：${msg}` }, 502);
+  }
+
+  const mgr = new UserTokenManager({
+    store: makeUserTokenStore(kv, state.openId),
+    env,
+    openId: state.openId,
+  });
+  await mgr.save(tok);
+
+  await notify(
+    context,
+    env,
+    state.chatId,
+    [
+      "✅ 云文档授权成功。",
+      "",
+      "现在可以直接把飞书文档 / 知识库 / 多维表格 / 电子表格的链接发过来提问了。",
+      tok.refreshToken
+        ? "（拿到了刷新令牌，之后不用反复授权。）"
+        : "⚠️ 没拿到刷新令牌 —— 飞书后台的 offline_access 权限可能没开，两小时后要重新授权。",
+    ].join("\n"),
+  );
+
+  return json({ ok: true });
+}
+
+/** 回飞书一条消息。失败只记日志 —— 令牌已经存好了，不该因为一句回执没发出去就报错 */
+async function notify(
+  context: any,
+  env: AgentEnv,
+  chatId: string,
+  text: string,
+): Promise<void> {
+  if (!chatId) return;
+  try {
+    await sendText(env, makeFeishuStore(context).tokenCache(), chatId, text);
+  } catch (e) {
+    console.warn("[feishu] 授权回执发送失败：", (e as Error).message);
+  }
 }
 
 // ── 自测探针 ──────────────────────────────────────────────────────────

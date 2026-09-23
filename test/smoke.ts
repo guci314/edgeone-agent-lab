@@ -17,13 +17,32 @@
 //   G. webhook  —— 端到端：假 Request → 转发 → 断言转发头
 //   H. turn     —— 端到端：一条 /help 走完整回合
 //   I. compact  —— 会话压缩的纯函数（渲染历史 / 写回形状 / 门槛）
+//   J. oauth    —— 云文档授权：链接解析 / state 签名 / 授权链接
+//   K. token    —— 用户令牌：续期、轮换不丢 refresh_token、单飞、按人分槽
+//   L. doctools —— 云文档三个工具：wiki 解引用 / 翻页缓存 / 拍平 / 未授权提示
 //
 // ⚠️ 这个文件会替换全局 fetch。所有测试都在一个进程里跑，
 // 每个小节自己装自己的 stub，不要跨小节依赖。
 
 import { decryptEvent, verifySignature } from "../src/feishu/crypto.ts";
 import { parseMessageEvent, readChallenge, readEnvelope } from "../src/feishu/event.ts";
-import { parseCommand } from "../src/feishu/commands.ts";
+import { HELP_TEXT, parseCommand } from "../src/feishu/commands.ts";
+import {
+  DOC_SCOPES,
+  buildAuthorizeUrl,
+  parseDocUrl,
+  redirectUri,
+  signState,
+  tokenFresh,
+  verifyState,
+} from "../src/feishu/oauth.ts";
+import { MemoryKv as TokenKv } from "../src/feishu/store.ts";
+import {
+  UserTokenManager,
+  makeUserTokenStore,
+  type UserTokenStore,
+} from "../src/feishu/user-token.ts";
+import { makeFeishuDocTools } from "../src/feishu/docs.ts";
 import {
   MIN_ITEMS_TO_COMPACT,
   SUMMARY_SYSTEM_PROMPT,
@@ -279,6 +298,20 @@ await describe("C. 命令解析", async () => {
 
   await it("带了多余参数的 /compact 也照常识别（参数被忽略）", () => {
     eq(parseCommand("/compact 现在").kind, "compact");
+  });
+
+  await it("/login /logout 与中文别名", () => {
+    eq(parseCommand("/login").kind, "login");
+    eq(parseCommand("/授权").kind, "login");
+    eq(parseCommand("/logout").kind, "logout");
+    eq(parseCommand("/退出授权").kind, "logout");
+    // 别把 /login 认成 /lo… 之类的近邻命令
+    eq(parseCommand("/log").kind, "error");
+  });
+
+  await it("帮助文案里列出了两个授权命令", () => {
+    ok(HELP_TEXT.includes("/login"), "应列出 /login");
+    ok(HELP_TEXT.includes("/logout"), "应列出 /logout");
   });
 });
 
@@ -927,6 +960,8 @@ await describe("H. 回合流程", async () => {
     statusText: async () => "当前仓库：a/b@main",
     compact: async () => "已压缩：8 条历史 → 摘要（约 300 字）",
     clear: async () => "会话已清空",
+    loginUrl: async () => "点这条链接授权：\nhttps://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_x",
+    logout: async () => "已撤销云文档授权。",
     ...over,
   });
 
@@ -960,6 +995,35 @@ await describe("H. 回合流程", async () => {
     const calls = stubFetch(feishuStub);
     await runFeishuTurn(host() as any, ENV, new FeishuStore(new MemoryKv()), evt("/status"));
     eq(sentTexts(calls)[0], "当前仓库：a/b@main");
+  });
+
+  await it("/login 发出的是宿主给的链接，不是模型编的", async () => {
+    const calls = stubFetch(feishuStub);
+    await runFeishuTurn(host() as any, ENV, new FeishuStore(new MemoryKv()), evt("/login"));
+    const texts = sentTexts(calls);
+    eq(texts.length, 1);
+    // 链接必须**原样**出现。授权链接错一个字符就是飞书的一个报错页，
+    // 用户完全无从判断 —— 所以这条路径不走模型
+    ok(texts[0].includes("https://accounts.feishu.cn/open-apis/authen/v1/authorize"), texts[0]);
+  });
+
+  await it("/logout 走 host.logout", async () => {
+    const calls = stubFetch(feishuStub);
+    await runFeishuTurn(host() as any, ENV, new FeishuStore(new MemoryKv()), evt("/退出授权"));
+    eq(sentTexts(calls)[0], "已撤销云文档授权。");
+  });
+
+  await it("host.loginUrl 抛错时也发得出一条消息", async () => {
+    // 比如没配 FEISHU_OAUTH_REDIRECT_URI —— buildAuthorizeUrl 会抛。
+    // 不兜的话用户一条消息都收不到，看起来像 bot 死了
+    const calls = stubFetch(feishuStub);
+    const h = host({
+      loginUrl: async () => {
+        throw new Error("没有配置 FEISHU_OAUTH_REDIRECT_URI");
+      },
+    });
+    await runFeishuTurn(h as any, ENV, new FeishuStore(new MemoryKv()), evt("/login"));
+    ok(sentTexts(calls)[0].includes("没有配置 FEISHU_OAUTH_REDIRECT_URI"), sentTexts(calls)[0]);
   });
 
   await it("/repo 先回执再报结果", async () => {
@@ -1147,6 +1211,594 @@ await describe("I. 会话压缩的纯函数", async () => {
       ok(SUMMARY_SYSTEM_PROMPT.includes(k), `prompt 里应提到「${k}」`);
     }
     ok(SUMMARY_SYSTEM_PROMPT.includes("不要编"), "必须明确禁止编造");
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// J. 云文档授权：链接解析 / state 签名 / 授权链接
+// ═══════════════════════════════════════════════════════════════════════
+
+await describe("J. 云文档授权（纯函数）", async () => {
+  await it("parseDocUrl 认得五种链接形态", () => {
+    eq(parseDocUrl("https://x.feishu.cn/docx/AbCd1234"), { kind: "docx", token: "AbCd1234" });
+    eq(parseDocUrl("https://x.feishu.cn/wiki/WkNode99"), { kind: "wiki", token: "WkNode99" });
+    eq(parseDocUrl("https://x.feishu.cn/base/BtApp77"), { kind: "bitable", token: "BtApp77" });
+    eq(parseDocUrl("https://x.feishu.cn/sheets/ShTok55"), { kind: "sheets", token: "ShTok55" });
+    // 旧版文档链接：飞书会重定向到 /docx，但我们得先认得它
+    eq(parseDocUrl("https://x.feishu.cn/docs/OldDoc1"), { kind: "docx", token: "OldDoc1" });
+  });
+
+  await it("parseDocUrl 带出 ?table= / ?sheet= 子标识", () => {
+    eq(parseDocUrl("https://x.feishu.cn/base/Bt?table=tbl1&view=v1"), {
+      kind: "bitable",
+      token: "Bt",
+      tableId: "tbl1",
+    });
+    eq(parseDocUrl("https://x.feishu.cn/sheets/Sh?sheet=sid1"), {
+      kind: "sheets",
+      token: "Sh",
+      sheetId: "sid1",
+    });
+  });
+
+  await it("parseDocUrl 认其他租户前缀和 lark 域名", () => {
+    eq(parseDocUrl("acme.feishu.cn/docx/T1").kind, "docx", "租户子域 + 无协议头");
+    eq(parseDocUrl("https://acme.larksuite.com/docx/T2").kind, "docx", "国际版");
+    eq((parseDocUrl("https://x.feishu.cn/docx/T3?from=chat#frag") as any).token, "T3", "query 和 hash 不能干扰");
+  });
+
+  // 认不出时返回的是 {kind:"unknown", reason}，成功时是 {kind, token} —— 断言只要那一半
+  const why = (u: string) => (parseDocUrl(u) as { reason?: string }).reason ?? "";
+
+  await it("parseDocUrl 对认不出的东西给可读理由，而不是抛", () => {
+    ok(why("https://example.com/docx/T1").includes("不是飞书文档"), "外站域名");
+    ok(why("https://x.feishu.cn/file/F1").includes("/file/"), "云空间文件应给具体理由");
+    ok(why("https://x.feishu.cn/docx/").includes("没有文档 token"), "缺 token");
+    ok(why("").includes("没有给链接"), "空串");
+  });
+
+  await it("state 签名能过，篡改/换密钥/过期都过不了", async () => {
+    const secret = "s3cret";
+    const st = { chatId: "oc_1", openId: "ou_1", nonce: "n", issuedAt: Date.now() };
+    const raw = await signState(st, secret);
+
+    eq((await verifyState(raw, secret))?.chatId, "oc_1");
+    eq(await verifyState(raw, "wrong"), null, "换密钥");
+    eq(await verifyState(raw.slice(0, -2) + "zz", secret), null, "改签名");
+    eq(await verifyState("nodot", secret), null, "格式不对");
+    eq(await verifyState((await signState({ ...st, issuedAt: Date.now() - 20 * 60_000 }, secret)), secret), null, "过期 20 分钟");
+  });
+
+  await it("签名 wire format 和中转（node:crypto）对得上", async () => {
+    // ⚠️ 这条是**跨仓库**的守门测试。state 的签名在两处各实现了一遍
+    // （本仓库用 WebCrypto，cf-agent-lab 的中转用 node:crypto），
+    // 只要有一边的 base64url 填充或 HMAC 参数不同，整条授权链路就会静默
+    // 断在「链接无效」上 —— 而那个报错完全指不出是这里。
+    //
+    // 下面这串是**真的**用本仓库 signState 签出来的，密钥 test-secret-abc。
+    // 中转侧的 verify 用同一对输入验过（见交付说明里的实测记录）。
+    const RAW =
+      "eyJjaGF0SWQiOiJvY19hYmMxMjMiLCJvcGVuSWQiOiJvdV94eXo3ODkiLCJub25jZSI6Im4xIiwiaXNzdWVkQXQiOjE3NTg2MDAwMDAwMDB9" +
+      ".wsYFQ-kzm6QBTIzUQtOnSNYBcNeyvTFivOsqxkG4ubE";
+    // issuedAt 是固定的过去时刻，所以拿它验会过期 —— 这里只验签名部分能否解出内容：
+    // 重新签一次同样的 payload，确认签名可复现
+    const again = await signState(
+      { chatId: "oc_abc123", openId: "ou_xyz789", nonce: "n1", issuedAt: 1758600000000 },
+      "test-secret-abc",
+    );
+    eq(again, RAW, "同样的输入必须签出同样的串（签名可复现，否则中转验不过）");
+    ok(!again.includes("="), "base64url 不能带填充 —— node 的 digest('base64url') 也不带");
+  });
+
+  await it("scope 里必须有 offline_access", () => {
+    // 少了它响应里**根本没有 refresh_token 字段**，用户每两小时要重新授权一次。
+    // 这是整件事最容易漏、也最难在测试环境发现的一条
+    ok(DOC_SCOPES.includes("offline_access"), "offline_access 是拿 refresh_token 的前提");
+    for (const s of ["docx:document:readonly", "wiki:wiki:readonly", "bitable:app:readonly", "sheets:spreadsheet:readonly"]) {
+      ok(DOC_SCOPES.includes(s), `缺 scope：${s}`);
+    }
+  });
+
+  await it("授权链接的各个参数都对", () => {
+    const url = buildAuthorizeUrl(
+      {
+        FEISHU_APP_ID: "cli_x",
+        FEISHU_APP_SECRET: "s",
+        FEISHU_OAUTH_REDIRECT_URI: "https://agent.example/api/feishu/oauth",
+      },
+      "STATE.VAL",
+    );
+    const u = new URL(url);
+    eq(u.host, "accounts.feishu.cn", "授权页在 accounts 域名，不在 open.feishu.cn");
+    eq(u.pathname, "/open-apis/authen/v1/authorize");
+    eq(u.searchParams.get("client_id"), "cli_x");
+    eq(u.searchParams.get("response_type"), "code");
+    eq(u.searchParams.get("redirect_uri"), "https://agent.example/api/feishu/oauth");
+    eq(u.searchParams.get("state"), "STATE.VAL");
+    // scope 用空格分隔，URL 里编码成 %20（不是 +）
+    ok(url.includes("%20"), "scope 之间应是 %20");
+    ok(u.searchParams.get("scope")!.includes("offline_access"));
+  });
+
+  await it("没配 redirect_uri 时明确报错，而不是给个默认值", () => {
+    // 默认值是错的概率极高（必须和飞书后台登记的完全一致），
+    // 猜一个的话用户看到的是飞书的一个报错页，完全不知道原因
+    let threw = "";
+    try {
+      redirectUri({ FEISHU_APP_ID: "cli_x", FEISHU_APP_SECRET: "s" });
+    } catch (e) {
+      threw = (e as Error).message;
+    }
+    ok(threw.includes("FEISHU_OAUTH_REDIRECT_URI"), threw);
+  });
+
+  await it("tokenFresh 的提前量可以被放大（为了能手工验续期）", () => {
+    const t = { accessToken: "a", refreshToken: "r", exp: Date.now() + 10 * 60_000, refreshExp: 0, openId: "", scope: "" };
+    ok(tokenFresh(t), "10 分钟后过期，默认提前 5 分钟，算新鲜");
+    ok(!tokenFresh(t, Date.now(), 60 * 60_000), "提前量放大到 1 小时就判过期 —— 续期链路这下能在一次调用里验到");
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// K. 用户令牌管理器
+// ═══════════════════════════════════════════════════════════════════════
+
+await describe("K. 用户令牌管理器", async () => {
+  const ENV = { FEISHU_APP_ID: "cli_x", FEISHU_APP_SECRET: "s" };
+  const NOW = Date.now();
+
+  const tok = (over: Record<string, unknown> = {}) => ({
+    accessToken: "at-old",
+    refreshToken: "rt-old",
+    exp: NOW + 3600_000,
+    refreshExp: NOW + 30 * 86400_000,
+    openId: "ou_1",
+    scope: "docx:document:readonly",
+    ...over,
+  });
+
+  /** 可外部改写的令牌槽。让测试能从 fetch 桩里同步地模拟「别的实例刚写回」 */
+  const slot = (initial: ReturnType<typeof tok> | null) => {
+    const box: { cur: any; writes: any[] } = { cur: initial, writes: [] };
+    const store: UserTokenStore = {
+      get: async () => box.cur,
+      set: async (v) => {
+        box.cur = v;
+        box.writes.push(v);
+      },
+      clear: async () => {
+        box.cur = null;
+        box.writes.push(null);
+      },
+    };
+    return { box, store };
+  };
+
+  const tokenReply = (over: Record<string, unknown> = {}) =>
+    new Response(
+      JSON.stringify({
+        access_token: "at-new",
+        refresh_token: "rt-new",
+        expires_in: 7200,
+        refresh_token_expires_in: 2592000,
+        scope: "docx:document:readonly",
+        ...over,
+      }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    );
+
+  await it("没记录过 → needAuth，且不发任何请求", async () => {
+    const { store } = slot(null);
+    const calls = stubFetch(() => undefined);
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    const r = await mgr.accessToken();
+    ok("needAuth" in r, "应返回 needAuth");
+    eq(calls.length, 0, "不该发请求");
+  });
+
+  await it("令牌还新鲜 → 直接用，不发续期请求", async () => {
+    const { store } = slot(tok());
+    const calls = stubFetch(() => undefined);
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    eq(await mgr.accessToken(), { token: "at-old" });
+    eq(calls.length, 0, "这个也要发请求的话，每次工具调用都白跑一次网络");
+  });
+
+  await it("过期 → 续期一次并把新令牌落盘", async () => {
+    const { box, store } = slot(tok({ exp: NOW - 1000 }));
+    const calls = stubFetch((url) => (url.includes("/oauth/v3/token") ? tokenReply() : undefined));
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    eq(await mgr.accessToken(), { token: "at-new" });
+    eq(calls.length, 1);
+    eq(box.cur.accessToken, "at-new", "必须落盘，否则每个回合都要续一次");
+    ok(decodeURIComponent(calls[0].init.body).includes("grant_type=refresh_token"), "走的是 refresh_token 授权");
+  });
+
+  await it("响应没带 refresh_token 时保留旧的（最要命的一条）", async () => {
+    // 飞书续期时轮换 refresh_token，但不保证每次都回传新值。照着响应整个覆盖
+    // 的话，一次没带就写成空串 —— 而那是唯一的长效凭据。表现是「用着用着
+    // 突然要重新授权」，重新授权一次又能好一阵，极难归因
+    const { box, store } = slot(tok({ exp: NOW - 1000 }));
+    stubFetch((url) =>
+      url.includes("/oauth/v3/token") ? tokenReply({ refresh_token: undefined }) : undefined,
+    );
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    await mgr.accessToken();
+    eq(box.cur.refreshToken, "rt-old", "旧的 refresh_token 必须留下来");
+  });
+
+  await it("响应带了新的 refresh_token 时用新的", async () => {
+    const { box, store } = slot(tok({ exp: NOW - 1000 }));
+    stubFetch((url) => (url.includes("/oauth/v3/token") ? tokenReply() : undefined));
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    await mgr.accessToken();
+    eq(box.cur.refreshToken, "rt-new");
+  });
+
+  await it("并发取令牌只续一次（单飞）", async () => {
+    // 一轮工具循环里模型可能连着调三四个文档工具，它们同时发现令牌过期。
+    // 没有单飞就是三四次并发续期，而每次续期都轮换 refresh_token ——
+    // 后到的那些拿一个已作废的令牌，全部失败，用户看到「刚授权完就说失效」
+    const { store } = slot(tok({ exp: NOW - 1000 }));
+    const calls = stubFetch((url) => (url.includes("/oauth/v3/token") ? tokenReply() : undefined));
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+
+    const rs = await Promise.all([1, 2, 3, 4, 5].map(() => mgr.accessToken()));
+    eq(calls.length, 1, "五次并发只该发一次续期请求");
+    for (const r of rs) eq(r, { token: "at-new" });
+  });
+
+  await it("续期失败先重读一次（另一个实例可能刚轮换过）", async () => {
+    const { box, store } = slot(tok({ exp: NOW - 1000 }));
+    let n = 0;
+    const calls = stubFetch((url) => {
+      if (!url.includes("/oauth/v3/token")) return undefined;
+      n++;
+      if (n === 1) {
+        // 模拟：我们手上的 rt-old 已被作废，但另一台实例刚写回了 rt-fresh
+        box.cur = tok({ accessToken: "at-x", refreshToken: "rt-fresh", exp: NOW - 1000 });
+        return new Response(JSON.stringify({ error: "invalid_grant" }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return tokenReply({ refresh_token: "rt-3" });
+    });
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    eq(await mgr.accessToken(), { token: "at-new" });
+    eq(calls.length, 2, "第二次用的是重读回来的 rt-fresh");
+    ok(decodeURIComponent(calls[1].init.body).includes("rt-fresh"), "重试要用新读到的令牌");
+  });
+
+  await it("续期怎么都不行 → 清掉坏记录并要重新授权", async () => {
+    const { box, store } = slot(tok({ exp: NOW - 1000 }));
+    stubFetch((url) =>
+      url.includes("/oauth/v3/token")
+        ? new Response(JSON.stringify({ error: "invalid_grant" }), {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          })
+        : undefined,
+    );
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    const r = await mgr.accessToken();
+    ok("needAuth" in r, "应要重新授权");
+    eq(box.cur, null, "坏的记录要清掉，否则下次又拿它去撞同一堵墙");
+  });
+
+  await it("没有 refresh_token 且已过期 → 直接要重新授权", async () => {
+    const { store } = slot(tok({ exp: NOW - 1000, refreshToken: "" }));
+    const calls = stubFetch(() => undefined);
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    const r = await mgr.accessToken();
+    ok("needAuth" in r && r.reason.includes("offline_access"), JSON.stringify(r));
+    eq(calls.length, 0, "没得续就别发请求");
+  });
+
+  await it("peek 只看不续，forget 清干净", async () => {
+    const { box, store } = slot(tok({ exp: NOW - 1000 }));
+    const calls = stubFetch(() => undefined);
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    eq((await mgr.peek())?.accessToken, "at-old");
+    eq(calls.length, 0, "peek 是给 /status 用的，不能有副作用");
+    eq(await mgr.forget(), true);
+    eq(await mgr.peek(), null);
+    eq(box.cur, null);
+    eq(await mgr.forget(), false, "第二次说「本来就没有」");
+  });
+
+  await it("invalidate 之后下次取会强制续期", async () => {
+    // 99991663 用得上：令牌被用户在飞书侧撤销时 exp 还没到，看时间是发现不了的
+    const { store } = slot(tok());
+    const calls = stubFetch((url) => (url.includes("/oauth/v3/token") ? tokenReply() : undefined));
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    await mgr.invalidate();
+    eq(await mgr.accessToken(), { token: "at-new" });
+    eq(calls.length, 1);
+  });
+
+  await it("skewMs 放大后新鲜令牌也会被判过期", async () => {
+    const { store } = slot(tok());
+    const calls = stubFetch((url) => (url.includes("/oauth/v3/token") ? tokenReply() : undefined));
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1", skewMs: 7200_000 });
+    eq(await mgr.accessToken(), { token: "at-new" });
+    eq(calls.length, 1, "提前量 2 小时 > 剩余 1 小时，所以要续期");
+  });
+
+  await it("不同 openId 用不同的槽（群聊里各授权各的）", async () => {
+    const kv = new TokenKv();
+    await makeUserTokenStore(kv, "ou_A").set(tok({ accessToken: "at-A" }));
+    await makeUserTokenStore(kv, "ou_B").set(tok({ accessToken: "at-B" }));
+
+    const a = new UserTokenManager({ store: makeUserTokenStore(kv, "ou_A"), env: ENV, openId: "ou_A" });
+    const b = new UserTokenManager({ store: makeUserTokenStore(kv, "ou_B"), env: ENV, openId: "ou_B" });
+    eq((await a.peek())?.accessToken, "at-A");
+    eq((await b.peek())?.accessToken, "at-B");
+    // A 退出不该影响 B
+    await a.forget();
+    eq(await a.peek(), null);
+    eq((await b.peek())?.accessToken, "at-B", "共用一个槽的话，群里最后授权的人会把自己的权限出借给全群");
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// L. 云文档工具族
+// ═══════════════════════════════════════════════════════════════════════
+
+await describe("L. 云文档工具族", async () => {
+  const ENV = { FEISHU_APP_ID: "cli_x", FEISHU_APP_SECRET: "s" };
+
+  const DOC_TEXT = "第一段。".repeat(5) + "第二段内容。".repeat(5);
+
+  /** 三个工具共用的假飞书。按 URL 片段路由 */
+  const docStub = (url: string): Response | undefined => {
+    const json = (v: unknown) =>
+      new Response(JSON.stringify({ code: 0, ...(v as object) }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+
+    if (url.includes("/docx/v1/documents/DOC1/raw_content")) return json({ data: { content: DOC_TEXT } });
+    if (url.includes("/docx/v1/documents/DOC1")) return json({ data: { document: { title: "设计文档" } } });
+
+    // wiki 节点：node token 是 WKNODE，底层其实是 DOC1
+    if (url.includes("/wiki/v2/spaces/get_node")) return json({ data: { node: { obj_token: "DOC1", obj_type: "docx" } } });
+
+    if (url.includes("/sheets/v3/spreadsheets/SH1/sheets/query")) {
+      return json({ data: { sheets: [{ sheet_id: "sid1", title: "Sheet1", grid_properties: { row_count: 3, column_count: 2 } }] } });
+    }
+    if (url.includes("/sheets/v2/spreadsheets/SH1/values/")) {
+      return json({
+        data: {
+          valueRange: {
+            range: "sid1!A1:B3",
+            values: [
+              ["名称", "数量"],
+              ["甲", 1],
+              ["乙", [{ text: "带链接", link: "https://x" }]],
+            ],
+          },
+        },
+      });
+    }
+
+    if (url.includes("/bitable/v1/apps/BT1/tables?") || url.endsWith("/bitable/v1/apps/BT1/tables")) {
+      return json({ data: { items: [{ table_id: "tbl1", name: "任务表" }, { table_id: "tbl2", name: "人表" }] } });
+    }
+    if (url.includes("/bitable/v1/apps/BT1/tables/tbl1/records")) {
+      return json({
+        data: {
+          items: [
+            { record_id: "rec1", fields: { 任务: [{ text: "写文档" }], 负责人: [{ name: "张三" }], 完成: true } },
+            { record_id: "rec2", fields: { 任务: "读代码", 负责人: [], 完成: false } },
+          ],
+          has_more: true,
+        },
+      });
+    }
+    return undefined;
+  };
+
+  /** 建一套「已授权」的工具 */
+  const tools = async (skewMs?: number) => {
+    const kv = new TokenKv();
+    const store = makeUserTokenStore(kv, "ou_1");
+    await store.set({
+      accessToken: "at-1",
+      refreshToken: "rt-1",
+      exp: Date.now() + 3600_000,
+      refreshExp: Date.now() + 86400_000,
+      openId: "ou_1",
+      scope: "",
+    });
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1", skewMs });
+    const list = makeFeishuDocTools({ env: ENV, tokens: mgr }) as any[];
+    return Object.fromEntries(list.map((t) => [t.name, t]));
+  };
+
+  await it("三个工具都注册了，名字是 feishu_ 前缀", async () => {
+    const t = await tools();
+    eq(Object.keys(t).sort(), ["feishu_bitable_read", "feishu_doc_read", "feishu_sheet_read"]);
+  });
+
+  await it("读 docx：返回标题、正文、字数", async () => {
+    const t = await tools();
+    stubFetch(docStub);
+    const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/docx/DOC1" });
+    eq(r.title, "设计文档");
+    eq(r.content, DOC_TEXT);
+    eq(r.totalChars, DOC_TEXT.length);
+    eq(r.truncated, false);
+  });
+
+  await it("读 docx：截断时给 nextOffset，且翻页不再重新拉一次全文", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r1 = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/docx/DOC1", limit: 10 });
+    eq(r1.truncated, true);
+    eq(r1.content, DOC_TEXT.slice(0, 10));
+    eq(r1.nextOffset, 10);
+    ok(r1.note.includes(String(DOC_TEXT.length)), "截断提示里要说全文多少字");
+
+    const before = calls.length;
+    const r2 = await callTool(t.feishu_doc_read, {
+      url: "https://x.feishu.cn/docx/DOC1",
+      offset: r1.nextOffset,
+      limit: 10,
+    });
+    eq(r2.content, DOC_TEXT.slice(10, 20));
+    eq(calls.length, before, "翻页不该重新拉全文 —— 那正是缓存存在的理由");
+  });
+
+  await it("读 wiki 链接：先解节点，再用 obj_token 读正文", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/wiki/WKNODE" });
+    eq(r.content, DOC_TEXT);
+
+    const node = calls.find((c) => c.url.includes("get_node"));
+    ok(node, "必须调 get_node 解引用");
+    ok(node!.url.includes("obj_type=wiki"), "要带 obj_type=wiki");
+    // ⚠️ 最容易发的一处错：拿节点 token 去读正文，于是所有 wiki 链接都「找不到文档」
+    ok(calls.some((c) => c.url.includes("/docx/v1/documents/DOC1/raw_content")), "正文必须用 obj_token(DOC1)，不是节点 token");
+    ok(!calls.some((c) => c.url.includes("/documents/WKNODE/")), "不能用节点 token 当文档 token");
+  });
+
+  await it("类型对不上时给出「该换哪个工具」的提示", async () => {
+    const t = await tools();
+    stubFetch(docStub);
+    const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/sheets/SH1" });
+    ok(r.error.includes("feishu_sheet_read"), r.error);
+  });
+
+  await it("读电子表格：拿到 sheet 名、行列数和拍平后的文本", async () => {
+    const t = await tools();
+    stubFetch(docStub);
+    const r = await callTool(t.feishu_sheet_read, { url: "https://x.feishu.cn/sheets/SH1" });
+    eq(r.sheet, "Sheet1");
+    eq(r.rowCount, 3);
+    eq(r.colCount, 2);
+    ok(r.text.includes("名称\t数量"), r.text);
+    ok(r.text.includes("甲\t1"), r.text);
+    // 单元格是对象（富文本带链接）时要拍平成文本，不能把 JSON 倒给模型
+    ok(r.text.includes("带链接"), r.text);
+    ok(!r.text.includes("file_token"), "不该出现原始 JSON 字段");
+  });
+
+  await it("多维表格：不给 table_id 先列表", async () => {
+    const t = await tools();
+    stubFetch(docStub);
+    const r = await callTool(t.feishu_bitable_read, { url: "https://x.feishu.cn/base/BT1" });
+    eq(r.tableList.length, 2);
+    eq(r.tableList[0], { table_id: "tbl1", name: "任务表" });
+    eq(r.records, undefined, "这一步还不该返回记录");
+  });
+
+  await it("多维表格：给了 table_id 读记录，字段值拍平成文本", async () => {
+    const t = await tools();
+    stubFetch(docStub);
+    const r = await callTool(t.feishu_bitable_read, { url: "https://x.feishu.cn/base/BT1", table_id: "tbl1" });
+    eq(r.count, 2);
+    eq(r.hasMore, true);
+    eq(r.records[0].fields["任务"], "写文档", "富文本数组应拍平");
+    eq(r.records[0].fields["负责人"], "张三", "人员字段应取 name");
+    eq(r.records[0].fields["完成"], "true");
+    eq(r.records[1].fields["任务"], "读代码");
+  });
+
+  await it("链接里带了 ?table= 就直接用，不再多余问一次", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_bitable_read, {
+      url: "https://x.feishu.cn/base/BT1?table=tbl1",
+    });
+    eq(r.count, 2, "应直接读到记录");
+    ok(!calls.some((c) => c.url.includes("/tables?page_size")), "不该再去列一次数据表");
+  });
+
+  await it("没授权时给的是「发 /login」的可执行提示，而且不发任何请求", async () => {
+    const kv = new TokenKv();
+    const mgr = new UserTokenManager({
+      store: makeUserTokenStore(kv, "ou_new"),
+      env: ENV,
+      openId: "ou_new",
+    });
+    const t = Object.fromEntries(
+      (makeFeishuDocTools({ env: ENV, tokens: mgr }) as any[]).map((x) => [x.name, x]),
+    );
+    const calls = stubFetch(() => undefined);
+
+    const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/docx/DOC1" });
+    ok(r.error.includes("/login"), r.error);
+    eq(calls.length, 0, "没授权就别浪费一次网络往返");
+  });
+
+  await it("令牌失效(99991663) → 续期后自动重试一次", async () => {
+    const kv = new TokenKv();
+    const store = makeUserTokenStore(kv, "ou_1");
+    await store.set({
+      accessToken: "at-stale",
+      refreshToken: "rt-1",
+      exp: Date.now() + 3600_000,
+      refreshExp: Date.now() + 86400_000,
+      openId: "ou_1",
+      scope: "",
+    });
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    const t = Object.fromEntries(
+      (makeFeishuDocTools({ env: ENV, tokens: mgr }) as any[]).map((x) => [x.name, x]),
+    );
+
+    let docCalls = 0;
+    const calls = stubFetch((url) => {
+      if (url.includes("/oauth/v3/token")) {
+        return new Response(
+          JSON.stringify({ access_token: "at-fresh", refresh_token: "rt-2", expires_in: 7200 }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      if (url.includes("/raw_content")) {
+        docCalls++;
+        // 第一次说令牌无效 —— 模拟用户在飞书侧撤销了授权（exp 还没到）
+        if (docCalls === 1) {
+          return new Response(JSON.stringify({ code: 99991663, msg: "token invalid" }), {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          });
+        }
+        return new Response(JSON.stringify({ code: 0, data: { content: "正文" } }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return docStub(url);
+    });
+
+    const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/docx/DOC1" });
+    eq(r.content, "正文", "应重试成功");
+    eq(docCalls, 2, "该重试恰好一次");
+    ok(calls.some((c) => c.url.includes("/oauth/v3/token")), "重试前要先续期");
+    // 重试用的是新令牌
+    const retry = calls.filter((c) => c.url.includes("/raw_content"))[1];
+    eq(retry.init.headers.authorization, "Bearer at-fresh");
+  });
+
+  await it("网络抛错时返回 { error }，不把异常抛出去", async () => {
+    // 工具抛错会中断整个工具循环 —— 契约是永不抛（同 workspace/tools.ts）
+    const t = await tools();
+    stubFetch(() => {
+      throw new Error("网络炸了");
+    });
+    const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/docx/DOC1" });
+    ok(r.error.includes("工具执行失败"), r.error);
+    ok(r.error.includes("网络炸了"), r.error);
+  });
+
+  await it("认不出的链接走到工具时也是 { error }，不是空转", async () => {
+    const t = await tools();
+    stubFetch(() => undefined); // 不该有请求
+    const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/slides/S1" });
+    ok(typeof r.error === "string" && r.error.length > 0, JSON.stringify(r));
   });
 });
 

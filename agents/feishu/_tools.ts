@@ -106,6 +106,16 @@ export function summarizeToolOutput(output: unknown): string {
     if (Array.isArray(o.paths)) return `${o.paths.length} 个路径`;
     if (Array.isArray(o.entries)) return `${o.entries.length} 个条目`;
     if (typeof o.totalLines === "number") return `共 ${o.totalLines} 行`;
+
+    // 云文档那三个工具（见 src/feishu/docs.ts）。字段名是各自独有的，
+    // 特意挑的：不跟上面那些重名，免得卡片上把「表格 3 行」显示成「3 个条目」。
+    // ⚠️ 顺序要紧 —— `ls` 也返回 count，所以 count 这条必须排在最后
+    if (typeof o.totalChars === "number") {
+      return o.truncated ? `文档共 ${o.totalChars} 字（还没读完）` : `文档 ${o.totalChars} 字`;
+    }
+    if (typeof o.rowCount === "number") return `表格 ${o.rowCount} 行`;
+    if (Array.isArray(o.tableList)) return `${o.tableList.length} 张数据表`;
+    if (typeof o.count === "number") return `${o.count} 条记录`;
   }
   return "完成";
 }

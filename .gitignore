@@ -9,3 +9,6 @@ dist/
 .vercel/
 .npm-cache/
 *.zip
+
+# Tencent Cloud EdgeOne
+.tef_dist/*

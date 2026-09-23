@@ -34,18 +34,20 @@ const TOKEN_SAFETY_MS = 60_000;
  *  总比整条消息发失败、用户什么都收不到好 */
 const MAX_TEXT_CHARS = 4000;
 
-interface FeishuResponse {
+export interface FeishuResponse {
   code?: number;
   msg?: string;
   tenant_access_token?: string;
   expire?: number;
-  // ⚠️ 不同接口往 data 里塞不同的东西：发消息给 message_id，建卡片给 card_id。
-  // 只声明其中一个会让另一处编译不过 —— 而这两处本来就该由调用方自己判空，
-  // 不是靠类型收窄。所以两个都列上，调用方各取所需。
-  data?: { message_id?: string; card_id?: string };
+  // ⚠️ 不同接口往 data 里塞不同的东西：发消息给 message_id，建卡片给 card_id，
+  // 文档接口给 content / document / items。**刻意不收窄成联合类型** ——
+  // 每加一个接口就要改一次这里，而这几处本来就该由调用方自己判空，
+  // 不是靠类型收窄。所以放开成索引签名，调用方各取所需。
+  data?: Record<string, any>;
 }
 
-class FeishuError extends Error {
+/** 导出是为了让调用方能按业务码分流（比如 99991663 / 99991664 = 令牌失效） */
+export class FeishuError extends Error {
   code: number;
   constructor(code: number, msg: string) {
     super(`飞书 API 错误 ${code}：${msg}`);
@@ -120,6 +122,42 @@ export async function feishuCall(
     }
     throw e;
   }
+}
+
+/**
+ * 用**调用方指定的** access token 发请求 —— 用户身份（user_access_token）走这里。
+ *
+ * 和 `feishuCall` 只差「token 从哪儿来」这一件事，但**刻意不做刷新重试**：
+ * 用户 token 的续期要用 refresh_token 换，而飞书会**轮换** refresh_token，
+ * 新值必须落盘。把这件事埋在通用 helper 里，调用方就看不见那次写回了 ——
+ * 所以续期归 `docs.ts` 的令牌供应器管，这里只负责发。
+ */
+export async function feishuCallAs(
+  env: FeishuEnv,
+  bearer: string,
+  method: string,
+  path: string,
+  body?: unknown,
+): Promise<FeishuResponse> {
+  const res = await fetch(`${base(env)}${path}`, {
+    method,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      authorization: `Bearer ${bearer}`,
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+    signal: AbortSignal.timeout(15_000),
+  });
+  const text = await res.text();
+  let json: FeishuResponse;
+  try {
+    json = JSON.parse(text) as FeishuResponse;
+  } catch {
+    throw new Error(`飞书返回的不是 JSON（HTTP ${res.status}）：${text.slice(0, 200)}`);
+  }
+  // 飞书即使出错也回 200 + 业务错误码，所以不能只看 res.ok
+  if (json.code !== 0) throw new FeishuError(json.code ?? -1, json.msg ?? `HTTP ${res.status}`);
+  return json;
 }
 
 export async function tenantAccessToken(

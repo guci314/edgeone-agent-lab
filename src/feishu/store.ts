@@ -52,6 +52,13 @@ const MAX_EVENTS = 500;
 const EVENTS_KEY = "feishu.events";
 const TOKEN_KEY = "feishu.token";
 
+// ⚠️ 用户身份（user_access_token）**不在这里**，在 user-token.ts 里按
+// `feishu.userToken.<openId>` 单独存。两个理由：
+//   ① 上面这个槽被 api.ts 的 TokenCache 按固定形状 {token, exp} 读写，
+//      塞进同一个 key 会两边互相覆盖，而且失败起来很安静；
+//   ② 用户令牌要按授权人分槽（群聊里每人一份），而这里的事件表是按会话的，
+//      两者生命周期不同，混在一起会让 ensureSchema 的惰性加载变得别扭。
+
 /**
  * 存储后端。三个方法就够 —— 这是 `context.store.state` 的原生形状，
  * 所以线上实现是一层零成本的直通；本地测试用 `MemoryKv`。

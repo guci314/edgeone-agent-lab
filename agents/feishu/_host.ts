@@ -24,6 +24,14 @@ import {
 // （踩过：一开始在这里也发了一份错误提示，结果和 turn.ts 的那份重复，
 //   用户同时收到两条。）
 import type { FeishuEnv, TokenCache } from "../../src/feishu/api.ts";
+import {
+  MIN_ITEMS_TO_COMPACT,
+  SUMMARY_SYSTEM_PROMPT,
+  buildSummaryUserPrompt,
+  compactReply,
+  renderTranscript,
+  summaryItem,
+} from "../../src/feishu/compact.ts";
 import { FeishuStreamer } from "../../src/feishu/streamer.ts";
 import type { FeishuTurnHost } from "../../src/feishu/turn.ts";
 import { makeWorkspaceTools } from "../../src/workspace/tools.ts";
@@ -67,6 +75,14 @@ const MAX_TURNS = 24;
 /** 输出上限。原版注释：不显式设的话默认只给 256 token，长回答会在半截被砍断 */
 const MAX_OUTPUT_TOKENS = 8_192;
 
+/**
+ * 摘要请求的输出上限。
+ *
+ * `SUMMARY_SYSTEM_PROMPT` 自己要求「800 字以内」，2048 token 留了足够余量。
+ * 不设的话默认上限很低、摘要会被砍断；给太大则容易被写成一整篇复述。
+ */
+const COMPACT_MAX_TOKENS = 2_048;
+
 function fmtBytes(n: number): string {
   if (n < 1024) return `${n} B`;
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
@@ -84,18 +100,26 @@ export interface HostDeps {
 export function createHost(deps: HostDeps): FeishuTurnHost {
   const { env, context, repo, cache } = deps;
 
+  // ⚠️ 默认值必须带 `@makers/` 前缀。EdgeOne AI Gateway 的模型名**一律要求
+  // provider 前缀**，免费档是 `@makers/<model>`；写成裸 `deepseek-v4.1-flash`
+  // 会直接 404。移植前这里是 OpenCode Go 的默认值，前缀规则不同。
+  const MODEL_NAME = env.AI_GATEWAY_MODEL ?? "@makers/deepseek-v4.1-flash";
+
   // 模型客户端只建一次。每个实例（= 每个飞书会话）一份，
   // 这样底层 HTTP 连接池能复用 —— 每回合重建会白白多一次 TLS 握手。
-  let model: OpenAIChatCompletionsModel | null = null;
-  const getModel = (): OpenAIChatCompletionsModel => {
-    if (model) return model;
+  //
+  // 单独抽成 getClient()（而不是留在 getModel() 里）是因为 `/compact` 要**绕过
+  // Agent run** 直接发一次摘要请求，走的是同一个客户端、同一份凭证。
+  let client: OpenAI | null = null;
+  const getClient = (): OpenAI => {
+    if (client) return client;
 
     // 走用户自己的 OpenCode Go 订阅池，不用平台的免费模型 ——
     // 免费额度是账号级的 50 万 token，代码问答读几个文件就没了。
     //
     // 变量名沿用 AI_GATEWAY_*：edgeone.json 的 framework 适配和模板惯例都读这三个
     // 名字，换成 OpenCode Go 只需要改值。
-    const client = new OpenAI({
+    client = new OpenAI({
       apiKey: env.AI_GATEWAY_API_KEY,
       baseURL: env.AI_GATEWAY_BASE_URL,
       // OpenCode Go 要求带这个头，缺了会被直接拒。值只是个路由标签。
@@ -105,17 +129,17 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
         ? { "x-opencode-session": env.OPENCODE_SESSION }
         : undefined,
     });
+    return client;
+  };
+
+  let model: OpenAIChatCompletionsModel | null = null;
+  const getModel = (): OpenAIChatCompletionsModel => {
+    if (model) return model;
 
     // ⚠️ 用 OpenAIChatCompletionsModel 而不是默认的 Responses API：
     // OpenCode Go 只兼容 Chat Completions。用错模型类会得到 404 而不是
     // 「不支持这个端点」这种看得懂的错。
-    // ⚠️ 默认值必须带 `@makers/` 前缀。EdgeOne AI Gateway 的模型名**一律要求
-    // provider 前缀**，免费档是 `@makers/<model>`；写成裸 `deepseek-v4.1-flash`
-    // 会直接 404。移植前这里是 OpenCode Go 的默认值，前缀规则不同。
-    model = new OpenAIChatCompletionsModel(
-      client,
-      env.AI_GATEWAY_MODEL ?? "@makers/deepseek-v4.1-flash",
-    );
+    model = new OpenAIChatCompletionsModel(getClient(), MODEL_NAME);
     return model;
   };
 
@@ -136,6 +160,28 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
       /* 本地没有平台 context 时退化成无记忆，不该因此跑不起来 */
     }
     return undefined;
+  };
+
+  /**
+   * 生成摘要。**刻意不走 `run(agent, …)`**。
+   *
+   * 走 Agent run 的话这一回合本身会被写进 session —— 压缩的前提是「拿全量历史
+   * 再清空」，而 run() 会在我们读到历史和清空之间往里塞东西，顺序一乱就白压。
+   * 直接打模型的 Chat Completions 就没有这个问题：它不接触 session，天然干净。
+   *
+   * 也不给工具：摘要是纯文本任务，带上工具只会让它多绕几圈。
+   */
+  const summarize = async (transcript: string): Promise<string> => {
+    const resp = await getClient().chat.completions.create({
+      model: MODEL_NAME,
+      messages: [
+        { role: "system", content: SUMMARY_SYSTEM_PROMPT },
+        { role: "user", content: buildSummaryUserPrompt(transcript) },
+      ],
+      max_tokens: COMPACT_MAX_TOKENS,
+    });
+    // 思考模型的正式答案仍在 content 里；reasoning_content 那一路是草稿，不要
+    return String(resp?.choices?.[0]?.message?.content ?? "").trim();
   };
 
   const buildAgent = (): Agent =>
@@ -253,6 +299,45 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
       ];
       if (st.capped) lines.push("⚠️ 语料只收了一部分");
       return lines.join("\n");
+    },
+
+    async compact() {
+      const s = session();
+      if (!s) {
+        return "这个会话没接上平台的会话存储（多半是本地调试环境），没有可压缩的历史。";
+      }
+
+      const items = await s.getItems();
+      if (items.length < MIN_ITEMS_TO_COMPACT) {
+        return `这个会话只有 ${items.length} 项历史，没什么可压缩的。`;
+      }
+
+      const summary = await summarize(renderTranscript(items));
+
+      // ⚠️ 摘要空着就**什么都别动**。此前清了 session 却没东西写回，
+      // 等于把整个对话记忆抹掉 —— 而用户只是想让它变短。宁可这次失败重来。
+      if (!summary) {
+        return "摘要没生成出来（模型返回了空内容）。历史原样保留，稍后再试一次。";
+      }
+
+      // 顺序要紧：历史已经取完（上面的 getItems），才轮到清空 + 写回。
+      // 写回的**只有这一条摘要** —— 「用户发了 /compact」这个动作本身不留痕，
+      // 否则下次压缩又会把这条指令当成历史项压一遍。
+      await s.clearSession();
+      await s.addItems([summaryItem(summary)]);
+
+      return compactReply(items.length, summary.length);
+    },
+
+    async clear() {
+      const s = session();
+      if (!s) {
+        return "这个会话没接上平台的会话存储（多半是本地调试环境），没有可清的历史。";
+      }
+      await s.clearSession();
+      // 只说清了对话 —— 语料（repo 快照）在另一个键里，不受影响。
+      // 不写这句的话，用户会以为要重新 /repo 一遍。
+      return "会话已清空，之前的对话记忆没了。导入的仓库还在（发 /status 可以看）。";
     },
   };
 }

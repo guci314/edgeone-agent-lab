@@ -16,6 +16,7 @@
 //   F. tools    —— read / ls / find / grep 的真实调用
 //   G. webhook  —— 端到端：假 Request → 转发 → 断言转发头
 //   H. turn     —— 端到端：一条 /help 走完整回合
+//   I. compact  —— 会话压缩的纯函数（渲染历史 / 写回形状 / 门槛）
 //
 // ⚠️ 这个文件会替换全局 fetch。所有测试都在一个进程里跑，
 // 每个小节自己装自己的 stub，不要跨小节依赖。
@@ -23,6 +24,13 @@
 import { decryptEvent, verifySignature } from "../src/feishu/crypto.ts";
 import { parseMessageEvent, readChallenge, readEnvelope } from "../src/feishu/event.ts";
 import { parseCommand } from "../src/feishu/commands.ts";
+import {
+  MIN_ITEMS_TO_COMPACT,
+  SUMMARY_SYSTEM_PROMPT,
+  compactReply,
+  renderTranscript,
+  summaryItem,
+} from "../src/feishu/compact.ts";
 import { FeishuStore, MemoryKv } from "../src/feishu/store.ts";
 import { runFeishuTurn } from "../src/feishu/turn.ts";
 import type { FeishuQueueEvent } from "../src/feishu/types.ts";
@@ -260,6 +268,17 @@ await describe("C. 命令解析", async () => {
     eq(parseCommand("/help").kind, "help");
     eq(parseCommand("/帮助").kind, "help");
     eq(parseCommand("/不认识").kind, "error");
+  });
+
+  await it("/compact /clear 与中文别名", () => {
+    eq(parseCommand("/compact").kind, "compact");
+    eq(parseCommand("/压缩").kind, "compact");
+    eq(parseCommand("/CLEAR").kind, "clear", "命令名大小写不敏感");
+    eq(parseCommand("/清空").kind, "clear");
+  });
+
+  await it("带了多余参数的 /compact 也照常识别（参数被忽略）", () => {
+    eq(parseCommand("/compact 现在").kind, "compact");
   });
 });
 
@@ -906,6 +925,8 @@ await describe("H. 回合流程", async () => {
     ask: async () => ({ text: "答案是 42", streamed: false }),
     ingest: async () => "已导入 a/b@main：3 个文件",
     statusText: async () => "当前仓库：a/b@main",
+    compact: async () => "已压缩：8 条历史 → 摘要（约 300 字）",
+    clear: async () => "会话已清空",
     ...over,
   });
 
@@ -987,6 +1008,145 @@ await describe("H. 回合流程", async () => {
     const h = host({ ask: async () => ({ text: "   ", streamed: false }) });
     await runFeishuTurn(h as any, ENV, new FeishuStore(new MemoryKv()), evt("问题"));
     ok(sentTexts(calls)[0].includes("模型没有返回任何内容"), sentTexts(calls)[0]);
+  });
+
+  await it("/compact 走 host.compact 并回执", async () => {
+    const calls = stubFetch(feishuStub);
+    await runFeishuTurn(host() as any, ENV, new FeishuStore(new MemoryKv()), evt("/compact"));
+    const texts = sentTexts(calls);
+    eq(texts.length, 1);
+    ok(texts[0].includes("已压缩"), texts[0]);
+  });
+
+  await it("/clear 走 host.clear 并回执", async () => {
+    const calls = stubFetch(feishuStub);
+    await runFeishuTurn(host() as any, ENV, new FeishuStore(new MemoryKv()), evt("/clear"));
+    eq(sentTexts(calls)[0], "会话已清空");
+  });
+
+  /**
+   * 这条守的是「异常不许静默」：compact/clear 抛出去的话，异步模式下用户
+   * **一条消息都收不到**。上面 ask 那条早就踩过同样的坑，这里同样要有一条。
+   */
+  await it("/compact 抛错时仍发出一条消息（不能静默）", async () => {
+    const calls = stubFetch(feishuStub);
+    const h = host({
+      compact: async () => {
+        throw new Error("模型 429");
+      },
+    });
+    await runFeishuTurn(h as any, ENV, new FeishuStore(new MemoryKv()), evt("/compact"));
+    const texts = sentTexts(calls);
+    eq(texts.length, 1, "必须有一条消息发出去");
+    ok(texts[0].includes("处理失败") && texts[0].includes("429"), texts[0]);
+  });
+
+  await it("元命令自己不留痕：/compact 不调用 host.ask", async () => {
+    stubFetch(feishuStub);
+    let asked = 0;
+    const h = host({
+      ask: async () => {
+        asked++;
+        return { text: "不该被调到", streamed: false };
+      },
+    });
+    await runFeishuTurn(h as any, ENV, new FeishuStore(new MemoryKv()), evt("/compact"));
+    await runFeishuTurn(h as any, ENV, new FeishuStore(new MemoryKv()), evt("/clear"));
+    eq(asked, 0, "元命令走的是 host.compact / host.clear，不是 ask");
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// I. 会话压缩（纯函数）
+// ═══════════════════════════════════════════════════════════════════════
+
+await describe("I. 会话压缩的纯函数", async () => {
+  await it("门槛是 3 项，且这个门槛让 /compact 幂等", () => {
+    eq(MIN_ITEMS_TO_COMPACT, 3);
+    // 压完只剩「一条摘要」 → 再压一次会被挡在门槛外，不会把摘要又压一遍
+    ok(1 < MIN_ITEMS_TO_COMPACT);
+  });
+
+  await it("用户/助手消息渲染成带角色标签的文本", () => {
+    const t = renderTranscript([
+      { role: "user", content: "is-stream 怎么判断" },
+      { role: "assistant", content: "看 src/index.js:12" },
+    ]);
+    eq(t, "用户：is-stream 怎么判断\n\n助手：看 src/index.js:12");
+  });
+
+  await it("内容块数组（SDK 的 input_text / output_text）也能渲染", () => {
+    const t = renderTranscript([
+      { role: "user", content: [{ type: "input_text", text: "第一段" }, { type: "input_image" }] },
+      { role: "assistant", content: [{ type: "output_text", text: "第二段" }] },
+    ]);
+    eq(t, "用户：第一段\n[图片]\n\n助手：第二段");
+  });
+
+  await it("type 缺省的项也当消息处理（平台换实现时的兜底）", () => {
+    eq(renderTranscript([{ role: "user", content: "裸形状" }]), "用户：裸形状");
+  });
+
+  await it("工具调用与返回各渲染成一行", () => {
+    const t = renderTranscript([
+      { type: "function_call", name: "grep", arguments: '{"pattern":"x"}' },
+      { type: "function_call_result", name: "grep", output: '{"matchCount":0}' },
+    ]);
+    eq(t, '[调用工具 grep] {"pattern":"x"}\n\n[工具 grep 返回] {"matchCount":0}');
+  });
+
+  await it("思考项被丢掉（又长又吵，结论在正文里）", () => {
+    const t = renderTranscript([
+      { type: "reasoning", content: [{ type: "reasoning_text", text: "嗯……让我想想……" }] },
+      { role: "user", content: "问题" },
+    ]);
+    eq(t, "用户：问题");
+  });
+
+  await it("空历史渲染成空串", () => {
+    eq(renderTranscript([]), "");
+    eq(renderTranscript([{ role: "user", content: "   " }]), "");
+  });
+
+  await it("超长消息保留头尾（中段省略）", () => {
+    const t = renderTranscript([{ role: "user", content: `开头${"x".repeat(9000)}结尾` }]);
+    ok(t.startsWith("用户：开头"), t.slice(0, 30));
+    ok(t.endsWith("结尾"), t.slice(-10));
+    ok(t.includes("省略"), "应标注省略");
+    ok(t.length < 9000, `应显著短于原文，实际 ${t.length}`);
+  });
+
+  await it("整段 transcript 超限时保留头和尾（仓库坐标在开头，不能丢）", () => {
+    const items = [
+      { role: "user", content: "导入了 sindresorhus/is-stream@main" },
+      ...Array.from({ length: 40 }, (_, i) => ({
+        role: "user",
+        content: `第${i}轮问：${"很长的内容".repeat(900)}`,
+      })),
+    ];
+    const t = renderTranscript(items);
+    ok(t.length <= 120_100, `应被截到上限附近，实际 ${t.length}`);
+    ok(t.includes("sindresorhus/is-stream@main"), "头部的仓库坐标必须留下");
+    ok(t.includes("中间省略"), "应有省略标注");
+    ok(t.includes("第39轮问"), "尾部的最近讨论必须留下");
+  });
+
+  await it("摘要写回的形状：user role + 固定前缀", () => {
+    const item = summaryItem("  这里是摘要  ");
+    eq(item.role, "user");
+    ok(item.content.startsWith("以下是此前对话的压缩摘要："), item.content);
+    ok(item.content.includes("这里是摘要"), "两端的空白应被 trim");
+  });
+
+  await it("回执文案带上条数和字数", () => {
+    eq(compactReply(12, 345), "已压缩：12 条历史 → 摘要（约 345 字）");
+  });
+
+  await it("摘要 prompt 点名了四类必须保留的信息", () => {
+    for (const k of ["仓库", "代码位置", "偏好", "还没做完"]) {
+      ok(SUMMARY_SYSTEM_PROMPT.includes(k), `prompt 里应提到「${k}」`);
+    }
+    ok(SUMMARY_SYSTEM_PROMPT.includes("不要编"), "必须明确禁止编造");
   });
 });
 

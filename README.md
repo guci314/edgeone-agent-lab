@@ -102,11 +102,12 @@ edgeone-agent-lab/
 │   ├── feishu/
 │   │   ├── api.ts         ✅ 原样   # tenant_access_token、发文本
 │   │   ├── card.ts        ✅ 原样   # 流式卡片（cardkit）
-│   │   ├── commands.ts    ✅ 原样   # /repo /status /help 解析
+│   │   ├── commands.ts    🔧 微改   # 命令解析（加 /compact /clear）
+│   │   ├── compact.ts     ➕ 新增   # 会话压缩的纯函数（渲染历史 / 写回形状）
 │   │   ├── crypto.ts      ✅ 原样   # 验签 + AES 解密
 │   │   ├── event.ts       ✅ 原样   # 事件体解析
 │   │   ├── streamer.ts    ✅ 原样   # 增量 → 卡片，250ms 一拍
-│   │   ├── turn.ts        🔧 微改   # 回合流程（只把 markDone 改成 await）
+│   │   ├── turn.ts        🔧 微改   # 回合流程（markDone 改 await；加 /compact /clear 分发）
 │   │   ├── store.ts       🔄 重写   # SQL → 按会话隔离的 JSON KV
 │   │   └── types.ts       ➕ 新增   # FeishuQueueEvent 从 router.ts 挪出来
 │   └── workspace/

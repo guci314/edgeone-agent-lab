@@ -34,6 +34,30 @@ export interface FeishuTurnHost {
   ingest(owner: string, name: string, ref: string): Promise<string>;
   /** 「当前导入了什么」的一句话 */
   statusText(): Promise<string>;
+  /**
+   * 把当前会话历史压成一条摘要，返回给用户看的回执。
+   *
+   * ⚠️ 实现**不该抛**：模型失败也要返回一句能看懂的说明。真抛了也有
+   * `safeReply()` 兜底，但那里的文案是通用的，不如实现自己说清楚。
+   */
+  compact(): Promise<string>;
+  /** 清空当前会话的对话记忆，返回给用户看的回执。同上，不该抛 */
+  clear(): Promise<string>;
+}
+
+/**
+ * 命令回执的兜底：宿主抛错时也必须有东西发回去。
+ *
+ * 不兜的话异常会一路冒到 `index.ts`，默认的 async 模式下进程只记一条日志就
+ * 结束了 —— **用户那边一条消息都收不到**，看起来像 bot 死了。`ask` 那条分支
+ * 早就踩过这个坑（见下面的注释），这里照抄同样的处理。
+ */
+async function safeReply(fn: () => Promise<string>): Promise<string> {
+  try {
+    return await fn();
+  } catch (e) {
+    return `处理失败：${(e as Error).message.slice(0, 200)}`;
+  }
 }
 
 const EMPTY_ANSWER =
@@ -59,6 +83,14 @@ export async function runFeishuTurn(
 
     case "status":
       await sendText(env, cache, evt.chatId, await host.statusText());
+      break;
+
+    case "compact":
+      await sendText(env, cache, evt.chatId, await safeReply(() => host.compact()));
+      break;
+
+    case "clear":
+      await sendText(env, cache, evt.chatId, await safeReply(() => host.clear()));
       break;
 
     case "repo": {

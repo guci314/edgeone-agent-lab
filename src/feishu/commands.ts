@@ -11,6 +11,8 @@ export type Command =
   | { kind: "ask"; text: string }
   | { kind: "repo"; owner: string; name: string; ref?: string }
   | { kind: "status" }
+  | { kind: "compact" }
+  | { kind: "clear" }
   | { kind: "help" }
   | { kind: "error"; message: string };
 
@@ -20,6 +22,8 @@ export const HELP_TEXT = [
   "/repo owner/name        导入一个 GitHub 仓库（也可以粘完整链接）",
   "/repo owner/name@分支   指定分支，默认用仓库的默认分支",
   "/status                 看当前导入了哪个仓库、多少文件",
+  "/compact                把当前对话压成摘要，聊长了用一次，省上下文",
+  "/clear                  清空当前会话的对话记忆（导入的仓库保留）",
   "/help                   看这一段",
   "",
   "每个飞书会话（单聊、每个群）各自独立：仓库和对话记忆互不影响。",
@@ -47,6 +51,12 @@ export function parseCommand(raw: string): Command {
     case "/status":
     case "/状态":
       return { kind: "status" };
+    case "/compact":
+    case "/压缩":
+      return { kind: "compact" };
+    case "/clear":
+    case "/清空":
+      return { kind: "clear" };
     case "/help":
     case "/帮助":
     case "/?":

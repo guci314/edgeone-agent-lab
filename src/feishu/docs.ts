@@ -342,6 +342,9 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
           let sheetName = "";
           let totalRows: number | undefined;
           let totalCols: number | undefined;
+          // 我们自己算出来的窗口行数，用来判「有没有被裁」。调用方显式给了 range
+          // 时保持 undefined —— 他指定了要哪块，就不该再报「没读完」。
+          let askedRows: number | undefined;
           let target = range?.trim() ?? "";
 
           if (!target) {
@@ -364,6 +367,7 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
             // 只取到上限，别把整张表拖下来 —— 几万行的表会直接撑爆上下文
             const rows = Math.min(totalRows ?? SHEET_MAX_ROWS, SHEET_MAX_ROWS);
             const cols = Math.min(totalCols ?? SHEET_MAX_COLS, SHEET_MAX_COLS);
+            askedRows = rows;
             target = `${first.sheet_id}!A1:${colName(cols)}${rows}`;
           } else if (ref.sheetId && !target.includes("!")) {
             // 链接里的 ?sheet=<id> 是工作表 id，可以当 range 的前缀
@@ -381,22 +385,47 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
             | undefined;
           // 防御：不同版本这个字段可能在 data 层也可能在 valueRange 里
           const values = (vr?.values ?? (r.data?.values as unknown[][]) ?? []) as unknown[][];
-          const lines = values.map((row) =>
-            (row ?? []).slice(0, SHEET_MAX_COLS).map(cellText).join("\t"),
-          );
+
+          // ⚠️ 飞书把**整个网格**回给你，空行空列也占位（新建表默认 200 行 × 20 列）。
+          // 原样吐出去实测有两个后果，都撞到了：
+          //   ① 一份只有 4 行数据的表变成 100 行制表符，白烧掉一大截上下文；
+          //   ② 下面按「网格比窗口大」判 truncated，那对新表**永远成立**
+          //      （totalRows 200 > 读到的 100），于是每次都报「只读了一部分」，
+          //      模型信了、反复重读 —— 实测它为一个 4 行就够的表格连调了 8 次。
+          // 所以先把尾部全空的行列剪掉，再判断到底有没有被裁。
+          const rawRows = values.length;
+          const rawCols = values.reduce((m, row) => Math.max(m, (row ?? []).length), 0);
+          const grid = values
+            .slice(0, SHEET_MAX_ROWS)
+            .map((row) => (row ?? []).slice(0, SHEET_MAX_COLS).map(cellText));
+
+          while (grid.length && (grid[grid.length - 1] ?? []).every((c) => !c)) grid.pop();
+          let width = grid.reduce((m, r) => Math.max(m, r.length), 0);
+          while (width > 0 && grid.every((r) => !(r[width - 1] ?? ""))) width--;
+
+          const lines = grid.map((r) => r.slice(0, width).join("\t"));
           const rowCount = lines.length;
-          const colCount = values.reduce((m, row) => Math.max(m, (row ?? []).length), 0);
-          const truncated =
-            rowCount >= SHEET_MAX_ROWS ||
-            colCount > SHEET_MAX_COLS ||
-            (totalRows !== undefined && totalRows > rowCount) ||
-            (totalCols !== undefined && totalCols > colCount);
+          const colCount = width;
+
+          // 「被裁」的判据：**剪掉尾部空行之后，内容仍然顶在窗口边缘**。
+          //
+          // 两个反例各自排除了一个错误判据：
+          //   · 「网格比窗口大」——新表网格恒为 200 行，据此判定等于每次喊狼来了；
+          //   · 「服务端把窗口填满了」——飞书就是会**补空行填满**，恒真，同样没用。
+          // 真正的信号是：尾部一行空行都没剪掉（rowCount === rawRows），说明内容
+          // 一直延续到我们请求的边界，后面才可能还有。
+          // 显式给了 range 时不算 —— 调用方指定了要哪块，不该再报「没读完」。
+          const contentAtEdge = rowCount >= rawRows;
+          const windowFull = askedRows !== undefined && rawRows >= askedRows;
+          const gridBigger = totalRows === undefined || totalRows > rowCount;
+          const truncated = (windowFull && contentAtEdge && gridBigger) || rawCols > SHEET_MAX_COLS;
 
           return {
             kind: "sheets",
             sheetUrl: `https://feishu.cn/sheets/${ref.token}`,
             sheet: sheetName || undefined,
             range: vr?.range ?? target,
+            // 给的是**有内容的范围**，不是整个网格
             text: lines.join("\n"),
             rowCount,
             colCount,
@@ -404,7 +433,11 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
             ...(totalCols !== undefined ? { totalCols } : {}),
             truncated,
             ...(truncated
-              ? { note: "只读了一部分。缩小 range（比如只取需要的几列）再读一次能拿到完整结果。" }
+              ? {
+                  note:
+                    "读到的区域已经顶到上限，后面可能还有内容。" +
+                    "换一个更大的 range（或直接指定要读的那几行）再读一次。",
+                }
               : {}),
           };
         }),

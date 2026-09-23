@@ -1582,6 +1582,35 @@ await describe("L. 云文档工具族", async () => {
       });
     }
 
+    // SH2 模仿飞书**真实**的响应形状：整个网格都回、空行补到窗口满
+    // （新建表 grid_properties 就是 200 行 × 20 列）。SH1 那种「只回有内容的
+    // 三行」是理想化的，实测不会发生 —— 正因如此 SH1 掩盖了这个 bug。
+    if (url.includes("/sheets/v3/spreadsheets/SH2/sheets/query")) {
+      return json({
+        data: {
+          sheets: [
+            { sheet_id: "sid2", title: "Sheet1", grid_properties: { row_count: 200, column_count: 20 } },
+          ],
+        },
+      });
+    }
+    if (url.includes("/sheets/v2/spreadsheets/SH2/values/")) {
+      return json({
+        data: {
+          valueRange: {
+            range: "sid2!A1:T100",
+            values: [
+              ["城市", "销量", "负责人"],
+              ["杭州", 1280, "张三"],
+              ["哈尔滨", 77, "李四"],
+              ["乌鲁木齐", 9, "王五"],
+              ...Array.from({ length: 96 }, () => Array<string>(20).fill("")),
+            ],
+          },
+        },
+      });
+    }
+
     if (url.includes("/bitable/v1/apps/BT1/tables?") || url.endsWith("/bitable/v1/apps/BT1/tables")) {
       return json({ data: { items: [{ table_id: "tbl1", name: "任务表" }, { table_id: "tbl2", name: "人表" }] } });
     }
@@ -1683,6 +1712,52 @@ await describe("L. 云文档工具族", async () => {
     // 单元格是对象（富文本带链接）时要拍平成文本，不能把 JSON 倒给模型
     ok(r.text.includes("带链接"), r.text);
     ok(!r.text.includes("file_token"), "不该出现原始 JSON 字段");
+  });
+
+  // 回归：飞书把整个网格补空行回给你是**常态**，据此报 truncated 会让模型反复重读
+  // （实测一个 4 行数据的表被它连读了 8 次）。尾部空行还必须剪掉，不然白烧上下文。
+  await it("电子表格：尾部空行要剪掉，且不能因此误报 truncated", async () => {
+    const t = await tools();
+    stubFetch(docStub);
+    const r = await callTool(t.feishu_sheet_read, { url: "https://x.feishu.cn/sheets/SH2" });
+    eq(r.rowCount, 4, "96 行补位空行应被剪掉");
+    eq(r.colCount, 3, "17 列补位空列应被剪掉");
+    eq(r.truncated, false, "内容没顶到窗口边缘，不该报「只读了一部分」");
+    eq(r.note, undefined, "不截断就不该带催促模型重读的提示");
+    eq(r.totalRows, 200, "网格大小仍要如实报出来，别瞒着模型");
+    ok(r.text.includes("哈尔滨\t77\t李四"), r.text);
+    ok(!r.text.includes("\t\t\t\t"), "剪完不该还剩一串空列");
+  });
+
+  await it("电子表格：内容顶到窗口边缘时才报 truncated", async () => {
+    const t = await tools();
+    // 窗口 100 行全是有内容的行 —— 后面可能还有，这时候必须提醒
+    stubFetch((url) => {
+      if (url.includes("/sheets/v3/spreadsheets/SH3/sheets/query")) {
+        return new Response(
+          JSON.stringify({ code: 0, data: { sheets: [{ sheet_id: "sid3", title: "S", grid_properties: { row_count: 200, column_count: 2 } }] } }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      if (url.includes("/sheets/v2/spreadsheets/SH3/values/")) {
+        return new Response(
+          JSON.stringify({
+            code: 0,
+            data: {
+              valueRange: {
+                values: Array.from({ length: 100 }, (_, i) => [`行${i}`, i]),
+              },
+            },
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      return undefined;
+    });
+    const r = await callTool(t.feishu_sheet_read, { url: "https://x.feishu.cn/sheets/SH3" });
+    eq(r.rowCount, 100);
+    eq(r.truncated, true);
+    ok(typeof r.note === "string" && r.note.includes("顶到上限"), r.note);
   });
 
   await it("多维表格：不给 table_id 先列表", async () => {

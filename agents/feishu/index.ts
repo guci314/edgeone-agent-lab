@@ -154,13 +154,14 @@ export async function onRequest(context: any) {
   // sync         ：跑完才回。**不依赖后台执行能力**，代价是 webhook 要等
   const dispatch = String(mode ?? env.FEISHU_DISPATCH_MODE ?? "async").toLowerCase();
 
-  const work = async (signal?: AbortSignal) => {
+  const work = async (signal?: AbortSignal): Promise<string[]> => {
     try {
-      await runFeishuTurn(host, env, store, evt);
+      const replies = await runFeishuTurn(host, env, store, evt);
       // 一轮跑完顺手 prune 一次。原版靠 DO alarm 定期跑；
       // EdgeOne 免费版的 cron 最小间隔是 1 天，所以改成「搭车」——
       // 每轮跑完裁一次，成本几乎为零，效果够用
       await store.prune();
+      return replies;
     } catch (e) {
       // 到这一步说明 turn 里的异常已经冒出来了 —— 按设计它应该自己吞掉
       // （见 turn.ts 的注释），所以能到这儿基本只剩「发消息时网络抖动」。
@@ -173,8 +174,11 @@ export async function onRequest(context: any) {
   if (dispatch === "sync") {
     // ⚠️ 只有同步模式才把 request.signal 传下去。异步模式下这个 signal 会在
     // 响应发出时触发，把 signal 传给 run() 等于**自己掐掉后台任务**。
-    await work(request?.signal);
-    return json({ ok: true, mode: "sync" }, 200);
+    const replies = await work(request?.signal);
+    // 一并回显这一轮的回复。**这是自动化核对「机器人答了什么」的唯一途径** ——
+    // 流式卡片的正文通过 `im/v1/messages` 读不到（只回一句「请升级至最新版本
+    // 客户端」的占位）。async 那条路返回的 202 不承载业务内容，所以只在 sync 给。
+    return json({ ok: true, mode: "sync", replies }, 200);
   }
 
   // 后台跑。不 await —— 但**故意挂一个 catch**：不挂的话未处理的 rejection

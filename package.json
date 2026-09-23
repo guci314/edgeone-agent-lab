@@ -10,7 +10,8 @@
     "deploy": "npm run clean:zip && edgeone makers deploy",
     "clean:zip": "rm -f edgeone-agent-lab.zip",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types test/smoke.ts"
+    "test": "node --experimental-strip-types test/smoke.ts",
+    "ask": "node tools/ask-bot.mjs"
   },
   "dependencies": {
     "@openai/agents": "^0.11.4",

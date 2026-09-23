@@ -77,37 +77,50 @@ export async function runFeishuTurn(
   env: FeishuEnv,
   store: FeishuStore,
   evt: FeishuQueueEvent,
-): Promise<void> {
+): Promise<string[]> {
   const cache = store.tokenCache();
   const cmd = parseCommand(evt.text);
 
+  // 这一轮发出去的所有回复，按发出顺序。返回值给 `?mode=sync` 回显用。
+  //
+  // 为什么要回显：同步模式是**唯一**能把答案拿进 HTTP 响应的地方。没有它，
+  // 想自动核对「机器人到底答了什么」就只能去读飞书消息，而流式卡片的正文
+  // 通过 `im/v1/messages` 读不到 —— 那条接口对 card_id 型卡片只回一句
+  // 「请升级至最新版本客户端」的占位。于是自动验证退化成「开浏览器人工看」。
+  const sent: string[] = [];
+  /** 发一条回复，并记下来（见上） */
+  const say = async (text: string): Promise<void> => {
+    sent.push(text);
+    await sendText(env, cache, evt.chatId, text);
+  };
+
   switch (cmd.kind) {
     case "help":
-      await sendText(env, cache, evt.chatId, HELP_TEXT);
+      await say(HELP_TEXT);
       break;
 
     case "error":
-      await sendText(env, cache, evt.chatId, cmd.message);
+      await say(cmd.message);
       break;
 
     case "status":
-      await sendText(env, cache, evt.chatId, await host.statusText());
+      await say(await host.statusText());
       break;
 
     case "compact":
-      await sendText(env, cache, evt.chatId, await safeReply(() => host.compact()));
+      await say(await safeReply(() => host.compact()));
       break;
 
     case "clear":
-      await sendText(env, cache, evt.chatId, await safeReply(() => host.clear()));
+      await say(await safeReply(() => host.clear()));
       break;
 
     case "login":
-      await sendText(env, cache, evt.chatId, await safeReply(() => host.loginUrl()));
+      await say(await safeReply(() => host.loginUrl()));
       break;
 
     case "logout":
-      await sendText(env, cache, evt.chatId, await safeReply(() => host.logout()));
+      await say(await safeReply(() => host.logout()));
       break;
 
     case "repo": {
@@ -117,10 +130,7 @@ export async function runFeishuTurn(
           ref = await resolveDefaultBranch(cmd.owner, cmd.name);
         } catch (e) {
           // 这一步失败是**永久性**的（仓库不存在/私有），直接说清楚，别重试
-          await sendText(
-            env,
-            cache,
-            evt.chatId,
+          await say(
             `${(e as Error).message}\n\n确认一下链接，或者显式写分支：/repo ${cmd.owner}/${cmd.name}@main`,
           );
           break;
@@ -128,12 +138,7 @@ export async function runFeishuTurn(
       }
 
       // 抓取可能要几十秒。先给一条回执，否则用户不知道有没有收到
-      await sendText(
-        env,
-        cache,
-        evt.chatId,
-        `正在抓取 ${cmd.owner}/${cmd.name}@${ref} …`,
-      );
+      await say(`正在抓取 ${cmd.owner}/${cmd.name}@${ref} …`);
 
       let reply: string;
       try {
@@ -141,7 +146,7 @@ export async function runFeishuTurn(
       } catch (e) {
         reply = `导入失败：${(e as Error).message}`;
       }
-      await sendText(env, cache, evt.chatId, reply);
+      await say(reply);
       break;
     }
 
@@ -149,9 +154,13 @@ export async function runFeishuTurn(
       let reply: string;
       try {
         const r = await host.ask(cmd.text, evt.messageId, evt.chatId);
-        // 已经流式发出去了，别再补一条 —— 那会变成同一段回答的两份
-        if (r.streamed) break;
         reply = r.text.trim() || EMPTY_ANSWER;
+        // 流式的话答案已经在卡片里了，**不能再发一条**（那是同一段回答的两份）。
+        // 但要**记下来** —— 卡片正文从飞书 API 读不到，不记就没法自动核对。
+        if (r.streamed) {
+          sent.push(reply);
+          break;
+        }
       } catch (e) {
         // ⚠️ 这里**必须把异常吞掉**。
         //
@@ -165,7 +174,7 @@ export async function runFeishuTurn(
         const msg = (e as Error).message.slice(0, 300);
         reply = `没答上来：${msg}\n\n如果这是刚部署的，八成是模型凭证没配好。`;
       }
-      await sendText(env, cache, evt.chatId, reply);
+      await say(reply);
       break;
     }
   }
@@ -177,4 +186,5 @@ export async function runFeishuTurn(
   // ⚠️ 原版这里是同步调用（DO SQLite 本地写）；换成 KV 之后必须 await，
   // 否则写回可能还没落地、进程就先结束了。
   await store.markDone(evt.messageId);
+  return sent;
 }

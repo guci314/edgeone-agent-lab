@@ -1,0 +1,15 @@
+{
+  "agents": {
+    "framework": "openai-agents-sdk",
+    "dir": "agents",
+    "timeout": 900,
+    "sandbox": {
+      "timeout": 900
+    }
+  },
+  "cloudFunctions": {
+    "nodejs": {
+      "includeFiles": []
+    }
+  }
+}

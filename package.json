@@ -1,0 +1,24 @@
+{
+  "name": "edgeone-agent-lab",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "cf-agent-lab 的 EdgeOne Makers 移植版：飞书代码仓库问答机器人（OpenAI Agents SDK）",
+  "scripts": {
+    "link": "edgeone makers link",
+    "dev": "edgeone makers dev",
+    "deploy": "edgeone makers deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types test/smoke.ts"
+  },
+  "dependencies": {
+    "@openai/agents": "^0.11.4",
+    "openai": "^6.35.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "edgeone": "^1.6.41",
+    "typescript": "^5.5.3"
+  }
+}

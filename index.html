@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>edgeone-agent-lab 状态</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body {
+        margin: 0; padding: 2rem;
+        font: 15px/1.7 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+        max-width: 720px;
+      }
+      h1 { font-size: 1.25rem; margin: 0 0 .25rem; }
+      p.sub { margin: 0 0 1.75rem; opacity: .6; font-size: .875rem; }
+      h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; opacity: .5; margin: 1.75rem 0 .5rem; }
+      ul { margin: 0; padding-left: 1.1rem; }
+      li { margin: .3rem 0; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .875em;
+             background: rgba(127,127,127,.15); padding: .1em .35em; border-radius: 4px; }
+      .row { display: flex; gap: .75rem; align-items: baseline; margin: .35rem 0; }
+      .row b { font-weight: 600; min-width: 5.5rem; opacity: .7; font-weight: 400; font-size: .875rem; }
+      button { font: inherit; padding: .35rem .9rem; border-radius: 6px; cursor: pointer;
+               border: 1px solid rgba(127,127,127,.4); background: transparent; color: inherit; }
+      pre { background: rgba(127,127,127,.12); padding: .75rem; border-radius: 6px;
+            overflow: auto; font-size: .8125rem; margin: .5rem 0 0; }
+      .ok { color: #1a7f37; } .bad { color: #cf222e; }
+    </style>
+  </head>
+  <body>
+    <h1>edgeone-agent-lab</h1>
+    <p class="sub">cf-agent-lab 的 EdgeOne Makers 移植版 · 飞书代码仓库问答 · OpenAI Agents SDK</p>
+
+    <h2>飞书回调地址</h2>
+    <div class="row"><b>地址</b><code id="hook"></code></div>
+    <p class="sub" style="margin-top:.5rem">
+      填到飞书开放平台 → 事件与回调 → 订阅方式 → 「将事件发送至开发者服务器」。
+      请求网址校验会在保存时立刻发起一次，那一次必须通过。
+    </p>
+
+    <h2>Agent 路由</h2>
+    <div class="row"><b>路由</b><code>/feishu</code></div>
+    <p class="sub" style="margin-top:.5rem">
+      只接受带 <code>Makers-Conversation-Id</code> 和 <code>x-internal-token</code> 的 POST，
+      由上面的回调地址转发调用。直接打开这个地址会返回 405 —— 那是正常的。
+    </p>
+
+    <h2>后台执行能力自测</h2>
+    <p class="sub" style="margin:0 0 .75rem">
+      这套移植最大的未知数：返回 Response 之后，未 await 的异步代码还能不能跑完。
+      飞书链路依赖它（先 ACK 再跑模型）。两次请求之间要隔 15 秒。
+    </p>
+    <button id="probe">跑一次自测</button>
+    <pre id="out">还没跑。</pre>
+
+    <h2>下一步</h2>
+    <ul>
+      <li>如果自测结果是 ✅，<code>FEISHU_DISPATCH_MODE</code> 保持 <code>async</code>。</li>
+      <li>如果是 ❌，把它改成 <code>sync</code> 再重新部署。</li>
+      <li>详细步骤见仓库里的 <code>docs/03-验证清单.md</code>。</li>
+    </ul>
+
+    <script>
+      // 回调地址按当前 origin 推出来，省得手抄
+      document.getElementById("hook").textContent = location.origin + "/feishu-webhook";
+
+      const out = document.getElementById("out");
+      const btn = document.getElementById("probe");
+      const CID = "probe-" + Math.random().toString(36).slice(2, 10); // 6~36 字符，合法字符集
+
+      btn.onclick = async () => {
+        btn.disabled = true;
+        out.textContent = "1/2 发起…";
+        try {
+          const start = await fetch("/feishu?probe=start", {
+            method: "POST",
+            headers: { "Makers-Conversation-Id": CID },
+          });
+          const sj = await start.json();
+          out.textContent = "1/2 已返回（" + start.status + "）：\n" + JSON.stringify(sj, null, 2) +
+                            "\n\n等 16 秒…";
+          await new Promise((r) => setTimeout(r, 16000));
+
+          out.textContent += "\n2/2 查询…";
+          const check = await fetch("/feishu?probe=check", {
+            method: "POST",
+            headers: { "Makers-Conversation-Id": CID },
+          });
+          const cj = await check.json();
+          out.textContent =
+            "1/2 已返回（" + start.status + "）：\n" + JSON.stringify(sj, null, 2) +
+            "\n\n2/2 查询结果：\n" + JSON.stringify(cj, null, 2) +
+            "\n\n" + (cj.verdict || "");
+        } catch (e) {
+          out.textContent += "\n\n请求失败：" + e.message;
+        } finally {
+          btn.disabled = false;
+        }
+      };
+    </script>
+  </body>
+</html>

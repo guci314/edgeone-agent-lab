@@ -52,6 +52,20 @@ export interface FeishuTurnHost {
   loginUrl(): Promise<string>;
   /** 撤销授权，返回给用户看的回执 */
   logout(): Promise<string>;
+  /**
+   * 长期记忆清单（跨会话共享的那些），返回给用户看的纯文本。
+   *
+   * ⚠️ 走的是 `sendText`，飞书**纯文本消息不渲染 Markdown** ——
+   * 实现里别用加粗和反引号。
+   */
+  memoryText(): Promise<string>;
+  /**
+   * 删一条长期记忆；`key` 为 `all confirm` 时清空。
+   *
+   * 参数是**原样透传**的用户输入（可能为空串）——「用法说明」由实现回，
+   * 因为只有它知道有哪些键、以及清空需要什么确认词。同上，不该抛。
+   */
+  forgetMemory(key: string): Promise<string>;
 }
 
 /**
@@ -113,6 +127,14 @@ export async function runFeishuTurn(
 
     case "clear":
       await say(await safeReply(() => host.clear()));
+      break;
+
+    case "memory":
+      await say(await safeReply(() => host.memoryText()));
+      break;
+
+    case "forget":
+      await say(await safeReply(() => host.forgetMemory(cmd.key)));
       break;
 
     case "login":

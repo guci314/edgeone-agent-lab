@@ -45,6 +45,18 @@ import {
 } from "../src/feishu/user-token.ts";
 import { makeFeishuDocTools } from "../src/feishu/docs.ts";
 import {
+  GlobalMemory,
+  InMemoryMemoryBackend,
+  MAX_ENTRIES,
+  MAX_VALUE_CHARS,
+  blobMemoryBackend,
+  memoryBackendStatus,
+  normalizeMemoryKey,
+  projectKey,
+  renderMemoryList,
+  userKey,
+} from "../src/feishu/global-memory.ts";
+import {
   MIN_ITEMS_TO_COMPACT,
   SUMMARY_SYSTEM_PROMPT,
   compactReply,
@@ -313,6 +325,26 @@ await describe("C. 命令解析", async () => {
   await it("帮助文案里列出了两个授权命令", () => {
     ok(HELP_TEXT.includes("/login"), "应列出 /login");
     ok(HELP_TEXT.includes("/logout"), "应列出 /logout");
+  });
+
+  await it("/memory /forget 与中文别名", () => {
+    eq(parseCommand("/memory").kind, "memory");
+    eq(parseCommand("/记忆").kind, "memory");
+    eq(parseCommand("/forget 技术栈"), { kind: "forget", key: "技术栈" });
+    eq(parseCommand("/忘记 prefs/技术栈"), { kind: "forget", key: "prefs/技术栈" });
+    // 光秃秃的 /forget 也要认 —— 宿主会回一段用法，比在这里报「参数缺失」有用。
+    // （用户打一个不完整的命令时想看的是用法，不是一句错误提示。）
+    eq(parseCommand("/forget"), { kind: "forget", key: "" });
+  });
+
+  await it("帮助文案里列出了记忆相关命令", () => {
+    ok(HELP_TEXT.includes("/memory"), "应列出 /memory");
+    ok(HELP_TEXT.includes("/forget"), "应列出 /forget");
+  });
+
+  await it("别把 /forget 认成 /for… 之类的近邻命令", () => {
+    eq(parseCommand("/for").kind, "error");
+    eq(parseCommand("/memories").kind, "error");
   });
 });
 
@@ -963,6 +995,8 @@ await describe("H. 回合流程", async () => {
     clear: async () => "会话已清空",
     loginUrl: async () => "点这条链接授权：\nhttps://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_x",
     logout: async () => "已撤销云文档授权。",
+    memoryText: async () => "长期记忆共 0 条（跨会话共享）：",
+    forgetMemory: async (k: string) => `已删掉 ${k}。`,
     ...over,
   });
 
@@ -1012,6 +1046,51 @@ await describe("H. 回合流程", async () => {
     const calls = stubFetch(feishuStub);
     await runFeishuTurn(host() as any, ENV, new FeishuStore(new MemoryKv()), evt("/退出授权"));
     eq(sentTexts(calls)[0], "已撤销云文档授权。");
+  });
+
+  await it("/memory 走 host.memoryText", async () => {
+    const calls = stubFetch(feishuStub);
+    await runFeishuTurn(
+      host({ memoryText: async () => "长期记忆共 1 条（跨会话共享）：\n- prefs/技术栈：pnpm" }) as any,
+      ENV,
+      new FeishuStore(new MemoryKv()),
+      evt("/memory"),
+    );
+    ok(sentTexts(calls)[0].includes("prefs/技术栈"), sentTexts(calls)[0]);
+  });
+
+  await it("/forget 把键名原样透传给宿主（空参数也透传）", async () => {
+    const seen: string[] = [];
+    const calls = stubFetch(feishuStub);
+    const h = host({
+      forgetMemory: async (k: string) => {
+        seen.push(k);
+        return "已删掉 prefs/技术栈。";
+      },
+    });
+    await runFeishuTurn(h as any, ENV, new FeishuStore(new MemoryKv()), evt("/forget 技术栈"));
+    await runFeishuTurn(h as any, ENV, new FeishuStore(new MemoryKv()), evt("/forget"));
+
+    // 空串也要原样传下去 —— 「用法说明」由宿主回（只有它知道有哪些键、
+    // 以及清空需要什么确认词），turn 这一层不该自己编文案
+    eq(seen, ["技术栈", ""]);
+    eq(sentTexts(calls)[0], "已删掉 prefs/技术栈。");
+  });
+
+  await it("/memory 上宿主抛错时兜住，而不是静默", async () => {
+    const calls = stubFetch(feishuStub);
+    await runFeishuTurn(
+      host({
+        memoryText: async () => {
+          throw new Error("blob 连不上");
+        },
+      }) as any,
+      ENV,
+      new FeishuStore(new MemoryKv()),
+      evt("/memory"),
+    );
+    // 不兜的话用户那边一条消息都收不到，看起来像 bot 死了
+    ok(sentTexts(calls)[0].includes("blob 连不上"), sentTexts(calls)[0]);
   });
 
   await it("host.loginUrl 抛错时也发得出一条消息", async () => {
@@ -2032,6 +2111,284 @@ await describe("L. 云文档工具族", async () => {
     eq((out[0] as any).role, "user");
   });
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// M. 跨会话记忆
+// ═══════════════════════════════════════════════════════════════════════
+
+await describe("M. 跨会话记忆", async () => {
+  await it("键名规范化：空格 / 大写 / 中文 / 危险串 / 超长", () => {
+    eq(normalizeMemoryKey("Tech Stack"), "tech-stack");
+    // 中文保留 —— 用户是中文，键叫「技术栈」比叫 tech-stack 更好读
+    eq(normalizeMemoryKey("技术栈"), "技术栈");
+    // 斜杠被剥掉、连续点被压成一个 —— 杜绝 `..` 这种路径穿越形状
+    eq(normalizeMemoryKey("../../etc/passwd"), "etcpasswd");
+    eq(normalizeMemoryKey("a".repeat(200)).length, 64);
+    eq(normalizeMemoryKey("   "), null);
+    eq(normalizeMemoryKey("///"), null);
+  });
+
+  await it("项目级 / 按人的逻辑键", () => {
+    eq(projectKey("技术栈"), "prefs/技术栈");
+    eq(userKey("ou_x", "负责模块"), "user/ou_x/负责模块");
+    // 没有 openId 就造不出按人的键 —— 调用方据此回一句「改用 project」
+    eq(userKey("", "负责模块"), null);
+  });
+
+  await it("remember → entries → forget 往返", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    // 用真实形状的 openId（ou_ + 一长串），因为 by 是截尾的，短假名会掩盖截断逻辑
+    const alice = "ou_9f3c2a1b7e4d";
+    eq(await m.remember("prefs/技术栈", "pnpm + TypeScript", alice), "已记住 prefs/技术栈");
+    // 同一个键再写是**更新**，不是新增 —— 这是「一条事实一个键」的用法
+    eq(
+      await m.remember("prefs/技术栈", "pnpm + TypeScript，不用 yarn", alice),
+      "已更新 prefs/技术栈",
+    );
+
+    const all = await m.entries();
+    eq(all.length, 1);
+    eq(all[0].value, "pnpm + TypeScript，不用 yarn");
+    // by 只留后 6 位：/memory 列表里够区分人，又不至于把完整 openId 摊在记忆值里
+    eq(all[0].by, "1b7e4d", "by 应只留 openId 后 6 位");
+    ok(all[0].by !== alice, "别把完整 openId 写进去");
+    ok(typeof all[0].at === "number", "应记下写入时间");
+
+    eq(await m.forget("prefs/技术栈"), true);
+    eq(await m.forget("prefs/技术栈"), false, "删第二次应返回 false");
+    eq((await m.entries()).length, 0);
+  });
+
+  await it("空值 / 超长值被拒绝，且不落盘", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    ok((await m.remember("prefs/a", "   ", "ou_x")).includes("value 是空的"));
+    ok((await m.remember("prefs/b", "x".repeat(MAX_VALUE_CHARS + 1), "ou_x")).includes("超过单条上限"));
+    eq((await m.entries()).length, 0);
+  });
+
+  await it("记满 MAX_ENTRIES 后拒绝新键，但更新旧键仍然可以", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    for (let i = 0; i < MAX_ENTRIES; i++) await m.remember(`prefs/k${i}`, "v", "ou_x");
+
+    ok((await m.remember("prefs/新键", "v", "ou_x")).includes("已经记满"));
+    // ⚠️ 更新已有键必须不受上限影响 —— 否则记满之后连改错都改不了
+    eq(await m.remember("prefs/k0", "改过", "ou_x"), "已更新 prefs/k0");
+  });
+
+  await it("渲染只显示提问人自己的按人记忆", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    await m.remember("prefs/技术栈", "pnpm", "ou_alice");
+    await m.remember("user/ou_alice/负责模块", "auth", "ou_alice");
+    await m.remember("user/ou_bob/负责模块", "支付", "ou_bob");
+
+    const forAlice = await m.renderForPrompt("ou_alice");
+    ok(forAlice.includes("prefs/技术栈"), "项目级应可见");
+    ok(forAlice.includes("user/ou_alice/负责模块"), "自己的按人记忆应可见");
+    ok(!forAlice.includes("支付"), "别人的按人记忆不该出现");
+
+    // 第三个人：项目级能看，两份按人的都看不到
+    const forCarol = await m.renderForPrompt("ou_carol");
+    ok(forCarol.includes("prefs/技术栈"));
+    ok(!forCarol.includes("auth"));
+    ok(!forCarol.includes("支付"));
+  });
+
+  await it("渲染预算：条数超了就截断并说明还有多少", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    for (let i = 0; i < 40; i++) {
+      await m.remember(`prefs/k${String(i).padStart(2, "0")}`, "v", "ou_x");
+    }
+    const s = await m.renderForPrompt("ou_x");
+    ok(s.includes("共 40 条"), s.slice(0, 300));
+    ok(s.includes("只显示了 30 条"), "应说明被截断，否则模型以为自己看到了全部");
+  });
+
+  await it("空记忆时给出「可以记什么」的指引，而不是一片空白", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    const s = await m.renderForPrompt("ou_x");
+    ok(s.includes("还是空的"));
+    ok(s.includes("remember_fact"), "要告诉模型有这个工具，否则它不会想到去用");
+  });
+
+  await it("forgetLoose：人不带 prefs/ 前缀也能删掉", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    await m.remember("prefs/技术栈", "pnpm", "ou_x");
+    // 用户会打「技术栈」而不是「prefs/技术栈」
+    eq(await m.forgetLoose("技术栈", "ou_x"), "prefs/技术栈");
+    eq(await m.forgetLoose("技术栈", "ou_x"), null, "删第二次应找不到");
+  });
+
+  await it("forgetAll 只清项目级 + 自己的，不碰别人的", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    await m.remember("prefs/a", "1", "ou_alice");
+    await m.remember("user/ou_alice/b", "2", "ou_alice");
+    await m.remember("user/ou_bob/c", "3", "ou_bob");
+
+    eq(await m.forgetAll("ou_alice"), 2);
+    const left = await m.entries();
+    eq(left.length, 1);
+    eq(left[0].key, "user/ou_bob/c");
+  });
+
+  await it("裸文本（不是信封）也能读出来，不抛", async () => {
+    // 手工往 Blob 里写一行、或者以后信封格式改了，都不该让整段记忆消失
+    const be = new InMemoryMemoryBackend();
+    await be.put("prefs/raw", "手写进去的一行");
+    const m = new GlobalMemory(be);
+    const all = await m.entries();
+    eq(all.length, 1);
+    eq(all[0].value, "手写进去的一行");
+  });
+
+  await it("单条读失败不影响其余条目", async () => {
+    const be = new InMemoryMemoryBackend();
+    await be.put("prefs/good", JSON.stringify({ v: "好的一条" }));
+    await be.put("prefs/bad", JSON.stringify({ v: "坏的" }));
+    // 让某一条的 read 抛错
+    const orig = be.read.bind(be);
+    be.read = async (k: string) => {
+      if (k === "prefs/bad") throw new Error("这一条读挂了");
+      return orig(k);
+    };
+    const m = new GlobalMemory(be);
+    const all = await m.entries();
+    eq(all.length, 1);
+    eq(all[0].key, "prefs/good");
+  });
+
+  await it("renderMemoryList：别人的按人记忆只报条数，不显示内容", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    await m.remember("prefs/a", "1", "ou_alice");
+    await m.remember("user/ou_bob/c", "别人的秘密", "ou_bob");
+    const s = await renderMemoryList(m, "ou_alice");
+    ok(s.includes("prefs/a"));
+    ok(!s.includes("别人的秘密"), "群聊里显示别人的个人记忆是越界");
+    ok(s.includes("另有 1 条"));
+  });
+
+  await it("拿不到记忆后端时 renderMemoryList 直说，而不是假装空", async () => {
+    const s = await renderMemoryList(null, "ou_x");
+    ok(s.includes("接不上"), s);
+  });
+
+  await it("memoryBackendStatus：能指出「记忆为什么不见了」", () => {
+    const g = globalThis as any;
+    const saved = g.__EDGEONE_AGENT_RUNTIME__;
+    const savedPid = process.env.PAGES_PROJECT_ID;
+    const savedPid2 = process.env.ProjectId;
+    const savedPid3 = process.env.EDGEONE_PROJECT_ID;
+
+    try {
+      // 病一：运行时没暴露 getStore（本地裸 Node / 平台改了 API）
+      delete g.__EDGEONE_AGENT_RUNTIME__;
+      const noRt = memoryBackendStatus({ PAGES_PROJECT_ID: "makers-x" });
+      eq(noRt.available, false);
+      // ⚠️ 就算 projectId 有，运行时不在也得说不可用 —— 否则诊断会把病因指错
+      ok(noRt.reason!.includes("getStore"), noRt.reason!);
+
+      g.__EDGEONE_AGENT_RUNTIME__ = { getStore: () => ({}) };
+      delete process.env.PAGES_PROJECT_ID;
+      delete process.env.ProjectId;
+      delete process.env.EDGEONE_PROJECT_ID;
+
+      // 病二：拿不到 projectId
+      const noPid = memoryBackendStatus({});
+      eq(noPid.available, false);
+      ok(noPid.reason!.includes("projectId"), noPid.reason!);
+
+      const okSt = memoryBackendStatus({ PAGES_PROJECT_ID: "makers-abc" });
+      eq(okSt.available, true);
+      eq(okSt.namespace, "agent-memory-makers-abc");
+      eq(okSt.projectIdFrom, "env.PAGES_PROJECT_ID", "诊断要能说清是哪个变量生效了");
+
+      // ⚠️ process.env 里也要兜 —— 实测 agents 运行时把 Blob 凭证注入在
+      // process.env，只查 context.env 有整个功能静默失效的风险
+      process.env.ProjectId = "makers-fromproc";
+      const fromProc = memoryBackendStatus({});
+      eq(fromProc.namespace, "agent-memory-makers-fromproc");
+      eq(fromProc.projectIdFrom, "process.env.ProjectId");
+      delete process.env.ProjectId;
+
+      // 两处都有时 env 赢（控制台配的项目变量该覆盖进程环境）
+      process.env.PAGES_PROJECT_ID = "makers-proc";
+      eq(memoryBackendStatus({ PAGES_PROJECT_ID: "makers-env" }).namespace, "agent-memory-makers-env");
+
+      // 显式覆盖优先于一切
+      const over = memoryBackendStatus({ PAGES_PROJECT_ID: "makers-env", AGENT_MEMORY_NAMESPACE: "x" });
+      eq(over.namespace, "x");
+      eq(over.projectIdFrom, "AGENT_MEMORY_NAMESPACE");
+    } finally {
+      if (savedPid !== undefined) process.env.PAGES_PROJECT_ID = savedPid;
+      else delete process.env.PAGES_PROJECT_ID;
+      if (savedPid2 !== undefined) process.env.ProjectId = savedPid2;
+      else delete process.env.ProjectId;
+      if (savedPid3 !== undefined) process.env.EDGEONE_PROJECT_ID = savedPid3;
+      else delete process.env.EDGEONE_PROJECT_ID;
+      if (saved === undefined) delete g.__EDGEONE_AGENT_RUNTIME__;
+      else g.__EDGEONE_AGENT_RUNTIME__ = saved;
+    }
+  });
+
+  await it("blobMemoryBackend：运行时没暴露 getStore 时返回 null", () => {
+    const g = globalThis as any;
+    const saved = g.__EDGEONE_AGENT_RUNTIME__;
+    delete g.__EDGEONE_AGENT_RUNTIME__;
+    try {
+      eq(blobMemoryBackend({ PAGES_PROJECT_ID: "makers-x" }), null);
+    } finally {
+      if (saved !== undefined) g.__EDGEONE_AGENT_RUNTIME__ = saved;
+    }
+  });
+
+  await it("blobMemoryBackend：命名空间按 projectId 拼，可用 env 覆盖", () => {
+    const g = globalThis as any;
+    const saved = g.__EDGEONE_AGENT_RUNTIME__;
+    const savedEnv = process.env.PAGES_PROJECT_ID;
+    const savedEnv2 = process.env.ProjectId;
+    const savedEnv3 = process.env.EDGEONE_PROJECT_ID;
+    const names: string[] = [];
+
+    g.__EDGEONE_AGENT_RUNTIME__ = {
+      getStore: (o: any) => {
+        names.push(o.name);
+        return {
+          get: async () => null,
+          set: async () => {},
+          delete: async () => {},
+          list: async () => ({ blobs: [] }),
+        };
+      },
+    };
+
+    try {
+      // 三个候选键都要清掉，否则「没有 projectId」这一条会假通过
+      delete process.env.PAGES_PROJECT_ID;
+      delete process.env.ProjectId;
+      delete process.env.EDGEONE_PROJECT_ID;
+
+      // 命名空间**故意和平台自己的 memory-<projectId> 分开** ——
+      // 那边装着 conversations/ state/ 这些线上用户数据，不能共用一个键空间
+      ok(blobMemoryBackend({ PAGES_PROJECT_ID: "makers-abc" }) !== null);
+      eq(names[0], "agent-memory-makers-abc");
+
+      blobMemoryBackend({ PAGES_PROJECT_ID: "makers-abc", AGENT_MEMORY_NAMESPACE: "custom-ns" });
+      eq(names[1], "custom-ns");
+
+      // 没有 projectId 也没有覆盖 → 拿不到，返回 null
+      // （不硬编一个共享命名空间：多项目共用会串数据）
+      eq(blobMemoryBackend({}), null);
+    } finally {
+      if (savedEnv !== undefined) process.env.PAGES_PROJECT_ID = savedEnv;
+      else delete process.env.PAGES_PROJECT_ID;
+      if (savedEnv2 !== undefined) process.env.ProjectId = savedEnv2;
+      else delete process.env.ProjectId;
+      if (savedEnv3 !== undefined) process.env.EDGEONE_PROJECT_ID = savedEnv3;
+      else delete process.env.EDGEONE_PROJECT_ID;
+      if (saved === undefined) delete g.__EDGEONE_AGENT_RUNTIME__;
+      else g.__EDGEONE_AGENT_RUNTIME__ = saved;
+    }
+  });
+});
 
 // ── 收尾 ──────────────────────────────────────────────────────────────
 

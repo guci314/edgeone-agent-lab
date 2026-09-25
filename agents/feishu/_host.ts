@@ -33,6 +33,12 @@ import {
   summaryItem,
 } from "../../src/feishu/compact.ts";
 import { authStateText, makeFeishuDocTools } from "../../src/feishu/docs.ts";
+import {
+  GlobalMemory,
+  blobMemoryBackend,
+  makeMemoryTools,
+  renderMemoryList,
+} from "../../src/feishu/global-memory.ts";
 import { buildAuthorizeUrl, signState, type OAuthEnv } from "../../src/feishu/oauth.ts";
 import type { StateKv } from "../../src/feishu/store.ts";
 import { FeishuStreamer } from "../../src/feishu/streamer.ts";
@@ -82,6 +88,18 @@ export interface AgentEnv extends FeishuEnv, OAuthEnv {
   /** OpenCode Go 要求的会话标签头 `x-opencode-session`，值只是个路由标签 */
   OPENCODE_SESSION?: string;
   SANDBOX_ENABLED?: string;
+  /**
+   * 平台注入的项目身份。**跨会话记忆要用它拼 Blob 命名空间**
+   * （`agent-memory-<projectId>`），所以必须能读到。
+   *
+   * 三个名字都留着是因为构建产物里 `__userEnv` 同时塞了 `PAGES_PROJECT_ID` /
+   * `ProjectId` / `EDGEONE_PROJECT_ID` 三个键，值一样；哪个先被平台砍掉不好说，
+   * 取值时按顺序兜（见 global-memory.ts 的 blobMemoryBackend）。
+   */
+  PAGES_PROJECT_ID?: string;
+  ProjectId?: string;
+  /** 覆盖跨会话记忆的 Blob 命名空间。不设时按 `agent-memory-<projectId>` 算 */
+  AGENT_MEMORY_NAMESPACE?: string;
   /**
    * serper 的 key，给自建的 `web_search` 用（见 `_search.ts`）。
    *
@@ -245,6 +263,22 @@ export function makeModelClient(env: AgentEnv, onFailure?: (e: DiagEntry) => voi
   });
 }
 
+/**
+ * 建跨会话记忆。**拿不到平台 Blob 时返回 null**，不退化成本地内存。
+ *
+ * 为什么不用 `InMemoryMemoryBackend` 兜底：一个「这一轮记得、下一条消息就没了」
+ * 的记忆比没有记忆更坏 —— 用户会以为它真记住了，然后被它的遗忘搞糊涂。
+ * 宁可明确地没有（`/memory` 会直说接不上），也不要假的。
+ *
+ * 抽成模块级导出是为了让诊断端点能和真实回合走**同一条**取值路 ——
+ * `?probe=store` 的 `memory` 字段就是 `memoryBackendStatus(env)` 的输出，
+ * 和这里 `blobMemoryBackend(env)` 用的是同一个解析函数。
+ */
+export function makeGlobalMemory(env: AgentEnv): GlobalMemory | null {
+  const backend = blobMemoryBackend(env);
+  return backend ? new GlobalMemory(backend) : null;
+}
+
 export function createHost(deps: HostDeps): FeishuTurnHost {
   const { env, context, repo, cache } = deps;
 
@@ -350,14 +384,35 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
    */
   const searchTools = makeSearchTools(env);
 
+  /**
+   * 跨会话记忆。**每个回合建一个**（createHost 一次 = 一轮消息）——
+   * 实例内带读缓存，所以同一轮里「instructions 渲染」和「recall_facts」
+   * 只会打一次网络；而 remember/forget 会把缓存清掉，
+   * 于是同一轮内「刚记住 → 立刻查」也看得到。
+   */
+  const memory = makeGlobalMemory(env);
+
   const buildAgent = (): Agent =>
     new Agent({
       name: "code-repo-reader",
-      instructions: INSTRUCTIONS,
+      // ⚠️ `instructions` 这里是**函数**而不是字符串：长期记忆必须在每轮开头
+      // 动态拼进去。`@openai/agents` 的 `Agent.instructions` 支持
+      // `(runContext, agent) => string | Promise<string>`
+      // （见 node_modules/@openai/agents-core/dist/agent.d.ts）。
+      //
+      // 拿不到记忆（本地调试 / 运行时没暴露 Blob）时**退回静态字符串** ——
+      // 不只是省一次 await，更重要的是提示词里不会出现「你有长期记忆」这种
+      // 骗人的话（模型会去调一个没挂上的工具）。
+      instructions: memory
+        ? async () => INSTRUCTIONS + (await memory.renderForPrompt(deps.openId))
+        : INSTRUCTIONS,
       model: getModel(),
       modelSettings: { maxTokens: MAX_OUTPUT_TOKENS },
       tools: [
         ...makeWorkspaceTools(repo),
+        // 跨会话记忆的三个工具（remember_fact / forget_fact / recall_facts）。
+        // 挂不上就整个不挂，理由同上。
+        ...((memory ? makeMemoryTools(memory, deps.openId) : []) as any[]),
         // 用户身份读飞书云文档。工具拿不到 context，只能靠闭包捕获上面的管理器
         ...(userTokens ? (makeFeishuDocTools({ env, tokens: userTokens }) as any[]) : []),
         // 自建 web_search（serper）。挂了它就必须摘掉平台内置的那个
@@ -584,7 +639,47 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
       await s.clearSession();
       // 只说清了对话 —— 语料（repo 快照）在另一个键里，不受影响。
       // 不写这句的话，用户会以为要重新 /repo 一遍。
-      return "会话已清空，之前的对话记忆没了。导入的仓库还在（发 /status 可以看）。";
+      //
+      // ⚠️ 加了跨会话记忆之后，这句**必须点名长期记忆不动**。不写的话用户会以为
+      // `/clear` 能把记忆一起抹掉 —— 而记忆在另一个 Blob 命名空间里，
+      // 这个命令结构上就碰不到它。要删记忆只有 /forget 一条路。
+      const extra = memory ? "\n\n长期记忆不受影响（那是跨会话的，删它用 /forget）。" : "";
+      return `会话已清空，之前的对话记忆没了。导入的仓库还在（发 /status 可以看）。${extra}`;
+    },
+
+    async memoryText() {
+      return renderMemoryList(memory, deps.openId);
+    },
+
+    async forgetMemory(key) {
+      if (!memory) {
+        return "这个环境接不上跨会话记忆（多半是本地调试），没什么可删的。";
+      }
+      const k = key.trim();
+
+      // `/forget all confirm` —— 清空**这个人的视野**（项目级 + 他自己的）。
+      // 为什么非要二次确认：记忆是跨会话的，删掉之后别的群也看不到了，
+      // 而且没有回收站。误删一条还能重记，误清空就得重新教一遍。
+      if (k === "all confirm") {
+        const n = await memory.forgetAll(deps.openId);
+        return n ? `已清掉 ${n} 条长期记忆。` : "本来就没有可清的长期记忆。";
+      }
+      if (k === "all") {
+        return [
+          "这会删掉全部项目级记忆，别的会话也看不到了，而且不能恢复。",
+          "",
+          "确认就发：/forget all confirm",
+        ].join("\n");
+      }
+      if (!k) {
+        return "用法：/forget <键名> 删一条（键名见 /memory）。清空发 /forget all confirm。";
+      }
+
+      // 人打键名不会带 prefs/ 前缀，走宽松匹配
+      const hit = await memory.forgetLoose(k, deps.openId);
+      return hit
+        ? `已删掉 ${hit}。`
+        : `没找到「${k}」。发 /memory 看一下现有的键名。`;
     },
   };
 }

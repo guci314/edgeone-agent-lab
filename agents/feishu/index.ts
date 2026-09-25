@@ -35,6 +35,7 @@
 // 原版「一个 DO 实例一个 SQLite 库」正好等价于这个。
 
 import { sendText } from "../../src/feishu/api.ts";
+import { memoryBackendStatus } from "../../src/feishu/global-memory.ts";
 import { exchangeCode, redirectUri, verifyState } from "../../src/feishu/oauth.ts";
 import { MemoryKv, FeishuStore, type StateKv } from "../../src/feishu/store.ts";
 import { runFeishuTurn } from "../../src/feishu/turn.ts";
@@ -754,6 +755,15 @@ function redactEnvValue(k: string, v: string | undefined): unknown {
 }
 
 async function probeStore(context: any, url: URL): Promise<Response> {
+  // ⚠️ 必须挡令牌：`op=write` 会往**共享**命名空间里写键，`op=shape` 会回显
+  // 存储相关的环境变量名。`probe=start` / `probe=check` 之所以不挡，是因为
+  // 状态页要在浏览器里直接点它们 —— 把 INTERNAL_TOKEN 塞进静态页等于公开它。
+  // 这个端点没有那个约束：跑它的人本来就在 shell 里。
+  const gateEnv = (context?.env ?? {}) as Record<string, unknown>;
+  const expect = String(gateEnv.INTERNAL_TOKEN ?? "");
+  const got = String(url.searchParams.get("token") ?? "");
+  if (!expect || got !== expect) return json({ error: "需要 token=INTERNAL_TOKEN" }, 401);
+
   const op = url.searchParams.get("op") ?? "shape";
   const cid = String(context?.conversation_id ?? "");
   const out: Record<string, unknown> = { op, conversationId: cid };
@@ -769,6 +779,10 @@ async function probeStore(context: any, url: URL): Promise<Response> {
     hasList: typeof store?.list === "function",
   };
   out.contextTopKeys = collectKeys(context).slice(0, 60);
+
+  // ── ①.5 跨会话记忆：走和真实回合**同一个**解析函数 ─────────────────
+  // 「记忆不见了」只有两种病，这个字段直接指出是哪一种，不用猜。
+  out.memory = memoryBackendStatus((context?.env ?? {}) as Record<string, string | undefined>);
 
   // ── ② 运行时暴露面 ────────────────────────────────────────────────
   const rt = (globalThis as any).__EDGEONE_AGENT_RUNTIME__ ?? null;

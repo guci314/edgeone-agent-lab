@@ -13,24 +13,26 @@
 
 | 环节 | 状态 |
 |---|---|
-| 代码（约 5300 行） | ✅ 写完 |
+| 代码（约 5700 行） | ✅ 写完 |
 | `npm install` | ✅ **通过** —— 104 个包，约 1 分钟 |
 | `tsc --noEmit` 类型检查 | ✅ **零错误** |
-| `npm test` 冒烟测试 | ✅ **73 项全通过**（验签/解密、命令解析、去重限流、generation 制、四个代码工具、webhook 端到端、回合流程） |
-| `edgeone makers dev` 本地起服务 | ⚠️ **没跑成** —— 缺登录令牌（见下） |
+| `npm test` 冒烟测试 | ✅ **170 项全通过**（验签/解密、命令解析、去重限流、generation 制、四个代码工具、webhook 端到端、回合流程、云文档工具族、跨会话记忆） |
+| `edgeone makers dev` 本地起服务 | ⚠️ **能起来，但 agent 路由本地打不到** —— `agent-node` 不绑定端口（见下） |
+| 跨会话记忆的存储层 | ✅ **已实测**（不靠文档推断：agents 运行时内置 Blob SDK） |
 | 真实飞书链路 | ❌ 没跑过 |
 
-`edgeone makers dev` 起不来的原因不是代码，是**没登录**。CLI 原话：
+`edgeone makers dev` 的三个坑（都是实测）：
 
-```
-You are not authenticated, and browser login is unavailable in a non-interactive
-environment. Please provide a token via -t <token> or set the EDGEONE_PAGES_API_TOKEN
-environment variable.
-```
+1. **`agent-node` 不绑定端口** —— 日志停在 `[agent-node] Observability: openai-agents`，
+   只有 `node-function`(9005) 和 `observability`(9101) 起来。**`/feishu` 本地打不到**。
+2. 前端 dev server 会被跳过（`The configured dev command would recurse into edgeone itself.`），
+   因为 `package.json` 的 `dev` 就是 `edgeone makers dev`。所以「打开状态页看回调地址」
+   这一步只能部署后验。
+3. 未登录时 CLI 直接拒绝，要 `-t <token>` 或 `EDGEONE_PAGES_API_TOKEN`；
+   令牌可以从 `~/.edgeone/<sha256>`（JSON，取 `value.Token`）里捞。
+   再加 `--skip-env-sync --skip-ai-gateway-sync`，否则会卡在交互式提问上。
 
-先 `npx edgeone login`（会开浏览器），或者把令牌塞进 `EDGEONE_PAGES_API_TOKEN`。
-
-另外有两处**按文档推断、没有实测**的地方，写在 `docs/01-架构与移植映射.md` 的
+剩下两处**按文档推断、没有实测**的地方，写在 `docs/01-架构与移植映射.md` 的
 「两个未知数」一节 —— 部署后请按 `docs/03-验证清单.md` 实测确认。
 
 ---
@@ -82,8 +84,9 @@ npm run dev
 `generation` 制的原子切换、那个 36 字符的 `conversation_id` —— **全都不依赖平台**。
 把它们从平台里剥出来单独测，改一行就能验证一次，不用等部署。
 
-覆盖八节：A 验签解密 ｜ B 事件体解析 ｜ C 命令解析 ｜ D 去重限流 ｜
-E 语料仓储 ｜ F 代码工具 ｜ G webhook 端到端 ｜ H 回合流程。
+覆盖十三节：A 验签解密 ｜ B 事件体解析 ｜ C 命令解析 ｜ D 去重限流 ｜
+E 语料仓储 ｜ F 代码工具 ｜ G webhook 端到端 ｜ H 回合流程 ｜ I 会话压缩 ｜
+J 云文档授权 ｜ K 用户令牌管理 ｜ L 云文档工具族 ｜ M 跨会话记忆。
 
 ---
 
@@ -107,12 +110,13 @@ edgeone-agent-lab/
 │   ├── feishu/
 │   │   ├── api.ts         ✅ 原样   # tenant_access_token、发文本
 │   │   ├── card.ts        ✅ 原样   # 流式卡片（cardkit）
-│   │   ├── commands.ts    🔧 微改   # 命令解析（加 /compact /clear）
+│   │   ├── commands.ts    🔧 微改   # 命令解析（加 /compact /clear /memory /forget）
 │   │   ├── compact.ts     ➕ 新增   # 会话压缩的纯函数（渲染历史 / 写回形状）
 │   │   ├── crypto.ts      ✅ 原样   # 验签 + AES 解密
 │   │   ├── event.ts       ✅ 原样   # 事件体解析
+│   │   ├── global-memory.ts ➕ 新增 # **跨会话**记忆（Blob 后端 + 三个工具 + 渲染）
 │   │   ├── streamer.ts    ✅ 原样   # 增量 → 卡片，250ms 一拍
-│   │   ├── turn.ts        🔧 微改   # 回合流程（markDone 改 await；加 /compact /clear 分发）
+│   │   ├── turn.ts        🔧 微改   # 回合流程（markDone 改 await；加 /compact /clear /memory /forget 分发）
 │   │   ├── store.ts       🔄 重写   # SQL → 按会话隔离的 JSON KV
 │   │   └── types.ts       ➕ 新增   # FeishuQueueEvent 从 router.ts 挪出来
 │   └── workspace/
@@ -127,10 +131,10 @@ edgeone-agent-lab/
 │       └── tools.ts       🔧 换框架 # read/ls/find/grep：JSON Schema → zod
 │
 ├── test/
-│   └── smoke.ts                    # 冒烟测试：73 项，裸 Node 跑，不依赖 EdgeOne
+│   └── smoke.ts                    # 冒烟测试：170 项，裸 Node 跑，不依赖 EdgeOne
 │
 └── docs/
-    ├── 01-架构与移植映射.md         # 逐模块对照、两个未知数、刻意没做的事
+    ├── 01-架构与移植映射.md         # 逐模块对照、跨会话记忆、两个未知数、刻意没做的事
     ├── 02-飞书配置.md               # 飞书后台怎么点
     └── 03-验证清单.md               # 按顺序执行的验证步骤
 ```
@@ -149,11 +153,16 @@ cloud-functions/feishu-webhook      无状态 · 验签 · 解密 · 解析
  │  POST /feishu  + Makers-Conversation-Id: fs-<hash(chat_id)>
  ▼
 agents/feishu                       会话模式 · 粘性路由 · 最长 900 秒
- ├─ context.store.openaiSession()   对话记忆（平台托管，跨实例）
- ├─ context.store.state             去重 / 限流 / token 缓存 / 语料快照
+ ├─ context.store.openaiSession()   对话记忆（平台托管，按会话隔离）
+ ├─ context.store.state             去重 / 限流 / token 缓存 / 语料快照（按会话隔离）
+ ├─ Blob (agent-memory-<projectId>) **跨会话**长期事实：prefs/* · user/<openId>/*
  ├─ context.tools.*                 沙箱工具（commands / code_interpreter / web_search / …）
  └─ 回飞书（sendText 或流式卡片）
 ```
+
+> 上面两行是**按会话**的，第三行是**跨会话**的 —— 这是两片完全不同的键空间。
+> 「记住这个项目用 pnpm」写在第三行，所以换个群、`/clear` 之后都还在。
+> 详见 `docs/01-架构与移植映射.md` 第五节。
 
 拆成两段不是绕远路，是被平台的硬约束逼出来的：`agents/` 路由**强制要求**
 `Makers-Conversation-Id` 请求头，而飞书推送是它自己发的，我们加不了头。

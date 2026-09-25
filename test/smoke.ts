@@ -25,6 +25,7 @@
 // 每个小节自己装自己的 stub，不要跨小节依赖。
 
 import { decryptEvent, verifySignature } from "../src/feishu/crypto.ts";
+import { sanitizeAndAppend, sanitizeHistory } from "../src/feishu/session-sanitize.ts";
 import { parseMessageEvent, readChallenge, readEnvelope } from "../src/feishu/event.ts";
 import { HELP_TEXT, parseCommand } from "../src/feishu/commands.ts";
 import {
@@ -1933,6 +1934,104 @@ await describe("L. 云文档工具族", async () => {
     ok(typeof r.error === "string" && r.error.length > 0, JSON.stringify(r));
   });
 });
+
+// ── 会话历史消毒（session-sanitize）────────────────────────────────────
+//
+// 这一组守的是「会话被永久毒死」那个坑：窗口从 tool_calls 对中间切开后，
+// 开头会剩下孤儿 tool 消息，网关稳定 400，只有 /clear 能救。
+// 消毒函数是纯函数，所以能在这里把各种切歪的情况钉死。
+
+// 没有 group 辅助函数，用一个注释段代替（和文件里其它分组一致）
+{
+  const A = (id?: string, content = ""): any =>
+    id
+      ? { role: "assistant", content, tool_calls: [{ id, type: "function", function: { name: "t", arguments: "{}" } }] }
+      : { role: "assistant", content };
+  const T = (id: string): any => ({ role: "tool", tool_call_id: id, content: "结果" });
+  const U = (text: string): any => ({ role: "user", content: text });
+  const S: any = { role: "system", content: "你是助手" };
+
+  await it("正常序列原样保留，一条都不丢", async () => {
+    const input = [S, U("问"), A("c1"), T("c1"), A(undefined, "答")];
+    const r = sanitizeHistory(input);
+    eq(r.items.length, 5, JSON.stringify(r));
+    eq(r.droppedOrphanTools, 0);
+    eq(r.droppedEmptyAssistants, 0);
+  });
+
+  await it("⚠️ 开头就是孤儿 tool（窗口切歪的典型症状）→ 丢掉", async () => {
+    // 这就是线上那个角色序列 `s t t a u ...` 的形状
+    const input = [S, T("gone1"), T("gone2"), A(undefined, "答"), U("新问题")];
+    const r = sanitizeHistory(input);
+    eq(r.droppedOrphanTools, 2, JSON.stringify(r));
+    eq(r.items.length, 3, "只剩 system / assistant / user");
+    eq(r.items[0].role, "system");
+    eq(r.items[1].role, "assistant");
+    eq(r.items[2].role, "user");
+  });
+
+  await it("中间夹的孤儿 tool 也丢，但不影响配对的那些", async () => {
+    const input = [S, A("c1"), T("c1"), T("孤儿"), A("c2"), T("c2")];
+    const r = sanitizeHistory(input);
+    eq(r.droppedOrphanTools, 1);
+    eq(r.items.length, 5, JSON.stringify(r.items.map((i: any) => i.role)));
+  });
+
+  await it("同一个 callId 只能被消费一次（重复 tool 结果算孤儿）", async () => {
+    const input = [S, A("c1"), T("c1"), T("c1")];
+    const r = sanitizeHistory(input);
+    eq(r.droppedOrphanTools, 1, "第二个 T(c1) 认领不到声明方");
+    eq(r.items.length, 3);
+  });
+
+  await it("空 assistant（无文本无 tool_calls）丢掉", async () => {
+    const input = [S, A(undefined, ""), U("问")];
+    const r = sanitizeHistory(input);
+    eq(r.droppedEmptyAssistants, 1, JSON.stringify(r));
+    eq(r.items.length, 2);
+  });
+
+  await it("有 tool_calls 但没文本的 assistant **必须留**（不是空的）", async () => {
+    const input = [S, A("c1"), T("c1")];
+    const r = sanitizeHistory(input);
+    eq(r.droppedEmptyAssistants, 0);
+    eq(r.items.length, 3);
+  });
+
+  await it("sanitizeAndAppend：历史在前、本轮在后，顺序不变", async () => {
+    const history = [S, T("orphan"), A(undefined, "旧答")];
+    const out = sanitizeAndAppend(history, [U("本轮问题")]);
+    eq(out.length, 3, JSON.stringify(out));
+    eq(out[0].role, "system");
+    eq(out[1].role, "assistant");
+    eq(out[2].role, "user");
+    eq((out[2] as any).content, "本轮问题");
+  });
+
+  await it("sanitizeAndAppend：丢了东西要回调（用于落诊断，别静默）", async () => {
+    let reported: any = null;
+    sanitizeAndAppend([S, T("orphan")], [U("问")], (d) => {
+      reported = d;
+    });
+    ok(reported && reported.droppedOrphanTools === 1, JSON.stringify(reported));
+  });
+
+  await it("什么都没丢时不回调（避免正常回合也写 KV）", async () => {
+    let called = false;
+    sanitizeAndAppend([S, U("问"), A(undefined, "答")], [U("再问")], () => {
+      called = true;
+    });
+    eq(called, false);
+  });
+
+  await it("空历史 / 只有本轮输入时不出错", async () => {
+    const r = sanitizeHistory([] as any[]);
+    eq(r.items.length, 0);
+    const out = sanitizeAndAppend([], [U("你好")]);
+    eq(out.length, 1);
+    eq((out[0] as any).role, "user");
+  });
+}
 
 // ── 收尾 ──────────────────────────────────────────────────────────────
 

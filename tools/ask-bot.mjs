@@ -9,21 +9,29 @@
 // agent 的 normalizeEvent 只认 {messageId, chatId, chatType, openId, text}，
 // **不验飞书签名**：签名是 cf-agent-lab 中转那层做的。所以本机可以直接打 agent。
 //
-// ── ⚠️ 打 EdgeOne 必须走代理 ────────────────────────────────────────
-// 2026-09-23 实测（同一时刻、同一 URL、同一请求头）：
+// ── ⚠️ 代理：分域名，别一刀切 ────────────────────────────────────────
+// 2026-09-23 实测（同一时刻、同一 URL、同一请求头，打 `.edgeone.dev`）：
 //   经代理 127.0.0.1:7890 → 202 ✅
 //   直连                 → 401 ❌（腾讯 HTML 错误页，响应头 `x-eop-msg: eo_time missing`）
 // 那个 `eo_time missing` 是边缘的通用挡板文案，**与请求内容无关**，
 // 别照它去猜"少传了什么参数"。
 //
-// 踩过的坑：本机各会话普遍设着 `NO_PROXY=*`（claude-ds 那套启动脚本为加速自家
-// 端点而设）。**curl 并不认这个通配**，所以"默认环境"下 curl 其实走了 ALL_PROXY，
-// 于是能通；而我一开始把 *_PROXY 全删掉想"确保直连"，反而稳定 401。
-// 别再删代理变量了 —— 这里显式用代理。
+// 2026-09-25 补测（条件变了，结论要分开记）：
+//   · `.edgeone.dev`（AGENT_URL）  → **必须走代理**（直连 401，经代理 400/202）
+//   · `eolab.yujizi.org`（自定义域名）→ **直连就行**（直连、经代理都是 400）
+//   所以「打 EdgeOne 必须走代理」只对 `.edgeone.dev` 成立，别推广。
 //
-// 另一条同时踩到的：Node 的 fetch/https.request 和 Python 的 urllib 也全 401，
-// 当时误判成"OpenSSL 的 TLS 指纹被挡"。真正原因同上——它们没走代理。
+// ── 踩过的坑（2026-09-25 又踩一次）────────────────────────────────────
+// 原来这里只 `delete NO_PROXY`，然后 `if (!ALL_PROXY) all_proxy = 7890`。
+// 在本机各会话普遍设着 `NO_PROXY=*` 的年代这没问题；但现在环境里
+// **`HTTPS_PROXY=127.0.0.1:53513`（另一个端口）是设着的**，而 curl 解析
+// https 代理的优先级是 `HTTPS_PROXY` > `ALL_PROXY` —— 于是 all_proxy=7890
+// 被静默忽略，请求走了 53513，稳定 401。
 //
+// 所以现在**显式用 `-x` 指定代理**，并把所有代理类环境变量清干净，
+// 让 curl 没有别的选择。想换代理端口就设 `EO_PROXY`。
+const PROXY = process.env.EO_PROXY || "http://127.0.0.1:7890";
+
 // 用法: node ask-bot.mjs "问题文本"
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -51,16 +59,22 @@ for (const k of ["AGENT_URL", "INTERNAL_TOKEN", "FEISHU_APP_ID", "FEISHU_APP_SEC
 
 /** 经 curl 发一次请求。⚠️ 别换成 fetch，见文件头。 */
 async function curl(url, { method = "GET", headers = {}, body } = {}) {
-  const args = ["-sS", "-m", "60", "-X", method, "-o", "-", "-w", "\n%{http_code}"];
+  // 显式 -x 指定代理，见文件头的说明：环境里的 HTTPS_PROXY 会压过 all_proxy
+  const args = ["-sS", "-m", "60", "-x", PROXY, "-X", method, "-o", "-", "-w", "\n%{http_code}"];
   for (const [k, v] of Object.entries(headers)) args.push("-H", `${k}: ${v}`);
   if (body !== undefined) args.push("-d", body);
   args.push(url);
-  // ⚠️ 必须走代理（见文件头）。这里**清掉 NO_PROXY** 而不是清代理本身，
-  // 否则 curl 会直连 → 401。
+  // 把所有代理类变量清干净，让上面那个 -x 成为唯一来源（否则会被环境里的
+  // HTTPS_PROXY 覆盖掉，就是 9/25 那次 401 的原因）
   const cleanEnv = { ...process.env };
-  delete cleanEnv.NO_PROXY;
-  delete cleanEnv.no_proxy;
-  if (!cleanEnv.ALL_PROXY && !cleanEnv.all_proxy) cleanEnv.all_proxy = "http://127.0.0.1:7890";
+  for (const k of [
+    "NO_PROXY", "no_proxy",
+    "HTTP_PROXY", "http_proxy",
+    "HTTPS_PROXY", "https_proxy",
+    "ALL_PROXY", "all_proxy",
+  ]) {
+    delete cleanEnv[k];
+  }
   const { stdout, stderr } = await execFileP("curl", args, { env: cleanEnv, maxBuffer: 8 << 20 });
   if (stderr && /curl:/.test(stderr)) throw new Error(stderr.trim().slice(0, 200));
   const idx = stdout.lastIndexOf("\n");
@@ -146,6 +160,16 @@ console.log(`agent → ${res.status}`);
 const replies = res.json?.replies;
 if (!Array.isArray(replies)) {
   console.log("没有拿到 replies：", res.text.slice(0, 400));
+  // 401 + 腾讯 HTML 页 = 边缘挡板，**不是**业务鉴权失败（别去查 INTERNAL_TOKEN）。
+  // 判据：响应体里有 "Tencent Edgeone" 这种 HTML 标题，或 x-eop-msg: eo_time missing。
+  if (res.status === 401 && /Tencent Edgeone|<html/i.test(res.text)) {
+    console.log(
+      `\n💡 这是边缘挡板（eo_time missing），不是 INTERNAL_TOKEN 的问题。\n` +
+        `   AGENT_URL 是 .edgeone.dev 域名时必须经代理访问。当前用的代理是 ${PROXY}。\n` +
+        `   换端口：EO_PROXY=http://127.0.0.1:<port> node tools/ask-bot.mjs "…"\n` +
+        `   测代理是否可用：curl -s -o /dev/null -w '%{http_code}\\n' -x ${PROXY} "${env.AGENT_URL}"（400 就是通的）`,
+    );
+  }
   process.exit(1);
 }
 console.log("\n===== 机器人回复 =====");

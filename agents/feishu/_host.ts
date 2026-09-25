@@ -37,19 +37,49 @@ import { buildAuthorizeUrl, signState, type OAuthEnv } from "../../src/feishu/oa
 import type { StateKv } from "../../src/feishu/store.ts";
 import { FeishuStreamer } from "../../src/feishu/streamer.ts";
 import type { FeishuTurnHost } from "../../src/feishu/turn.ts";
+import { sanitizeAndAppend } from "../../src/feishu/session-sanitize.ts";
 import { UserTokenManager, makeUserTokenStore } from "../../src/feishu/user-token.ts";
 import { makeWorkspaceTools } from "../../src/workspace/tools.ts";
 import type { WorkspaceRepo } from "../../src/workspace/repo.ts";
 import { serveIngest } from "../../src/workspace/serve-ingest.ts";
 import { INSTRUCTIONS } from "./_instructions.ts";
+import { diagCounters, modelFetch, type DiagEntry } from "./_diag.ts";
 import { makeSearchTools } from "./_search.ts";
 import { platformTools, summarizeToolOutput, toolFailed } from "./_tools.ts";
 
+/**
+ * 模型层最后一次失败的落盘键（会话 KV）。
+ * `?probe=last` 读它 —— 内存环形缓冲按实例隔离，KV 按 conversation_id 归属，
+ * 换个实例也能读到。两个地方必须用同一个值。
+ */
+export const DIAG_KEY = "diag.lastModelFailure";
+
 /** 模型调用与平台密钥 */
 export interface AgentEnv extends FeishuEnv, OAuthEnv {
+  /**
+   * 模型路由。**优先用 OPENCODE_\*，不要用 AI_GATEWAY_\*** ——
+   * 后者是平台托管的，每次 deploy 都会被 CLI 的
+   * `Bound AI Gateway credentials to project` 覆盖回平台值，
+   * 手写的值活不过一轮部署（实测：setEnvs 写成功、listEnvs 回读一致，
+   * 部署完就变回旧值）。前者是普通自定义键，不会被碰。
+   *
+   * 正确取值：
+   *   OPENCODE_BASE_URL = https://opencode.ai/zen/go/v1
+   *   OPENCODE_MODEL    = deepseek-v4.1-flash（裸名，不带 @makers/）
+   *
+   * 取值逻辑见 `resolveModelRoute()`；key 和 baseURL **必须成对取**。
+   */
+  OPENCODE_API_KEY?: string;
+  OPENCODE_BASE_URL?: string;
+  OPENCODE_MODEL?: string;
+  /**
+   * ⚠️ 平台托管，会被 deploy 重置。只作兜底，不要指望能改。
+   * 名字是模板惯例（edgeone.json 的 framework 适配读这三个名字）。
+   */
   AI_GATEWAY_API_KEY?: string;
   AI_GATEWAY_BASE_URL?: string;
   AI_GATEWAY_MODEL?: string;
+  /** OpenCode Go 要求的会话标签头 `x-opencode-session`，值只是个路由标签 */
   OPENCODE_SESSION?: string;
   SANDBOX_ENABLED?: string;
   /**
@@ -126,40 +156,118 @@ export interface HostDeps {
   chatId: string;
 }
 
+/**
+ * 解析模型名。**裸名**（`deepseek-v4.1-flash`），因为路由指向 OpenCode Go。
+ *
+ * ⚠️ 两个网关的模型名规则是**相反**的，换端点时必须一起改，否则错得很像：
+ *   · EdgeOne AI Gateway：必须带 provider 前缀，免费档 `@makers/<model>`，
+ *     写裸名 → 400 `Model ID must include provider prefix`
+ *   · OpenCode Go：必须写裸名，带前缀 → 404
+ * 踩过：只把 baseURL 换成 opencode.ai 而留着 `@makers/` 前缀，报 404，
+ * 看起来像「模型不存在」，实际是前缀没摘。
+ *
+ * 取值优先级：`OPENCODE_MODEL` > `AI_GATEWAY_MODEL` > 硬编码兜底。
+ * 为什么优先前者见 `resolveModelRoute` 的注释。
+ */
+export function resolveModelName(env: AgentEnv): string {
+  return env.OPENCODE_MODEL || env.AI_GATEWAY_MODEL || "deepseek-v4.1-flash";
+}
+
+/**
+ * 解析「key + baseURL」这一对。**必须成对取，不能各取一半**。
+ *
+ * ── 为什么不能混着用 ────────────────────────────────────────────────
+ * 踩过：key 是 OpenCode Go 的、baseURL 却指着 EdgeOne AI Gateway，
+ * 稳定拿到 401 `API key not found`，看着像密钥失效，其实是打错了门。
+ * 所以这里按**来源**整体决定：认得出 OPENCODE_* 就两个都用它，
+ * 否则两个都退回 AI_GATEWAY_*。绝不出现「key 来自 A、地址来自 B」。
+ *
+ * ── 为什么要另起 OPENCODE_* 这个名字 ─────────────────────────────────
+ * `AI_GATEWAY_*` 是**平台托管**的：实测用 setEnvs 写进去、listEnvs 回读
+ * 确认成功（baseURL len 34 → 29），但跑一次 `deploy` 之后它自己变回了旧值 ——
+ * 因为 CLI 每次部署都会 `Bound AI Gateway credentials to project`，
+ * 用平台的值覆盖这三个键。手写的值活不过一轮部署。
+ *
+ * 对照组：`OPENCODE_SESSION` 同样是自定义键，从来没被重置过。
+ * 所以问题出在**名字**，不是写入能力 —— 早先的结论
+ * 「setEnvs 改不了 AI_GATEWAY_*」描述对了现象、说错了原因。
+ *
+ * 兜底保留 AI_GATEWAY_* 是为了本地调试和「万一没配 OPENCODE_*」时不至于跑不起来。
+ */
+export function resolveModelRoute(env: AgentEnv): {
+  apiKey: string | undefined;
+  baseURL: string | undefined;
+  /** 用的是哪一组变量，回显给探针用 */
+  source: "OPENCODE_*" | "AI_GATEWAY_*" | "未配置";
+} {
+  const ocKey = env.OPENCODE_API_KEY?.trim();
+  const ocUrl = env.OPENCODE_BASE_URL?.trim();
+  if (ocKey && ocUrl) return { apiKey: ocKey, baseURL: ocUrl, source: "OPENCODE_*" };
+
+  const gwKey = env.AI_GATEWAY_API_KEY?.trim();
+  const gwUrl = env.AI_GATEWAY_BASE_URL?.trim();
+  if (gwKey && gwUrl) return { apiKey: gwKey, baseURL: gwUrl, source: "AI_GATEWAY_*" };
+
+  // 半配的情况（只有 key 没有地址）当作没配，免得又出现「打错门」
+  return { apiKey: undefined, baseURL: undefined, source: "未配置" };
+}
+
+/**
+ * 按运行时 env 建一个模型客户端。
+ *
+ * 抽成**模块级导出**（而不是留在 createHost 里的闭包）是为了让
+ * `?probe=model` 能走**完全相同**的一条路：同一份 env、同一个 baseURL、
+ * 同一组请求头。探针要是自己另拼一份配置，测过的就不是线上真正跑的那条路了。
+ *
+ * 走用户自己的 OpenCode Go 订阅池，不用平台的免费模型 ——
+ * 免费额度是账号级的 50 万 token，代码问答读几个文件就没了。
+ */
+export function makeModelClient(env: AgentEnv, onFailure?: (e: DiagEntry) => void): OpenAI {
+  const route = resolveModelRoute(env);
+  return new OpenAI({
+    apiKey: route.apiKey,
+    baseURL: route.baseURL,
+    // OpenCode Go 要求带这个头，缺了会被直接拒。值只是个路由标签。
+    // 原版用的是 AI SDK 的 createOpenAICompatible({ headers })，
+    // 这里对应 OpenAI Node SDK 的 defaultHeaders。
+    defaultHeaders: env.OPENCODE_SESSION
+      ? { "x-opencode-session": env.OPENCODE_SESSION }
+      : undefined,
+    // 挂一层记录器：出站请求形状 + 入站响应都留在环形缓冲里，
+    // 用 `?probe=last` 取。模型返回光秃秃的 400 时，**唯一**能看出
+    // 原因的地方就是这里（SDK 的 message 不含响应正文）。
+    //
+    // ⚠️ 它还做**重试**：OpenAI SDK 的内置重试只认 408/409/429/5xx，
+    // 而实测 OpenCode Go 会间歇性返回 400（残缺响应体）—— SDK 不重试，
+    // 用户就直接看到「没答上来：400 status code (no body)」。
+    // 见 _diag.ts 的 isRetryable()。
+    fetch: modelFetch({ onFailure }),
+  });
+}
+
 export function createHost(deps: HostDeps): FeishuTurnHost {
   const { env, context, repo, cache } = deps;
 
-  // ⚠️ 默认值必须带 `@makers/` 前缀。EdgeOne AI Gateway 的模型名**一律要求
-  // provider 前缀**，免费档是 `@makers/<model>`；写成裸 `deepseek-v4.1-flash`
-  // 会直接 404。移植前这里是 OpenCode Go 的默认值，前缀规则不同。
-  const MODEL_NAME = env.AI_GATEWAY_MODEL ?? "@makers/deepseek-v4.1-flash";
+  // ⚠️ 模型名与客户端都从**模块级函数**取（见上面的 resolveModelName /
+  // makeModelClient）—— 这样 `?probe=model` 和真实回合走的是同一条路。
+  const MODEL_NAME = resolveModelName(env);
 
   // 模型客户端只建一次。每个实例（= 每个飞书会话）一份，
   // 这样底层 HTTP 连接池能复用 —— 每回合重建会白白多一次 TLS 握手。
   //
-  // 单独抽成 getClient()（而不是留在 getModel() 里）是因为 `/compact` 要**绕过
-  // Agent run** 直接发一次摘要请求，走的是同一个客户端、同一份凭证。
-  let client: OpenAI | null = null;
-  const getClient = (): OpenAI => {
-    if (client) return client;
-
-    // 走用户自己的 OpenCode Go 订阅池，不用平台的免费模型 ——
-    // 免费额度是账号级的 50 万 token，代码问答读几个文件就没了。
-    //
-    // 变量名沿用 AI_GATEWAY_*：edgeone.json 的 framework 适配和模板惯例都读这三个
-    // 名字，换成 OpenCode Go 只需要改值。
-    client = new OpenAI({
-      apiKey: env.AI_GATEWAY_API_KEY,
-      baseURL: env.AI_GATEWAY_BASE_URL,
-      // OpenCode Go 要求带这个头，缺了会被直接拒。值只是个路由标签。
-      // 原版用的是 AI SDK 的 createOpenAICompatible({ headers })，
-      // 这里对应 OpenAI Node SDK 的 defaultHeaders。
-      defaultHeaders: env.OPENCODE_SESSION
-        ? { "x-opencode-session": env.OPENCODE_SESSION }
-        : undefined,
+  // 这里用 const 而不是惰性 getter：OpenAI 客户端构造很便宜，
+  // 而且挂了诊断回调之后，越早建越好 —— 惰性会让失败发生在getClient之前，
+  // 那段失败就拿不到诊断信息了。`/compact` 也直接复用这一个实例。
+  //
+  // 失败时把最后一次失败的记录落进**会话 KV**：内存环形缓冲是按实例隔离的，
+  // 而 `?probe=last` 那次请求很可能被路由到**另一个实例**，就读不到了。
+  // 实测就踩过：明明刚失败过，探针却回 count=0。
+  // KV 按 conversation_id 归属（跟探针用的是同一个 id），所以任何实例都能读到。
+  const client = makeModelClient(env, (e: DiagEntry) => {
+    void deps.kv?.set(DIAG_KEY, e).catch(() => {
+      /* 诊断落盘失败不影响业务 */
     });
-    return client;
-  };
+  });
 
   let model: OpenAIChatCompletionsModel | null = null;
   const getModel = (): OpenAIChatCompletionsModel => {
@@ -168,7 +276,7 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
     // ⚠️ 用 OpenAIChatCompletionsModel 而不是默认的 Responses API：
     // OpenCode Go 只兼容 Chat Completions。用错模型类会得到 404 而不是
     // 「不支持这个端点」这种看得懂的错。
-    model = new OpenAIChatCompletionsModel(getClient(), MODEL_NAME);
+    model = new OpenAIChatCompletionsModel(client, MODEL_NAME);
     return model;
   };
 
@@ -201,7 +309,7 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
    * 也不给工具：摘要是纯文本任务，带上工具只会让它多绕几圈。
    */
   const summarize = async (transcript: string): Promise<string> => {
-    const resp = await getClient().chat.completions.create({
+    const resp = await client.chat.completions.create({
       model: MODEL_NAME,
       messages: [
         { role: "system", content: SUMMARY_SYSTEM_PROMPT },
@@ -280,6 +388,32 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
           stream: true,
           session: session(),
           maxTurns: MAX_TURNS,
+          // ⚠️ 必须过滤历史，否则会话会被**永久毒死**。
+          //
+          // 会话历史按窗口取（最近 N 条）。窗口一旦从「assistant 声明
+          // tool_calls → tool 结果」这一对的中间切开，开头就会剩下一条
+          // 没有对应 assistant 的孤儿 tool 消息；协议上非法，网关稳定 400。
+          // 之后每一轮都带着这个非法开头 → 这个会话再也问不出东西，
+          // 只有 /clear 能救。实测踩过：三次重试全 400，同一问题换个会话就正常。
+          //
+          // 详见 src/feishu/session-sanitize.ts 的文件头。
+          sessionInputCallback: (history: any[], newItems: any[]) => {
+            // 计数器让「钩子到底挂上没有」可观测 —— 这个钩子静默失效时
+            // 症状只是「偶尔还是 400」，没法归因。见 _diag.ts 的 diagCounters。
+            diagCounters.sessionInputCalls++;
+            return sanitizeAndAppend(history, newItems, (drop) => {
+              // 丢东西说明窗口切歪了 —— 记进诊断，别静默
+              diagCounters.droppedOrphanTools += drop.droppedOrphanTools;
+              diagCounters.droppedEmptyAssistants += drop.droppedEmptyAssistants;
+              void deps.kv
+                ?.set(DIAG_KEY, {
+                  t: Date.now(),
+                  kind: "history-sanitized",
+                  ...drop,
+                })
+                .catch(() => {});
+            });
+          },
         });
 
         for await (const event of result.toStream()) {

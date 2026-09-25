@@ -7,6 +7,37 @@
 > 「长连接」、在本机跑起这个进程就能顶上，两边算法（conversation id、
 > 事件字段）完全一致，切换无痕。
 
+> ## ⚠️ 依赖已移出本目录（2026-09-25）
+>
+> 本目录的 `node_modules/` 和 `.npm-cache/` **已挪到 `~/.config/edgeone-bridge/`**。
+>
+> 原因：EdgeOne **没有部署忽略清单**，会把整个项目目录当公网静态资源上传，
+> 而 CLI 的排除清单（含 `node_modules`）**只在项目根生效**。于是
+> `bridge/node_modules`（47M）+ `bridge/.npm-cache`（445 文件）被完整打包上传，
+> `.edgeone/assets/bridge/` 膨胀到 50M、上传 105 个批次，最后在 batch 85 崩掉：
+>
+> ```
+> Error: ENOENT: no such file or directory,
+>   open '<项目>/.edgeone/assets/bridge/.npm-cache/_cacache/...'
+> ```
+>
+> 移走之后 assets 从 1673 文件 / 50M 降到 40 文件 / 600K，部署 1 分钟跑完。
+>
+> **要在本机跑这个 bridge**，依赖得装回来（但别装回项目目录，否则下次部署又会崩）：
+>
+> ```bash
+> mkdir -p ~/.config/edgeone-bridge && cd ~/.config/edgeone-bridge
+> cp <项目>/bridge/package.json <项目>/bridge/package-lock.json .
+> npm install --cache ./.npm-cache --no-audit --no-fund
+> # 然后把 bridge/index.mjs 也拷过来跑（.env 本来就在这个目录）
+> ```
+>
+> **更彻底的做法**：把整个 `bridge/` 移出项目目录。本目录的源码目前仍在公网可读
+> （`https://<域名>/bridge/index.mjs` → 200），虽然不含密钥（配置已移到
+> `~/.config/edgeone-bridge/.env`），但没有理由公开。
+> 这是个待定的目录布局决定 —— 见项目 `docs/03-验证清单.md`。
+
+
 一个**跑在你自己机器上**的常驻小进程，负责把飞书消息转给 EdgeOne 的 agent。
 
 ```
@@ -82,8 +113,16 @@ Makers 的 agents runtime 传进来的 `context.request.headers` 是**普通对�
 现在 agent 侧三种形态都读（Headers 实例 / 普通对象 / body），
 bridge 这边 header 和 body `token` 字段**都发**，哪条路通都能过。
 
-诊断端点：`https://eolab.yujizi.org/feishu?probe=env`
-（要带 `Makers-Conversation-Id` 头，返回 env 指纹 + request 结构 + `match`）
+诊断端点（都要带 `Makers-Conversation-Id` 头和 `token=INTERNAL_TOKEN`）：
+
+| 端点 | 看什么 |
+|---|---|
+| `?probe=env` | env 指纹 + request 结构 + `match`；`model` / `baseUrl` / `opencodeSession` |
+| `?probe=model` | 真的打一次模型，回显 `upstream`（哪个网关）+ 状态码 |
+| `?probe=search` | 真的打一次 serper，回显原始状态码和结果标题 |
+
+`?probe=env` 只证明变量**读到了**，不证明请求**发得出去**。要后者用 `?probe=model`。
+详见 `docs/03-验证清单.md` 的「诊断探针」。
 
 ### 2. handler 里不能 `await` 转发
 

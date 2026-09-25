@@ -41,7 +41,15 @@ import { runFeishuTurn } from "../../src/feishu/turn.ts";
 import type { FeishuQueueEvent } from "../../src/feishu/types.ts";
 import { UserTokenManager, makeUserTokenStore } from "../../src/feishu/user-token.ts";
 import { WorkspaceRepo, type RepoSnapshot, type RepoSnapshotStore } from "../../src/workspace/repo.ts";
-import { createHost, type AgentEnv } from "./_host.ts";
+import {
+  createHost,
+  makeModelClient,
+  resolveModelName,
+  resolveModelRoute,
+  type AgentEnv,
+} from "./_host.ts";
+import { clearDiag, diagCounters, recentDiag, resetCounters } from "./_diag.ts";
+import { DIAG_KEY } from "./_host.ts";
 
 /**
  * 语料快照的大小上限。超过就不写进 KV —— 快照写不进去时退化成纯内存，
@@ -68,7 +76,10 @@ export async function onRequest(context: any) {
   if (probe === "start") return probeStart(context, url);
   if (probe === "check") return probeCheck(context, url);
   if (probe === "env") return probeEnv(context);
+  if (probe === "model") return probeModel(context, url);
+  if (probe === "last") return probeLast(context, url);
   if (probe === "search") return probeSearch(context, url);
+  if (probe === "store") return probeStore(context, url);
 
   if (method !== "POST") {
     return json({ error: "只接受 POST" }, 405);
@@ -328,12 +339,181 @@ function serperFingerprint(env: Record<string, unknown>): unknown {
 }
 
 /**
+ * 取模型出站请求/入站响应的最近记录（环形缓冲，最多 8 条）。
+ *
+ * ── 为什么需要它 ────────────────────────────────────────────────────
+ * bot 回「没答上来：400 status code (no body)」时，`?probe=model` 是 **200** ——
+ * 因为探针只发一个极简请求，不带工具、不带语料。
+ * 真正失败的是**真实回合**那个请求，而 SDK 把错误压成了一句话：
+ * `400 status code (no body)`，既没有正文也没说是哪个字段。
+ *
+ * 这个端点把真实回合的出站形状（工具名、工具 schema 字符数、body 字符数）
+ * 和入站原文取出来，于是「400 到底为什么」第一次有了证据。
+ *
+ * 用法：先 `?probe=clear` 清一下，再去飞书发一条消息复现，然后 `?probe=last`。
+ */
+async function probeLast(context: any, url: URL): Promise<Response> {
+  const env = (context?.env ?? {}) as AgentEnv;
+  const expect = String(env.INTERNAL_TOKEN ?? "");
+  const got = String(url.searchParams.get("token") ?? "");
+  if (!expect || got !== expect) return json({ error: "需要 token=INTERNAL_TOKEN" }, 401);
+
+  if (url.searchParams.get("op") === "clear") {
+    clearDiag();
+    resetCounters();
+    const kv = makeStateKv(context);
+    if (kv) await kv.delete(DIAG_KEY);
+    return json({ ok: true, cleared: true });
+  }
+
+  const entries = recentDiag();
+  let persisted: unknown = null;
+  try {
+    // ⚠️ 必须读 KV：内存环形缓冲按**实例**隔离，而这次探针请求很可能被
+    // 路由到另一个实例（实测就踩过：刚失败完，探针却回 count=0）。
+    // 会话 KV 按 conversation_id 归属，跨实例可读。
+    const kv = makeStateKv(context);
+    persisted = kv ? await kv.get(DIAG_KEY) : null;
+  } catch {
+    /* KV 不可用就只给内存里的 */
+  }
+
+  return json({
+    ok: true,
+    memoryCount: entries.length,
+    /**
+     * ⚠️ 先看 `counters.sessionInputCalls`：它是「历史消毒钩子挂上了没有」的
+     * **唯一直接证据**。这个钩子是可选参数，写错名字不会报错、只会静默不生效，
+     * 症状就是「偶尔还是 400」—— 分不出是没挂上还是别的原因。
+     * 它 > 0 就说明钩子在跑。
+     */
+    counters: diagCounters,
+    persistedFailure: persisted,
+    // 时间倒序，第一条就是最近那次
+    entries: entries.map((e) => ({ ...e, t: new Date(e.t).toISOString() })),
+    hint:
+      "看 persistedFailure（跨实例可读）+ entries（本实例内存）。" +
+      "重点关注 req.msgRoles / req.assistantKeys / req.attempt 和 res.text 原文。",
+  });
+}
+
+/**
+ * 从**运行时内部**真的打一次模型，把原始状态码和返回片段回显出来。
+ *
+ * ── 为什么需要它 ────────────────────────────────────────────────────
+ * 之前查「模型挂了」全靠飞书里发消息看 bot 回什么，一轮十几秒，
+ * 而且只能看到被包装过的错误文案。`?probe=env` 虽然能回显 baseURL / model，
+ * 但那只证明**变量读到了**，不证明**请求发得出去、鉴权过得去**。
+ *
+ * 这个探针补上最后一段：用 `makeModelClient(env)` —— 和真实回合**同一个**
+ * 工厂函数 —— 发一次最小请求。三种结果各自指向不同的病：
+ *   · 200            → 链路通，问题不在模型侧
+ *   · 401 `API key not found`      → 打错门了：baseURL 指着别的网关
+ *   · 400 `provider prefix`        → 模型名规则不对（EdgeOne 要前缀、OpenCode 不要）
+ *   · 429 / quota                  → 额度
+ *   · 超时 / DNS                    → 运行时出网问题
+ *
+ * ⚠️ 会真实消耗一次 token（十几 token 量级），用 INTERNAL_TOKEN 挡一道。
+ */
+async function probeModel(context: any, url: URL): Promise<Response> {
+  const env = (context?.env ?? {}) as AgentEnv;
+  const expect = String(env.INTERNAL_TOKEN ?? "");
+  const got = String(url.searchParams.get("token") ?? "");
+  if (!expect || got !== expect) return json({ error: "需要 token=INTERNAL_TOKEN" }, 401);
+
+  const route = resolveModelRoute(env);
+  const baseUrl = String(route.baseURL ?? "");
+  const model = resolveModelName(env);
+  const session = String(env.OPENCODE_SESSION ?? "");
+
+  // 上游是哪个网关，光看 host 就能认出来，先把结论摆出来免得读的人自己拼
+  let upstream = "未知";
+  try {
+    const h = new URL(baseUrl).host;
+    if (h.endsWith("opencode.ai")) upstream = "OpenCode Go";
+    else if (h.endsWith("edgeone.link")) upstream = "EdgeOne AI Gateway";
+  } catch {
+    upstream = "baseUrl 不是合法 URL";
+  }
+
+  // 半配（只有 key 没有地址，或反过来）在这里就挡掉。
+  // 不挡的话 OpenAI SDK 会抛「The OPENAI_API_KEY environment variable is missing」——
+  // 一句和真实原因（我们自己没配对）完全无关的话，够排查半天。
+  if (!route.apiKey || !route.baseURL) {
+    return json({
+      ok: false,
+      upstream,
+      envSource: route.source,
+      hasKey: Boolean(route.apiKey),
+      hasBaseUrl: Boolean(route.baseURL),
+      hint: "key 和 baseURL 必须成对配。检查 OPENCODE_API_KEY / OPENCODE_BASE_URL。",
+    });
+  }
+
+  const t0 = Date.now();
+  try {
+    const client = makeModelClient(env);
+    const resp = await client.chat.completions.create(
+      {
+        model,
+        messages: [{ role: "user", content: "只回复两个字：收到" }],
+        max_tokens: 32,
+      },
+      { signal: AbortSignal.timeout(30_000) } as any,
+    );
+    const choice = resp?.choices?.[0] as any;
+    return json({
+      ok: true,
+      ms: Date.now() - t0,
+      upstream,
+      envSource: route.source,
+      baseUrl,
+      model,
+      sessionLabel: session || null,
+      content: String(choice?.message?.content ?? "").slice(0, 120),
+      finishReason: choice?.finish_reason ?? null,
+      usage: resp?.usage ?? null,
+    });
+  } catch (e: any) {
+    // OpenAI SDK 抛的错把状态码和响应体分开放，尽量都掏出来
+    return json({
+      ok: false,
+      ms: Date.now() - t0,
+      upstream,
+      envSource: route.source,
+      baseUrl,
+      model,
+      sessionLabel: session || null,
+      status: e?.status ?? null,
+      error: String(e?.message ?? e).slice(0, 400),
+      // 401 时正文里往往有网关自己的一句话，比 SDK 的 message 更准
+      body: String(e?.error ? JSON.stringify(e.error) : "").slice(0, 400) || null,
+      hint:
+        route.source === "未配置"
+          ? "OPENCODE_API_KEY/OPENCODE_BASE_URL 没配全，AI_GATEWAY_* 兜底也没配全。key 和地址要成对。"
+          : e?.status === 401
+            ? "401 = 这个 baseURL 不认识这把 key。确认 baseUrl 指向的网关和 key 是同一家。"
+            : e?.status === 400
+              ? "400 = 模型名规则不对。EdgeOne AI Gateway 要 @makers/ 前缀，OpenCode Go 要裸名。"
+              : e?.status === 429
+                ? "429 = 额度或限流。"
+                : undefined,
+    });
+  }
+}
+
+/**
  * 从**运行时内部**真的发一次 serper 搜索请求，把原始状态码和结果回显出来。
  *
  * ── 为什么需要它 ────────────────────────────────────────────────────
  * 「工具能不能用」这件事被两层遮着：模型得先跑起来（网关鉴权/额度），
  * 才会去调工具。模型一挂，搜索就完全测不了 —— 于是没法回答
  * 「到底是搜索坏了，还是模型坏了」。
+ *
+ * 这两层现在各有各的探针：`?probe=model` 管上面那层，本端点管下面这层。
+ * 于是「搜索失败」能一次定位到是哪一层：
+ *   · model 探针 200 + search 探针 200 → 两层都好，问题在提示词/工具描述
+ *   · model 探针失败 → 先修模型，搜索根本轮不到
  *
  * 这个探针把模型那层摘掉，只测「运行时 → serper」这一段：
  *   · 200 + 有结果 → 出网正常、key 有效，问题在模型侧
@@ -385,7 +565,10 @@ async function probeSearch(context: any, url: URL): Promise<Response> {
 }
 
 async function probeEnv(context: any): Promise<Response> {
-  const env = (context?.env ?? {}) as Record<string, unknown>;
+  // 交叉类型：既要按 AgentEnv 取已知字段（有类型），又要按 Record 遍历所有键
+  // （`Object.keys` 只认索引签名，光 `as AgentEnv` 会报「缺 FEISHU_APP_ID」）
+  const env = (context?.env ?? {}) as AgentEnv & Record<string, unknown>;
+  const route = resolveModelRoute(env);
   const v = String(env.INTERNAL_TOKEN ?? "");
   const req = context?.request;
   // 请求头是不是**真的**穿过平台网关到了 agent —— 之前 401 查了半天，
@@ -400,8 +583,18 @@ async function probeEnv(context: any): Promise<Response> {
   const gotHeader = readInternalToken(req, null);
   return json({
     ok: true,
+    /**
+     * ⚠️ 这个正则决定「哪些变量在探针里看得见」，漏一个就会把人带沟里。
+     *
+     * 踩过两次：
+     *   · 漏了 SERPER → 「运行时到底有没有这个 key」看不出来，
+     *     误判成环境变量没生效，白排查半天（现在另有 serperFingerprint）
+     *   · 漏了 OPENCODE → OPENCODE_SESSION 不显示，就分不清
+     *     「会话头没配」和「配了没生效」
+     * 加新变量时记得同步这里，或者干脆按前缀白名单放宽。
+     */
     envKeys: Object.keys(env)
-      .filter((k) => /FEISHU|INTERNAL|AI_|AGENT|SANDBOX|SERPER/.test(k))
+      .filter((k) => /FEISHU|INTERNAL|AI_|AGENT|SANDBOX|SERPER|OPENCODE/.test(k))
       .sort(),
     internalToken: v ? { len: v.length, head: v.slice(0, 4), tail: v.slice(-4) } : null,
     /**
@@ -415,12 +608,30 @@ async function probeEnv(context: any): Promise<Response> {
     /**
      * 模型名与网关地址（都不是密钥，可以直接回显）。
      *
-     * 踩过：AI Gateway 的模型名**必须带 provider 前缀**（免费档 `@makers/<model>`），
-     * 写成裸 `deepseek-v4.1-flash` 会 400。本地 .env 里一度就是裸的，
-     * 而运行时到底读到哪个值，之前根本看不出来。
+     * 这两个值要**成对**读：模型名的规则由网关决定，而且两家是相反的
+     * （EdgeOne AI Gateway 要 `@makers/` 前缀，OpenCode Go 要裸名）。
+     * 只看其中一个会误判 —— 曾出现「model 是裸名」被当成配置错误，
+     * 实际那时 baseUrl 才是真问题。
+     *
+     * ⚠️ 这里只证明变量读到了，不证明请求发得出去。要那个结论用 `?probe=model`。
      */
-    model: String(env.AI_GATEWAY_MODEL ?? ""),
-    baseUrl: String(env.AI_GATEWAY_BASE_URL ?? ""),
+    model: resolveModelName(env),
+    /**
+     * 模型路由到底走了哪一组变量。**这是排查时第一个要看的东西**。
+     *
+     * ⚠️ 只看 `baseUrl` 会被误导：`AI_GATEWAY_*` 是平台托管的，
+     * 就算控制台里改了、回读也对了，deploy 之后它还是会变回平台值。
+     * 所以真正生效的是 `envSource` —— 显示 `AI_GATEWAY_*` 就说明
+     * `OPENCODE_*` 没配全，路由退回了托管的那组。
+     */
+    envSource: route.source,
+    baseUrl: String(route.baseURL ?? ""),
+    opencodeSession: String(env.OPENCODE_SESSION ?? "") || null,
+    /** 托管的那组现在是什么值（用来确认「被 deploy 重置了」这个现象） */
+    managedAiGateway: {
+      baseUrl: String(env.AI_GATEWAY_BASE_URL ?? "") || null,
+      model: String(env.AI_GATEWAY_MODEL ?? "") || null,
+    },
     requestShape: {
       ctor: req?.constructor?.name ?? null,
       keys: Object.keys(req ?? {}).slice(0, 30),
@@ -484,6 +695,211 @@ async function probeCheck(context: any, _url: URL): Promise<Response> {
       : "❌ 后台任务没跑完（响应发出后进程被回收了）—— 把 FEISHU_DISPATCH_MODE 改成 sync",
     raw: v,
   }, 200);
+}
+
+// ── 跨会话记忆的可行性实测（?probe=store）─────────────────────────────
+//
+// ── 为什么要有这个端点 ──────────────────────────────────────────────
+// 目标是「跨会话记忆」，而 `context.store.state` 按 conversation_id 隔离，
+// 换个会话就是空白 —— 所以必须找到一片**不带会话前缀**的键空间。
+//
+// 读 `.edgeone/agent-node/server.mjs`（agents 运行时的打包产物）发现：
+//   · `context.store` 是 `createBlobBackedStore(blob, "agent-store", "agent-feishu")`
+//     —— 一个**纯 key 前缀包装器**，前缀是**路由名**（不是会话名）；
+//   · 运行时把裸 Blob SDK 挂在 `globalThis.__EDGEONE_AGENT_RUNTIME__.getStore`；
+//   · 平台自己有个共享命名空间常量 `AGENT_SHARED_STORE_NAME = "agent-store"`。
+//
+// 由此推出三条候选路，本端点就是用来**实测哪条真的跨会话**：
+//   A. 裸 Blob：`getStore({name:"agent-store"})` + 自己起的键前缀
+//   B. 路由 store：`context.store.set(...)`（按上面推断是路由级、跨会话可见）
+//   C. 会话 state：`context.store.state.set(...)`（预期**不**跨会话，做对照）
+//
+// ── 用法 ────────────────────────────────────────────────────────────
+//   ① GET ?probe=store                     看形状（不写任何东西）
+//   ② GET ?probe=store&op=write            三条路各写一个带时间戳的探针键
+//   ③ GET ?probe=store&op=read             **换一个 Makers-Conversation-Id** 再跑
+//                                          三条路各自的 verdict 就是答案
+//
+// 所有写入都在 `probe-*` 前缀下，不碰 `repo.snapshot` / `feishu.*` 那些真键。
+
+const PROBE_GLOBAL_PREFIX = "probe-global/";
+const PROBE_ROUTE_PREFIX = "probe-route/";
+const PROBE_STATE_PREFIX = "probe-state/";
+
+/** 把一个对象自身的 + 原型链上的键都收上来（平台的 store 大量用 getter，只看 own 会漏） */
+function collectKeys(o: any): string[] {
+  if (!o || (typeof o !== "object" && typeof o !== "function")) return [];
+  const set = new Set<string>();
+  let cur = o;
+  let depth = 0;
+  while (cur && cur !== Object.prototype && depth < 4) {
+    for (const k of Object.getOwnPropertyNames(cur)) set.add(k);
+    cur = Object.getPrototypeOf(cur);
+    depth++;
+  }
+  return [...set].sort();
+}
+
+/** 凭证类的值不打印原文，只报长度 / 首尾 / 是不是没被替换的占位符 */
+function redactEnvValue(k: string, v: string | undefined): unknown {
+  const s = String(v ?? "");
+  if (!/CREDENTIAL|TOKEN|SECRET|KEY|PASSWORD/i.test(k)) return s;
+  return {
+    len: s.length,
+    head: s.slice(0, 4),
+    tail: s.slice(-4),
+    // 还是 {{...}} 形态 = 构建期没替换掉 → ambient 模式必然失败
+    isUnreplacedPlaceholder: s.startsWith("{{") && s.endsWith("}}"),
+  };
+}
+
+async function probeStore(context: any, url: URL): Promise<Response> {
+  const op = url.searchParams.get("op") ?? "shape";
+  const cid = String(context?.conversation_id ?? "");
+  const out: Record<string, unknown> = { op, conversationId: cid };
+
+  // ── ① 形状：context.store 到底有哪些口子 ──────────────────────────
+  const store = context?.store ?? null;
+  out.contextStore = {
+    present: !!store,
+    ctor: store?.constructor?.name ?? null,
+    keys: collectKeys(store),
+    stateKeys: collectKeys(store?.state),
+    // 有 list 就说明它就是个裸 KV；没有则说明是包装过的
+    hasList: typeof store?.list === "function",
+  };
+  out.contextTopKeys = collectKeys(context).slice(0, 60);
+
+  // ── ② 运行时暴露面 ────────────────────────────────────────────────
+  const rt = (globalThis as any).__EDGEONE_AGENT_RUNTIME__ ?? null;
+  out.runtime = {
+    present: !!rt,
+    keys: collectKeys(rt),
+    getStoreType: typeof rt?.getStore,
+  };
+
+  // ── ③ 环境变量里与存储/项目身份相关的 ─────────────────────────────
+  const pe = (typeof process !== "undefined" ? process.env : {}) as Record<string, string | undefined>;
+  out.storageEnv = Object.fromEntries(
+    Object.entries(pe)
+      .filter(([k]) => /^(PAGES_|EDGEONE_|ProjectId$|PROJECT_ID$)/.test(k))
+      .map(([k, v]) => [k, redactEnvValue(k, v)]),
+  );
+
+  if (op === "shape") {
+    out.next = [
+      "① GET ?probe=store&op=write 写三条探针键",
+      "② **换一个 Makers-Conversation-Id** 再 GET ?probe=store&op=read",
+      "③ 看三条路各自的 verdict：哪条 foreign>0，哪条就是可用的跨会话键空间",
+    ];
+    return json(out);
+  }
+
+  const getStoreFn = rt?.getStore;
+  const results: Record<string, unknown> = {};
+
+  // ⚠️ 命名空间必须用运行时真正在用的那个：`memory-<projectId>`。
+  // 早先以为 `context.store` 落在 `agent-store`，实测那个命名空间**根本不存在**
+  // （`resolveRouteStore` 这条路由级 store 在 agents 路由下从未被调用）。
+  // 用错名字会在账号里凭空建一个垃圾命名空间。
+  const projectId = String(
+    (pe.PAGES_PROJECT_ID ?? pe.ProjectId ?? pe.EDGEONE_PROJECT_ID ?? "").trim(),
+  );
+  const memoryNs = projectId ? `memory-${projectId}` : "";
+  results.namespace = memoryNs || "(拿不到 projectId)";
+
+  // ── A. 裸 Blob：自己起键前缀，理论上完全不带会话维度 ──────────────
+  try {
+    if (typeof getStoreFn !== "function") throw new Error("运行时未暴露 getStore");
+    if (!memoryNs) throw new Error("拿不到 projectId，无法定位命名空间");
+    const raw = getStoreFn({ name: memoryNs });
+
+    if (op === "write") {
+      const key = `${PROBE_GLOBAL_PREFIX}${Date.now()}-${cid.slice(0, 8)}`;
+      await raw.set(key, JSON.stringify({ cid, at: new Date().toISOString() }));
+      results.blob = { wrote: key };
+    } else {
+      const listed = await raw.list({ prefix: PROBE_GLOBAL_PREFIX });
+      const keys: string[] = (listed?.blobs ?? []).map((b: any) => String(b.key));
+      const rows: unknown[] = [];
+      for (const k of keys.slice(-20)) {
+        try {
+          rows.push({ key: k, value: await raw.get(k, { type: "text" }) });
+        } catch (e) {
+          rows.push({ key: k, error: (e as Error).message });
+        }
+      }
+      const foreign = rows.filter((r: any) => {
+        try {
+          return JSON.parse(String(r.value)).cid !== cid;
+        } catch {
+          return false;
+        }
+      });
+      results.blob = {
+        total: keys.length,
+        rows,
+        foreignCount: foreign.length,
+        verdict: foreign.length
+          ? `✅ 跨会话可见 —— 读到 ${foreign.length} 条别的会话写的键`
+          : keys.length
+            ? "⚠️ 只看到本会话写的键（换个 conversation_id 再跑一次 read）"
+            : "❌ 一条都没读到",
+      };
+    }
+  } catch (e) {
+    results.blob = { error: (e as Error).message, name: (e as Error).name };
+  }
+
+  // ── B. 路由 store：context.store.get/set（推断是路由级，跨会话可见）──
+  try {
+    const rs = store;
+    if (!rs || typeof rs.set !== "function") throw new Error("context.store.set 不可用");
+    const key = `${PROBE_ROUTE_PREFIX}${cid.slice(0, 8)}`;
+    if (op === "write") {
+      await rs.set(key, { cid, at: new Date().toISOString() });
+      results.routeStore = { wrote: key };
+    } else {
+      const v = await rs.get(key);
+      const all = typeof rs.list === "function"
+        ? await rs.list({ prefix: PROBE_ROUTE_PREFIX }).catch((e: Error) => ({ error: e.message }))
+        : null;
+      results.routeStore = {
+        readOwnKey: v,
+        ownKeyVisible: v != null,
+        list: all,
+      };
+    }
+  } catch (e) {
+    results.routeStore = { error: (e as Error).message, name: (e as Error).name };
+  }
+
+  // ── C. 会话 state：预期**不**跨会话（对照组，用来确认隔离确实存在）──
+  try {
+    const kv = makeStateKv(context);
+    if (!kv) throw new Error("context.store.state 不可用");
+    const key = `${PROBE_STATE_PREFIX}${cid.slice(0, 8)}`;
+    if (op === "write") {
+      await kv.set(key, { cid, at: new Date().toISOString() });
+      results.sessionState = { wrote: key };
+    } else {
+      const v = await kv.get(key);
+      results.sessionState = {
+        readOwnKey: v,
+        ownKeyVisible: v != null,
+        note: "这里读不到是**正常**的 —— 本会话没写过这个 key。要验证隔离，需要在本会话 write 一次。",
+      };
+    }
+  } catch (e) {
+    results.sessionState = { error: (e as Error).message, name: (e as Error).name };
+  }
+
+  out.results = results;
+  out.hint =
+    op === "write"
+      ? "已写入。现在**换一个 Makers-Conversation-Id** 跑 ?probe=store&op=read"
+      : "blob.foreignCount > 0 = 裸 Blob 可跨会话；routeStore.ownKeyVisible = 路由 store 可跨会话（且按路由名共享，注意别串数据）。";
+  return json(out);
 }
 
 // ── 平台适配层 ────────────────────────────────────────────────────────

@@ -53,9 +53,14 @@ npm i -g edgeone && edgeone login
 # 4. 配环境变量
 cp .env.example .env
 #    编辑 .env，至少填：
-#      AI_GATEWAY_API_KEY   ← OpenCode Go 的密钥
+#      OPENCODE_API_KEY     ← OpenCode Go 的密钥
+#      OPENCODE_BASE_URL    ← https://opencode.ai/zen/go/v1
+#      OPENCODE_MODEL       ← deepseek-v4.1-flash（裸名，不带 @makers/）
 #      FEISHU_APP_ID / FEISHU_APP_SECRET / FEISHU_VERIFICATION_TOKEN / FEISHU_ENCRYPT_KEY
 #      INTERNAL_TOKEN       ← openssl rand -hex 24
+#
+#    ⚠️ 别用 AI_GATEWAY_* 存自己的 key —— 那三个是平台托管的，
+#    每次 deploy 都会被重置回平台值。
 
 # 5. 本地起服务，默认 http://localhost:8088
 npm run dev

@@ -4,22 +4,25 @@
 //
 // ── 为什么要有这个 ──────────────────────────────────────────────────
 // `edgeone makers dev` 需要登录令牌，CI/无人环境里跑不了；而这条链路里
-// 真正容易错的东西（验签顺序、去重语义、generation 制、那个 36 字符的
-// conversation_id）**全都不依赖平台**。所以把它们从平台里剥出来单独测。
+// 真正容易错的东西（验签顺序、去重语义、那个 36 字符的 conversation_id）
+// **全都不依赖平台**。所以把它们从平台里剥出来单独测。
 //
 // 覆盖：
 //   A. crypto   —— 官方测试向量解密 + 签名计算
 //   B. event    —— 事件体解析、@占位符剥离
 //   C. commands —— 命令解析
 //   D. store    —— 去重 / 限流 / prune / token 缓存 / 跨实例恢复
-//   E. repo     —— 完整导入周期 + generation 制 + 快照往返 + 查询
-//   F. tools    —— read / ls / find / grep 的真实调用
-//   G. webhook  —— 端到端：假 Request → 转发 → 断言转发头
-//   H. turn     —— 端到端：一条 /help 走完整回合
-//   I. compact  —— 会话压缩的纯函数（渲染历史 / 写回形状 / 门槛）
-//   J. oauth    —— 云文档授权：链接解析 / state 签名 / 授权链接
-//   K. token    —— 用户令牌：续期、轮换不丢 refresh_token、单飞、按人分槽
-//   L. doctools —— 云文档三个工具：wiki 解引用 / 翻页缓存 / 拍平 / 未授权提示
+//   E. webhook  —— 端到端：假 Request → 转发 → 断言转发头
+//   F. turn     —— 端到端：一条 /help 走完整回合
+//   G. compact  —— 会话压缩的纯函数（渲染历史 / 写回形状 / 门槛）
+//   H. oauth    —— 云文档授权：链接解析 / state 签名 / 授权链接
+//   I. token    —— 用户令牌：续期、轮换不丢 refresh_token、单飞、按人分槽
+//   J. doctools —— 云文档三个工具：wiki 解引用 / 翻页缓存 / 拍平 / 未授权提示
+//
+// 2026-09-25：原来还有两节测「仓库语料导入」（`E. repo`）和
+// 「read / ls / find / grep 四个代码工具」（`F. tools`）。改成通用助手后
+// `src/workspace/*` 整个删掉了，这两节连同 `seed()` 帮手一起删除。
+// 字母编号顺次前移，节标题里的字母只是给人看的，不参与任何逻辑。
 //
 // ⚠️ 这个文件会替换全局 fetch。所有测试都在一个进程里跑，
 // 每个小节自己装自己的 stub，不要跨小节依赖。
@@ -67,8 +70,6 @@ import {
 import { FeishuStore, MemoryKv } from "../src/feishu/store.ts";
 import { runFeishuTurn } from "../src/feishu/turn.ts";
 import type { FeishuQueueEvent } from "../src/feishu/types.ts";
-import { WorkspaceRepo, type RepoSnapshot, type RepoSnapshotStore } from "../src/workspace/repo.ts";
-import { makeWorkspaceTools } from "../src/workspace/tools.ts";
 import { onRequest as webhook } from "../cloud-functions/feishu-webhook/index.ts";
 
 // ── 迷你测试框架 ──────────────────────────────────────────────────────
@@ -271,28 +272,19 @@ await describe("C. 命令解析", async () => {
     eq(parseCommand("这个函数干嘛的"), { kind: "ask", text: "这个函数干嘛的" });
   });
 
-  await it("/repo owner/name", () => {
+  await it("/repo 已经不是命令了（改成通用助手后去掉）", () => {
+    // 关键：`/repo xxx` 必须被判成「不认识的命令」→ `{ kind: "error" }`，
+    // **不能**掉进 `case "ask"` 被当成普通提问送给模型。
+    // 否则用户发 `/repo a/b` 会得到一段模型即兴发挥的答复，而不是明确的
+    // 「没这个命令」—— 那才是真正难排查的故障。
     eq(parseCommand("/repo sindresorhus/is-stream"), {
-      kind: "repo",
-      owner: "sindresorhus",
-      name: "is-stream",
+      kind: "error",
+      message: "不认识的命令 /repo。发 /help 看看有什么。",
     });
-  });
-
-  await it("GitHub 链接、@分支、/tree/ 三种写法都认", () => {
-    eq(parseCommand("/repo https://github.com/a/b.git").kind, "repo");
-    eq(parseCommand("/repo a/b@dev"), { kind: "repo", owner: "a", name: "b", ref: "dev" });
-    eq(parseCommand("/repo github.com/a/b/tree/feature/x"), {
-      kind: "repo",
-      owner: "a",
-      name: "b",
-      ref: "feature/x",
-    });
-  });
-
-  await it("非法字符被挡住", () => {
-    eq(parseCommand("/repo a/b;rm -rf /").kind, "error");
-    eq(parseCommand("/repo").kind, "error");
+    eq(parseCommand("/repo a/b@dev").kind, "error");
+    eq(parseCommand("/导入 a/b").kind, "error");
+    // 命令名大小写不敏感，`/REPO` 同样落到 error 分支
+    eq(parseCommand("/REPO a/b").kind, "error");
   });
 
   await it("/status /help 与中文别名", () => {
@@ -415,159 +407,6 @@ await describe("D. 飞书状态存储", async () => {
   });
 });
 
-// ═══════════════════════════════════════════════════════════════════════
-// E. repo
-// ═══════════════════════════════════════════════════════════════════════
-
-await describe("E. 语料仓储", async () => {
-  const FILES = [
-    { path: "README.md", content: "# demo\n" },
-    { path: "src/a.ts", content: "export const x = 1;\nexport function f() {\n  return x;\n}\n" },
-    { path: "src/deep/b.ts", content: "import { x } from '../a.ts';\nconsole.log(x);\n" },
-  ];
-
-  await it("完整导入周期：begin → batch → finish", () => {
-    const r = new WorkspaceRepo();
-    const { generation } = r.beginIngest("o", "n", "main", "ing1");
-    eq(generation, 1);
-    const batch = r.ingestBatch("ing1", FILES);
-    eq(batch.accepted, 3);
-    const fin = r.finishIngest("ing1", 0, false);
-    eq(fin.fileCount, 3);
-    eq(r.status().status, "ready");
-    eq(r.status().owner, "o");
-    eq(r.activeGeneration(), 1);
-  });
-
-  await it("readFile / hasFile", () => {
-    const r = seed();
-    ok(r.readFile("src/a.ts")!.content.includes("export function f"));
-    ok(r.hasFile("README.md"));
-    eq(r.readFile("nope.ts"), null);
-  });
-
-  await it("listDir：目录在前、文件在后，且父目录被自动建出来", () => {
-    const r = seed();
-    eq(r.listDir("", 10).map((e) => e.name + (e.kind === "d" ? "/" : "")), ["src/", "README.md"]);
-    eq(r.listDir("src", 10).map((e) => e.name + (e.kind === "d" ? "/" : "")), ["deep/", "a.ts"]);
-    eq(r.listDir("src/deep", 10).map((e) => e.name), ["b.ts"]);
-    eq(r.listDir("不存在", 10), []);
-  });
-
-  await it("allPaths 有序且按前缀过滤", () => {
-    const r = seed();
-    eq(r.allPaths("", 100), ["README.md", "src/a.ts", "src/deep/b.ts"]);
-    eq(r.allPaths("src/", 100), ["src/a.ts", "src/deep/b.ts"]);
-  });
-
-  await it("fileCursor 预筛：只返回内容命中的文件", () => {
-    const r = seed();
-    eq([...r.fileCursor("", { needle: "console", ci: false })].map((f) => f.path), [
-      "src/deep/b.ts",
-    ]);
-    eq([...r.fileCursor("", { needle: "CONSOLE", ci: true })].map((f) => f.path), [
-      "src/deep/b.ts",
-    ]);
-    eq([...r.fileCursor("", { needle: "CONSOLE", ci: false })].length, 0);
-    eq([...r.fileCursor("", undefined)].length, 3);
-  });
-
-  await it("generation 制：失败的重新导入不让旧语料失效", () => {
-    const r = seed();
-    r.beginIngest("o2", "n2", "dev", "ing2");
-    r.failIngest("ing2", "抓取失败");
-    eq(r.status().status, "ready", "应退回 ready 而不是 error");
-    ok(r.readFile("src/a.ts") !== null, "旧语料必须还在");
-    eq(r.status().owner, "o", "owner 不该被 building 值污染");
-  });
-
-  await it("generation 制：成功的重新导入原子切换，旧语料被清掉", () => {
-    const r = seed();
-    r.beginIngest("o2", "n2", "dev", "ing2");
-    r.ingestBatch("ing2", [{ path: "only.md", content: "x\n" }]);
-    r.finishIngest("ing2", 0, false);
-    eq(r.activeGeneration(), 2);
-    eq(r.status().owner, "o2");
-    eq(r.status().fileCount, 1);
-    eq(r.readFile("src/a.ts"), null, "旧 generation 应被删");
-    eq(r.allPaths("", 100), ["only.md"]);
-  });
-
-  await it("陈旧批次被静默丢弃（不污染新 generation）", () => {
-    const r = new WorkspaceRepo();
-    r.beginIngest("o", "n", "main", "ing1");
-    const res = r.ingestBatch("旧的-ingestId", FILES);
-    eq(res.accepted, 0);
-    eq(r.finishIngest("ing1", 0, false).fileCount, 0);
-  });
-
-  await it("重复路径后者覆盖前者（对应原版的 insert or replace）", () => {
-    const r = new WorkspaceRepo();
-    r.beginIngest("o", "n", "main", "i");
-    r.ingestBatch("i", [{ path: "a.ts", content: "v1\n" }]);
-    r.ingestBatch("i", [{ path: "a.ts", content: "v2\n" }]);
-    eq(r.finishIngest("i", 0, false).fileCount, 1);
-    eq(r.readFile("a.ts")!.content, "v2\n");
-  });
-
-  await it("reset 回到未导入状态", () => {
-    const r = seed();
-    r.reset();
-    eq(r.status().status, "empty");
-    eq(r.status().fileCount, 0);
-    eq(r.readFile("src/a.ts"), null);
-  });
-
-  await it("快照往返：落盘 → 新实例 hydrate → 语料还在", async () => {
-    const box: { v: RepoSnapshot | null } = { v: null };
-    const store: RepoSnapshotStore = {
-      load: async () => box.v,
-      save: async (s) => {
-        box.v = s;
-      },
-      clear: async () => {
-        box.v = null;
-      },
-    };
-
-    const a = new WorkspaceRepo(store);
-    a.beginIngest("o", "n", "main", "i");
-    a.ingestBatch("i", FILES);
-    a.finishIngest("i", 0, false);
-    ok(await a.persist(), "persist 应成功");
-    ok(box.v !== null, "快照应已写入");
-
-    const b = new WorkspaceRepo(store);
-    await b.hydrate();
-    eq(b.status().owner, "o");
-    eq(b.status().fileCount, 3);
-    eq(b.readFile("src/a.ts")!.content, FILES[1].content);
-    eq(b.listDir("src", 10).map((e) => e.name + (e.kind === "d" ? "/" : "")), ["deep/", "a.ts"]);
-    eq(b.allPaths("", 100), ["README.md", "src/a.ts", "src/deep/b.ts"]);
-  });
-
-  await it("没有快照后端时 persist 返回 false 而不是抛错", async () => {
-    const r = seed();
-    eq(await r.persist(), false);
-  });
-});
-
-function seed(): WorkspaceRepo {
-  const r = new WorkspaceRepo();
-  r.beginIngest("o", "n", "main", "i");
-  r.ingestBatch("i", [
-    { path: "README.md", content: "# demo\n" },
-    { path: "src/a.ts", content: "export const x = 1;\nexport function f() {\n  return x;\n}\n" },
-    { path: "src/deep/b.ts", content: "import { x } from '../a.ts';\nconsole.log(x);\n" },
-  ]);
-  r.finishIngest("i", 0, false);
-  return r;
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// F. tools
-// ═══════════════════════════════════════════════════════════════════════
-
 /**
  * 调一个 `tool()` 产出的工具。
  *
@@ -579,7 +418,7 @@ function seed(): WorkspaceRepo {
  * 返回 —— 不抛异常。所以传对象进去的表现是「每个工具都返回一段英文错误文本」，
  * 第一次跑测试时看到的是十几条 `Unexpected token 'A', "An error o"...`。
  *
- * runContext 传 `{}` 就够：这四个工具的 execute 只吃参数、不碰 runContext。
+ * runContext 传 `{}` 就够：云文档工具和记忆工具的 execute 都只吃参数、不碰 runContext。
  */
 async function callTool(t: any, args: any): Promise<any> {
   if (typeof t?.invoke !== "function") {
@@ -589,91 +428,11 @@ async function callTool(t: any, args: any): Promise<any> {
   return typeof out === "string" ? JSON.parse(out) : out;
 }
 
-await describe("F. 代码工具（read / ls / find / grep）", async () => {
-  const tools = makeWorkspaceTools(seed());
-  const byName = Object.fromEntries(tools.map((t: any) => [t.name, t]));
-
-  await it("四个工具都注册上了", () => {
-    eq(Object.keys(byName).sort(), ["find", "grep", "ls", "read"]);
-  });
-
-  await it("read 返回带行号的内容", async () => {
-    const r = await callTool(byName.read, { path: "src/a.ts" });
-    eq(r.path, "src/a.ts");
-    eq(r.totalLines, 4);
-    ok(r.content.includes("     1\texport const x = 1;"), `实际：${r.content}`);
-    eq(r.truncated, false);
-  });
-
-  await it("read 支持 offset / limit", async () => {
-    const r = await callTool(byName.read, { path: "src/a.ts", offset: 2, limit: 2 });
-    eq(r.startLine, 2);
-    eq(r.endLine, 3);
-    eq(r.truncated, true);
-    eq(r.nextOffset, 4);
-  });
-
-  await it("read 不存在的文件返回 error 而不是抛错", async () => {
-    const r = await callTool(byName.read, { path: "nope.ts" });
-    ok(typeof r.error === "string" && r.error.includes("文件不存在"), JSON.stringify(r));
-  });
-
-  await it("ls 目录带 / 后缀", async () => {
-    const r = await callTool(byName.ls, {});
-    eq(r.entries, ["src/", "README.md"]);
-  });
-
-  await it("ls 指向文件时报错并提示用 read", async () => {
-    const r = await callTool(byName.ls, { path: "README.md" });
-    ok(r.error.includes("不是目录"), JSON.stringify(r));
-  });
-
-  await it("find 支持 ** 与 {a,b}", async () => {
-    eq((await callTool(byName.find, { glob: "**/*.ts" })).paths, ["src/a.ts", "src/deep/b.ts"]);
-    eq((await callTool(byName.find, { glob: "src/**/*.{ts,md}" })).paths, ["src/a.ts", "src/deep/b.ts"]);
-    eq((await callTool(byName.find, { glob: "*.md" })).paths, ["README.md"]);
-  });
-
-  await it("grep 命中行号与内容", async () => {
-    const r = await callTool(byName.grep, { pattern: "export" });
-    eq(r.matchCount, 2);
-    eq(r.matches[0].path, "src/a.ts");
-    eq(r.matches[0].line, 1);
-  });
-
-  await it("grep 搜不到返回空列表而不是错误", async () => {
-    const r = await callTool(byName.grep, { pattern: "zzzzz不存在" });
-    eq(r.matchCount, 0);
-    eq(r.error, undefined);
-    ok(typeof r.note === "string");
-  });
-
-  await it("grep literal=true 按普通字符串（点号不当通配）", async () => {
-    eq((await callTool(byName.grep, { pattern: "a.ts", literal: true })).matchCount, 1);
-    eq((await callTool(byName.grep, { pattern: "aXts", literal: false })).matchCount, 0);
-  });
-
-  await it("grep 挡住嵌套量词（灾难性回溯）", async () => {
-    const r = await callTool(byName.grep, { pattern: "(a+)+" });
-    ok(r.error.includes("嵌套量词"), JSON.stringify(r));
-  });
-
-  await it("没导语料时四个工具都给出可执行的提示", async () => {
-    const empty = makeWorkspaceTools(new WorkspaceRepo());
-    const t = Object.fromEntries(empty.map((x: any) => [x.name, x]));
-    for (const name of ["read", "ls", "find", "grep"]) {
-      const args: any = name === "read" ? { path: "a" } : name === "find" ? { glob: "*" } : name === "grep" ? { pattern: "a" } : {};
-      const r = await callTool(t[name], args);
-      ok(r.error.includes("/repo"), `${name} 的提示应引导用户发 /repo，实际：${JSON.stringify(r)}`);
-    }
-  });
-});
-
 // ═══════════════════════════════════════════════════════════════════════
-// G. webhook 端到端
+// E. webhook 端到端
 // ═══════════════════════════════════════════════════════════════════════
 
-await describe("G. 飞书 webhook 端到端", async () => {
+await describe("E. 飞书 webhook 端到端", async () => {
   const ENV = {
     FEISHU_APP_ID: "cli_x",
     FEISHU_APP_SECRET: "s",
@@ -963,35 +722,23 @@ await describe("G. 飞书 webhook 端到端", async () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════
-// H. turn 端到端
+// F. turn 端到端
 // ═══════════════════════════════════════════════════════════════════════
 
-await describe("H. 回合流程", async () => {
+await describe("F. 回合流程", async () => {
   const ENV = { FEISHU_APP_ID: "cli_x", FEISHU_APP_SECRET: "s" };
 
   /**
-   * 飞书 + GitHub 的混合假响应。
+   * 宿主 stub。
    *
-   * ⚠️ `/repo owner/name` 不带 `@分支` 时，`runFeishuTurn` 会先调
-   * `resolveDefaultBranch()` 去问 GitHub —— 那是**另一个域名**。
-   * 只 stub 飞书的话这一步会抛「测试没有为这个请求准备响应」，
-   * 被 turn.ts 的 catch 接住，于是只发出「确认一下链接…」那一条，
-   * 「先回执再报结果」就永远只有 1 条消息。
+   * ⚠️ 2026-09-25 之前这里还有个 `ghStub`（飞书 + GitHub 的混合假响应），
+   * 专为 `/repo owner/name` 服务 —— 那条路径会先调 `resolveDefaultBranch()`
+   * 去问 `api.github.com`，只 stub 飞书的话那一步会抛
+   * 「测试没有为这个请求准备响应」。`/repo` 删掉后它没有任何使用者，一并删除。
    */
-  const ghStub = (url: string, init: any): Response | undefined => {
-    if (url.includes("api.github.com/repos/")) {
-      return new Response(JSON.stringify({ default_branch: "main" }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      });
-    }
-    return feishuStub(url, init);
-  };
-
   const host = (over: Partial<any> = {}) => ({
     ask: async () => ({ text: "答案是 42", streamed: false }),
-    ingest: async () => "已导入 a/b@main：3 个文件",
-    statusText: async () => "当前仓库：a/b@main",
+    statusText: async () => "会话 oc_1\n对话消息 3 条",
     compact: async () => "已压缩：8 条历史 → 摘要（约 300 字）",
     clear: async () => "会话已清空",
     loginUrl: async () => "点这条链接授权：\nhttps://accounts.feishu.cn/open-apis/authen/v1/authorize?client_id=cli_x",
@@ -1023,14 +770,16 @@ await describe("H. 回合流程", async () => {
 
     const texts = sentTexts(calls);
     eq(texts.length, 1);
-    ok(texts[0].includes("/repo owner/name"), texts[0]);
+    ok(texts[0].includes("/status"), texts[0]);
+    // 帮助里不该再出现已经删掉的 /repo
+    ok(!texts[0].includes("/repo"), texts[0]);
     eq((await store as any).events.get("om_1").state, "done");
   });
 
   await it("/status 走 host.statusText", async () => {
     const calls = stubFetch(feishuStub);
     await runFeishuTurn(host() as any, ENV, new FeishuStore(new MemoryKv()), evt("/status"));
-    eq(sentTexts(calls)[0], "当前仓库：a/b@main");
+    eq(sentTexts(calls)[0], "会话 oc_1\n对话消息 3 条");
   });
 
   await it("/login 发出的是宿主给的链接，不是模型编的", async () => {
@@ -1107,24 +856,26 @@ await describe("H. 回合流程", async () => {
     ok(sentTexts(calls)[0].includes("没有配置 FEISHU_OAUTH_REDIRECT_URI"), sentTexts(calls)[0]);
   });
 
-  await it("/repo 先回执再报结果", async () => {
-    const calls = stubFetch(ghStub);
-    await runFeishuTurn(host() as any, ENV, new FeishuStore(new MemoryKv()), evt("/repo a/b"));
-    const texts = sentTexts(calls);
-    eq(texts.length, 2);
-    ok(texts[0].includes("正在抓取"), texts[0]);
-    ok(texts[1].includes("已导入"), texts[1]);
-  });
-
-  await it("/repo 抓取失败时说清楚，并提示可以显式写分支", async () => {
+  await it("/repo 走不通了：回一句「不认识的命令」，且不发给模型", async () => {
+    // 改成通用助手后 `/repo` 被删。这条端到端测试守的是**它不会静默变成提问**：
+    // 如果哪天 parseCommand 的 default 分支被改成 `{ kind: "ask" }`，
+    // 用户发 `/repo a/b` 会拿到一段模型即兴发挥的答复，而宿主 stub 的 ask
+    // 会被调到 —— 下面那个 `asked` 断言就会炸。
+    let asked = false;
     const calls = stubFetch(feishuStub);
     const h = host({
-      ingest: async () => {
-        throw new Error("导入失败：仓库不存在");
+      ask: async () => {
+        asked = true;
+        return { text: "答案是 42", streamed: false };
       },
     });
-    await runFeishuTurn(h as any, ENV, new FeishuStore(new MemoryKv()), evt("/repo a/b@main"));
-    ok(sentTexts(calls).some((t) => t.includes("导入失败")), JSON.stringify(sentTexts(calls)));
+    await runFeishuTurn(h as any, ENV, new FeishuStore(new MemoryKv()), evt("/repo a/b"));
+
+    const texts = sentTexts(calls);
+    eq(texts.length, 1, "只该回一条提示");
+    eq(asked, false, "不该走到模型");
+    ok(texts[0].includes("不认识的命令"), texts[0]);
+    ok(!texts[0].includes("答案是 42"), texts[0]);
   });
 
   await it("提问：模型失败时**必须**发出提示而不是静默（原版踩过的坑）", async () => {
@@ -1202,10 +953,10 @@ await describe("H. 回合流程", async () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════
-// I. 会话压缩（纯函数）
+// G. 会话压缩（纯函数）
 // ═══════════════════════════════════════════════════════════════════════
 
-await describe("I. 会话压缩的纯函数", async () => {
+await describe("G. 会话压缩的纯函数", async () => {
   await it("门槛是 3 项，且这个门槛让 /compact 幂等", () => {
     eq(MIN_ITEMS_TO_COMPACT, 3);
     // 压完只剩「一条摘要」 → 再压一次会被挡在门槛外，不会把摘要又压一遍
@@ -1261,9 +1012,9 @@ await describe("I. 会话压缩的纯函数", async () => {
     ok(t.length < 9000, `应显著短于原文，实际 ${t.length}`);
   });
 
-  await it("整段 transcript 超限时保留头和尾（仓库坐标在开头，不能丢）", () => {
+  await it("整段 transcript 超限时保留头和尾（会话开头的出发点不能丢）", () => {
     const items = [
-      { role: "user", content: "导入了 sindresorhus/is-stream@main" },
+      { role: "user", content: "帮我盯一下 https://example.com/report 这份周报，只看交付时间" },
       ...Array.from({ length: 40 }, (_, i) => ({
         role: "user",
         content: `第${i}轮问：${"很长的内容".repeat(900)}`,
@@ -1271,7 +1022,7 @@ await describe("I. 会话压缩的纯函数", async () => {
     ];
     const t = renderTranscript(items);
     ok(t.length <= 120_100, `应被截到上限附近，实际 ${t.length}`);
-    ok(t.includes("sindresorhus/is-stream@main"), "头部的仓库坐标必须留下");
+    ok(t.includes("https://example.com/report"), "开头的来源链接必须留下");
     ok(t.includes("中间省略"), "应有省略标注");
     ok(t.includes("第39轮问"), "尾部的最近讨论必须留下");
   });
@@ -1288,18 +1039,20 @@ await describe("I. 会话压缩的纯函数", async () => {
   });
 
   await it("摘要 prompt 点名了四类必须保留的信息", () => {
-    for (const k of ["仓库", "代码位置", "偏好", "还没做完"]) {
+    for (const k of ["来源", "结论", "偏好", "还没做完"]) {
       ok(SUMMARY_SYSTEM_PROMPT.includes(k), `prompt 里应提到「${k}」`);
     }
     ok(SUMMARY_SYSTEM_PROMPT.includes("不要编"), "必须明确禁止编造");
+    // 改成通用助手后不该再要求模型记「导入了哪个仓库」—— 那个能力已经没了
+    ok(!SUMMARY_SYSTEM_PROMPT.includes("仓库"), "不该残留仓库问答时代的保留项");
   });
 });
 
 // ═══════════════════════════════════════════════════════════════════════
-// J. 云文档授权：链接解析 / state 签名 / 授权链接
+// H. 云文档授权：链接解析 / state 签名 / 授权链接
 // ═══════════════════════════════════════════════════════════════════════
 
-await describe("J. 云文档授权（纯函数）", async () => {
+await describe("H. 云文档授权（纯函数）", async () => {
   await it("parseDocUrl 认得五种链接形态", () => {
     eq(parseDocUrl("https://x.feishu.cn/docx/AbCd1234"), { kind: "docx", token: "AbCd1234" });
     eq(parseDocUrl("https://x.feishu.cn/wiki/WkNode99"), { kind: "wiki", token: "WkNode99" });
@@ -1433,10 +1186,10 @@ await describe("J. 云文档授权（纯函数）", async () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════
-// K. 用户令牌管理器
+// I. 用户令牌管理器
 // ═══════════════════════════════════════════════════════════════════════
 
-await describe("K. 用户令牌管理器", async () => {
+await describe("I. 用户令牌管理器", async () => {
   const ENV = { FEISHU_APP_ID: "cli_x", FEISHU_APP_SECRET: "s" };
   const NOW = Date.now();
 
@@ -1635,10 +1388,10 @@ await describe("K. 用户令牌管理器", async () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════
-// L. 云文档工具族
+// J. 云文档工具族
 // ═══════════════════════════════════════════════════════════════════════
 
-await describe("L. 云文档工具族", async () => {
+await describe("J. 云文档工具族", async () => {
   const ENV = { FEISHU_APP_ID: "cli_x", FEISHU_APP_SECRET: "s" };
 
   const DOC_TEXT = "第一段。".repeat(5) + "第二段内容。".repeat(5);
@@ -1997,7 +1750,8 @@ await describe("L. 云文档工具族", async () => {
   });
 
   await it("网络抛错时返回 { error }，不把异常抛出去", async () => {
-    // 工具抛错会中断整个工具循环 —— 契约是永不抛（同 workspace/tools.ts）
+    // 工具抛错会中断整个工具循环 —— 契约是永不抛
+    // （实现上靠 `src/shared/util.ts` 的 `guarded()` 兜住）
     const t = await tools();
     stubFetch(() => {
       throw new Error("网络炸了");
@@ -2114,10 +1868,10 @@ await describe("L. 云文档工具族", async () => {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// M. 跨会话记忆
+// K. 跨会话记忆
 // ═══════════════════════════════════════════════════════════════════════
 
-await describe("M. 跨会话记忆", async () => {
+await describe("K. 跨会话记忆", async () => {
   await it("键名规范化：空格 / 大写 / 中文 / 危险串 / 超长", () => {
     eq(normalizeMemoryKey("Tech Stack"), "tech-stack");
     // 中文保留 —— 用户是中文，键叫「技术栈」比叫 tech-stack 更好读

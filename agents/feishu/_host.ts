@@ -1,15 +1,18 @@
-// 飞书回合的宿主实现：把「问模型」「导仓库」「报状态」三件事接到
+// 飞书回合的宿主实现：把「问模型」「报状态」这两件事接到
 // OpenAI Agents SDK + EdgeOne 平台上。
 //
 // ── 这个文件在移植里扮演什么角色 ────────────────────────────────────
-// 原版这三件事的实现散在 `server.ts` 的 `onChatMessage` / `workspaceBegin...`
+// 原版这些事的实现散在 `server.ts` 的 `onChatMessage` / `workspaceBegin...`
 // 和 `feishuRun` 里，加起来四百多行，中间夹着 AIChatAgent 基类、DO storage、
 // AI SDK 的 streamText。
 //
 // 移植时**没有去改 `src/feishu/turn.ts`**，而是照着它的 `FeishuTurnHost` 接口
 // 写了一个新实现。这是这次移植里唯一一处「原版设计帮了大忙」的地方 ——
-// 当初把宿主能力抽成三个方法只是为了能脱离 DO 单测，结果正好让换平台时
-// 回合流程一行不用动。
+// 当初把宿主能力抽成接口只是为了能脱离 DO 单测，结果正好让换平台时
+// 回合流程几乎一行不用动。
+//
+// 2026-09-25：agent 从「代码仓库问答」改成通用助手，`HostDeps.repo`
+// 和 `ingest()`（抓 GitHub 仓库入库）随之删除。
 
 import OpenAI from "openai";
 import {
@@ -45,9 +48,6 @@ import { FeishuStreamer } from "../../src/feishu/streamer.ts";
 import type { FeishuTurnHost } from "../../src/feishu/turn.ts";
 import { sanitizeAndAppend } from "../../src/feishu/session-sanitize.ts";
 import { UserTokenManager, makeUserTokenStore } from "../../src/feishu/user-token.ts";
-import { makeWorkspaceTools } from "../../src/workspace/tools.ts";
-import type { WorkspaceRepo } from "../../src/workspace/repo.ts";
-import { serveIngest } from "../../src/workspace/serve-ingest.ts";
 import { INSTRUCTIONS } from "./_instructions.ts";
 import { diagCounters, modelFetch, type DiagEntry } from "./_diag.ts";
 import { makeSearchTools } from "./_search.ts";
@@ -154,17 +154,10 @@ const MAX_OUTPUT_TOKENS = 8_192;
  */
 const COMPACT_MAX_TOKENS = 2_048;
 
-function fmtBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  return `${(n / 1024 / 1024).toFixed(2)} MB`;
-}
-
 export interface HostDeps {
   env: AgentEnv;
   /** 平台注入的 context。`store` / `tools` 都从这里取 */
   context: any;
-  repo: WorkspaceRepo;
   cache: TokenCache;
   /** 按会话隔离的 KV，云文档令牌存这里。拿不到平台 state 时是 null（本地调试） */
   kv: StateKv | null;
@@ -238,7 +231,7 @@ export function resolveModelRoute(env: AgentEnv): {
  * 同一组请求头。探针要是自己另拼一份配置，测过的就不是线上真正跑的那条路了。
  *
  * 走用户自己的 OpenCode Go 订阅池，不用平台的免费模型 ——
- * 免费额度是账号级的 50 万 token，代码问答读几个文件就没了。
+ * 免费额度是账号级的 50 万 token，带工具的一轮问答多搜几个网页就没了。
  */
 export function makeModelClient(env: AgentEnv, onFailure?: (e: DiagEntry) => void): OpenAI {
   const route = resolveModelRoute(env);
@@ -280,7 +273,7 @@ export function makeGlobalMemory(env: AgentEnv): GlobalMemory | null {
 }
 
 export function createHost(deps: HostDeps): FeishuTurnHost {
-  const { env, context, repo, cache } = deps;
+  const { env, context, cache } = deps;
 
   // ⚠️ 模型名与客户端都从**模块级函数**取（见上面的 resolveModelName /
   // makeModelClient）—— 这样 `?probe=model` 和真实回合走的是同一条路。
@@ -420,7 +413,9 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
 
   const buildAgent = (): Agent =>
     new Agent({
-      name: "code-repo-reader",
+      // 名字只是个标识（会出现在日志和 trace 里），不参与行为。
+      // 2026-09-25 从 `code-repo-reader` 改成 `general-assistant`。
+      name: "general-assistant",
       // ⚠️ `instructions` 这里是**函数**而不是字符串：长期记忆必须在每轮开头
       // 动态拼进去。`@openai/agents` 的 `Agent.instructions` 支持
       // `(runContext, agent) => string | Promise<string>`
@@ -435,7 +430,8 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
       model: getModel(),
       modelSettings: { maxTokens: MAX_OUTPUT_TOKENS },
       tools: [
-        ...makeWorkspaceTools(repo),
+        // 2026-09-25：这里原先第一项是 `...makeWorkspaceTools(repo)`
+        // （read / ls / grep / find，读用户导入的仓库）。仓库层删除后不再有它。
         // 跨会话记忆的三个工具（remember_fact / forget_fact / recall_facts）。
         // 挂不上就整个不挂，理由同上。
         ...((memory ? makeMemoryTools(memory, deps.openId) : []) as any[]),
@@ -538,50 +534,23 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
       return { text: answer, streamed: false };
     },
 
-    async ingest(owner, name, ref) {
-      // serveIngest 是从原版原样搬过来的（它只依赖 repo / github / tar / filter，
-      // 零 Cloudflare 依赖），所以这里只是调它 + 落一次快照。
-      const r = await serveIngest(repo, owner, name, ref);
-
-      // 落快照。失败不影响这次导入的可用性 —— 语料已经在内存里了，
-      // 只是实例被驱逐后需要重新导入。所以吞掉结果，只在日志里留个痕。
-      const saved = await repo.persist();
-      if (!saved) console.warn("[ingest] 快照未落盘，实例被驱逐后需要重新导入");
-
-      const lines = [
-        `已导入 ${owner}/${name}@${ref}`,
-        `${r.fileCount} 个文件，${fmtBytes(r.totalBytes)}`,
-      ];
-      if (r.skipped > 0) lines.push(`跳过 ${r.skipped} 个（二进制 / 压缩产物 / 被规则排除）`);
-      if (r.capped) {
-        // ⚠️ 必须说清楚语料是部分的。不写这句，模型会把「搜不到」当成
-        // 「仓库里没有」，而实际上是根本没导入进来
-        const why =
-          r.truncatedBy === "entries"
-            ? "文件条目太多"
-            : r.truncatedBy === "time"
-              ? "抓取超时"
-              : "达到语料大小上限";
-        lines.push(`⚠️ 语料只收了一部分（${why}），搜不到的内容不代表仓库里没有`);
-      }
-      lines.push("现在可以直接问这个仓库的问题了。");
-      return lines.join("\n");
-    },
+    // 2026-09-25：这里原有 `async ingest(owner, name, ref)`（抓 GitHub 仓库入库 +
+    // 落 KV 快照）。agent 改成通用助手后整条链路删除，`FeishuTurnHost` 里也
+    // 没有这个方法了 —— 留着会编译不过（对象字面量多出未知属性）。
 
     async statusText() {
+      // 2026-09-25：这里原先报「当前导入了哪个仓库、文件数、语料大小」。
+      // 仓库层删除后改报**长期记忆规模**和**云文档授权**这两件事。
       const lines: string[] = [];
-      const st = repo.status();
 
-      if (st.activeGeneration === 0 || st.fileCount === 0) {
-        lines.push("还没有导入仓库。发 `/repo owner/name` 导入一个 GitHub 仓库（也可以直接粘链接）。");
+      if (memory) {
+        const n = (await memory.entries()).length;
+        lines.push(`长期记忆：${n} 条（跨会话共享，看清单发 /memory）`);
       } else {
-        lines.push(`当前仓库：${st.owner}/${st.name}@${st.ref}`);
-        lines.push(`文件数：${st.fileCount}`);
-        lines.push(`语料大小：${fmtBytes(st.totalBytes)}`);
-        if (st.capped) lines.push("⚠️ 语料只收了一部分");
+        lines.push("长期记忆：这个环境接不上（多半是本地调试）。");
       }
 
-      // 授权状态和仓库状态是**两件事**，各自独立 —— 没导仓库也可能授权过云文档
+      // 授权是**按人**的，和记忆不是一回事 —— 换个同事来问，授权状态就不一样
       if (userTokens) lines.push(await authStateText(userTokens, deps.openId));
       return lines.join("\n");
     },
@@ -663,14 +632,14 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
         return "这个会话没接上平台的会话存储（多半是本地调试环境），没有可清的历史。";
       }
       await s.clearSession();
-      // 只说清了对话 —— 语料（repo 快照）在另一个键里，不受影响。
-      // 不写这句的话，用户会以为要重新 /repo 一遍。
+      // ⚠️ 这句**必须点名长期记忆不动**。不写的话用户会以为 `/clear` 能把记忆
+      // 一起抹掉 —— 而记忆在另一个 Blob 命名空间里，这个命令结构上就碰不到它。
+      // 要删记忆只有 /forget 一条路。
       //
-      // ⚠️ 加了跨会话记忆之后，这句**必须点名长期记忆不动**。不写的话用户会以为
-      // `/clear` 能把记忆一起抹掉 —— 而记忆在另一个 Blob 命名空间里，
-      // 这个命令结构上就碰不到它。要删记忆只有 /forget 一条路。
+      // （2026-09-25：原先这里还补一句「导入的仓库还在，发 /status 可以看」——
+      //   仓库层已删除，那句随之去掉。）
       const extra = memory ? "\n\n长期记忆不受影响（那是跨会话的，删它用 /forget）。" : "";
-      return `会话已清空，之前的对话记忆没了。导入的仓库还在（发 /status 可以看）。${extra}`;
+      return `会话已清空，之前的对话记忆没了。${extra}`;
     },
 
     async memoryText() {

@@ -3,7 +3,12 @@
 `cf-agent-lab`（Cloudflare Workers + Durable Objects）到 **EdgeOne Makers** 的移植版。
 用 **OpenAI Agents SDK** 重写 Agent 核心，入口只有飞书 —— 没有网页聊天界面。
 
-用户导入一个 GitHub 仓库，然后在飞书里问关于这个仓库的代码问题。
+一个**通用助手**：在飞书里直接问，它会搜网页、读你授权的飞书云文档、跑代码算东西，
+并把该记住的事实跨会话记住。
+
+> 2026-09-25：原版是「代码仓库问答」—— 用户先发 `/repo owner/name` 导入一个 GitHub
+> 仓库，再问那个仓库的代码。**`/repo` 命令和整套 `src/workspace/` 语料层已经删掉**，
+> 改成上面这个通用助手。删掉的理由和迁移细节见 `docs/01-架构与移植映射.md`。
 
 ---
 
@@ -16,7 +21,7 @@
 | 代码（约 5800 行） | ✅ 写完 |
 | `npm install` | ✅ **通过** —— 104 个包，约 1 分钟 |
 | `tsc --noEmit` 类型检查 | ✅ **零错误** |
-| `npm test` 冒烟测试 | ✅ **173 项全通过**（验签/解密、命令解析、去重限流、generation 制、四个代码工具、webhook 端到端、回合流程、云文档工具族、跨会话记忆） |
+| `npm test` 冒烟测试 | ✅ **146 项全通过**（验签/解密、命令解析、去重限流、webhook 端到端、回合流程、会话压缩、云文档授权与工具族、跨会话记忆） |
 | `edgeone makers dev` 本地起服务 | ⚠️ **能起来，但 agent 路由本地打不到** —— `agent-node` 不绑定端口（见下） |
 | 跨会话记忆的存储层 | ✅ **已实测**（不靠文档推断：agents 运行时内置 Blob SDK） |
 | 【未知数 1】返回 Response 后后台代码能否跑完 | ✅ **线上实测成立** —— `phase: finished` / `elapsedMs: 15046`，`FEISHU_DISPATCH_MODE` 保持 `async` |
@@ -92,12 +97,12 @@ npm run dev
 
 `test/smoke.ts` 用**裸 Node** 跑，不启 EdgeOne、不连飞书、不发网络请求（`fetch` 被 stub 掉了）。
 理由：这条链路里最容易错的东西 —— 验签与解密的**顺序**、去重窗口的判据、
-`generation` 制的原子切换、那个 36 字符的 `conversation_id` —— **全都不依赖平台**。
+摘要写回的形状、那个 36 字符的 `conversation_id` —— **全都不依赖平台**。
 把它们从平台里剥出来单独测，改一行就能验证一次，不用等部署。
 
-覆盖十三节：A 验签解密 ｜ B 事件体解析 ｜ C 命令解析 ｜ D 去重限流 ｜
-E 语料仓储 ｜ F 代码工具 ｜ G webhook 端到端 ｜ H 回合流程 ｜ I 会话压缩 ｜
-J 云文档授权 ｜ K 用户令牌管理 ｜ L 云文档工具族 ｜ M 跨会话记忆。
+覆盖十一节：A 验签解密 ｜ B 事件体解析 ｜ C 命令解析 ｜ D 去重限流 ｜
+E webhook 端到端 ｜ F 回合流程 ｜ G 会话压缩 ｜ H 云文档授权 ｜
+I 用户令牌管理 ｜ J 云文档工具族 ｜ K 跨会话记忆。
 
 ---
 
@@ -110,7 +115,7 @@ edgeone-agent-lab/
 │
 ├── agents/feishu/                  # 【会话模式】Agent 运行时，单次可跑 900 秒
 │   ├── index.ts                    #   入口：POST /feishu。去重、限流、调度
-│   ├── _host.ts                    #   FeishuTurnHost 实现：模型调用 + 流式卡片 + 导入
+│   ├── _host.ts                    #   FeishuTurnHost 实现：模型调用 + 流式卡片
 │   ├── _instructions.ts            #   系统提示词
 │   └── _tools.ts                   #   工具装配 + 结果摘要
 │
@@ -118,31 +123,27 @@ edgeone-agent-lab/
 │   └── index.ts                    #   入口：POST /feishu-webhook。验签、解密、转发
 │
 ├── src/                            # 平台无关的业务逻辑（大部分从原版搬来）
-│   ├── feishu/
-│   │   ├── api.ts         ✅ 原样   # tenant_access_token、发文本
-│   │   ├── card.ts        ✅ 原样   # 流式卡片（cardkit）
-│   │   ├── commands.ts    🔧 微改   # 命令解析（加 /compact /clear /memory /forget）
-│   │   ├── compact.ts     ➕ 新增   # 会话压缩的纯函数（渲染历史 / 写回形状）
-│   │   ├── crypto.ts      ✅ 原样   # 验签 + AES 解密
-│   │   ├── event.ts       ✅ 原样   # 事件体解析
-│   │   ├── global-memory.ts ➕ 新增 # **跨会话**记忆（Blob 后端 + 三个工具 + 渲染）
-│   │   ├── streamer.ts    ✅ 原样   # 增量 → 卡片，250ms 一拍
-│   │   ├── turn.ts        🔧 微改   # 回合流程（markDone 改 await；加 /compact /clear /memory /forget 分发）
-│   │   ├── store.ts       🔄 重写   # SQL → 按会话隔离的 JSON KV
-│   │   └── types.ts       ➕ 新增   # FeishuQueueEvent 从 router.ts 挪出来
-│   └── workspace/
-│       ├── github.ts      ✅ 原样   # codeload URL、默认分支
-│       ├── tar.ts         ✅ 原样   # 流式 tar 解析
-│       ├── decode.ts      ✅ 原样   # gzip 解压
-│       ├── filter.ts      ✅ 原样   # 二进制/压缩产物判定、跳过规则
-│       ├── glob.ts        ✅ 原样   # ** 和 {a,b} 的 glob
-│       ├── types.ts       ✅ 原样   # 语料上限常量
-│       ├── serve-ingest.ts ✅ 原样  # 抓 tarball 入库（零平台依赖，原样能用）
-│       ├── repo.ts        🔄 重写   # SQL → 内存索引 + 快照
-│       └── tools.ts       🔧 换框架 # read/ls/find/grep：JSON Schema → zod
+│   ├── shared/
+│   │   └── util.ts        ➕ 新增   # guarded（工具永不抛的兜底）、UA 等通用零件
+│   └── feishu/
+│       ├── api.ts         ✅ 原样   # tenant_access_token、发文本
+│       ├── card.ts        ✅ 原样   # 流式卡片（cardkit）
+│       ├── commands.ts    🔧 微改   # 命令解析（加 /compact /clear /memory /forget；删 /repo）
+│       ├── compact.ts     ➕ 新增   # 会话压缩的纯函数（渲染历史 / 写回形状）
+│       ├── crypto.ts      ✅ 原样   # 验签 + AES 解密
+│       ├── docs.ts        ➕ 新增   # 飞书云文档三个工具（docx / sheets / bitable）
+│       ├── event.ts       ✅ 原样   # 事件体解析
+│       ├── global-memory.ts ➕ 新增 # **跨会话**记忆（Blob 后端 + 三个工具 + 渲染）
+│       ├── oauth.ts       ➕ 新增   # 云文档授权（state 签名、授权链接）
+│       ├── session-sanitize.ts ➕ 新增 # 历史消毒（丢孤儿 tool 项）
+│       ├── streamer.ts    ✅ 原样   # 增量 → 卡片，250ms 一拍
+│       ├── turn.ts        🔧 微改   # 回合流程（markDone 改 await；加 /compact /clear /memory /forget 分发）
+│       ├── user-token.ts  ➕ 新增   # 用户令牌：续期、轮换、单飞、按人分槽
+│       ├── store.ts       🔄 重写   # SQL → 按会话隔离的 JSON KV
+│       └── types.ts       ➕ 新增   # FeishuQueueEvent 从 router.ts 挪出来
 │
 ├── test/
-│   └── smoke.ts                    # 冒烟测试：170 项，裸 Node 跑，不依赖 EdgeOne
+│   └── smoke.ts                    # 冒烟测试：146 项，裸 Node 跑，不依赖 EdgeOne
 │
 └── docs/
     ├── 01-架构与移植映射.md         # 逐模块对照、跨会话记忆、两个未知数、刻意没做的事
@@ -165,7 +166,7 @@ cloud-functions/feishu-webhook      无状态 · 验签 · 解密 · 解析
  ▼
 agents/feishu                       会话模式 · 粘性路由 · 最长 900 秒
  ├─ context.store.openaiSession()   对话记忆（平台托管，按会话隔离）
- ├─ context.store.state             去重 / 限流 / token 缓存 / 语料快照（按会话隔离）
+ ├─ context.store.state             去重 / 限流 / token 缓存（按会话隔离）
  ├─ Blob (agent-memory-<projectId>) **跨会话**长期事实：prefs/* · user/<openId>/*
  ├─ context.tools.*                 沙箱工具（commands / code_interpreter / web_search / …）
  └─ 回飞书（sendText 或流式卡片）

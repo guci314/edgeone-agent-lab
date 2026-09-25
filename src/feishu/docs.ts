@@ -9,17 +9,20 @@
 // 每个工具都先做一次 wiki 解引用，所以 `/wiki/xxx` 在三个工具里都能直接用。
 // 少一个工具，模型就少一次选错的机会。
 //
-// ── 和 workspace/tools.ts 的关系 ────────────────────────────────────
-// 那边四个工具读**内存里的 GitHub 仓库**，这里三个读**飞书云文档**，数据源不同
+// ── 和别的工具族的关系 ──────────────────────────────────────────────
+// 这里三个工具读**飞书云文档**，`_search.ts` 那个读**公开网页**，数据源不同
 // 所以分文件；但约定必须一致，否则模型会看到两种风格：
 //   · 返回一律 JSON 字符串；出错返回 `{ error }` 而不是抛（复用 `guarded`）
 //   · 截断必须**显式标注**并给出继续读的办法，绝不能让半截内容被当成全文
 //   · 前置条件不满足时给**可执行**的提示，别让模型自己猜
+//
+// （2026-09-25：这段原先说的是「和 workspace/tools.ts 的 read/ls/grep/find 的关系」，
+//   那一族读的是用户导入的 GitHub 仓库快照。仓库层已删除，那段对照也随之改写。）
 
 import { tool } from "@openai/agents";
 import { z } from "zod";
 import { FeishuError, feishuCallAs, type FeishuEnv } from "./api.ts";
-import { guarded } from "../workspace/tools.ts";
+import { guarded } from "../shared/util.ts";
 import { parseDocUrl, type DocRef } from "./oauth.ts";
 import type { UserTokenManager } from "./user-token.ts";
 

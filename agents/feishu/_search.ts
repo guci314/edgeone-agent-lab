@@ -18,12 +18,12 @@
 //
 // ── 契约（和其它工具一致）──────────────────────────────────────────
 // · 永不抛错：异常一律转成 `{ error }`，让模型自己看到并调整
-// · 返回值序列化成 JSON 字符串（见 src/workspace/tools.ts 文件头的 ⚠️）
+// · 返回值序列化成 JSON 字符串（全仓工具族的统一契约，实现见 src/shared/util.ts 的 guarded）
 // · 搜到 0 条**不是错误**，返回空数组 + 一句提示，否则模型会反复重试同一个词
 
 import { tool } from "@openai/agents";
 import { z } from "zod";
-import { guarded } from "../../src/workspace/tools.ts";
+import { guarded } from "../../src/shared/util.ts";
 
 const SERPER_URL = "https://google.serper.dev/search";
 

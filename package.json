@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "cf-agent-lab 的 EdgeOne Makers 移植版：飞书代码仓库问答机器人（OpenAI Agents SDK）",
+  "description": "cf-agent-lab 的 EdgeOne Makers 移植版：飞书通用助手（OpenAI Agents SDK）",
   "scripts": {
     "link": "edgeone makers link",
     "dev": "edgeone makers dev",

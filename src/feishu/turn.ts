@@ -5,18 +5,20 @@
 // ACK 过了。EdgeOne 没有 `schedule()`/alarm，所以现在由 agent 入口
 // （`agents/feishu/index.ts`）来驱动这一回合，见那里的注释。
 //
-// 这个文件本身**几乎不用改**，因为它的设计一开始就把宿主能力抽成了三个方法的
-// 接口。这不是过度抽象 —— 当初只是为了「让整个回合流程可以脱离 DO 单独测」，
+// 这个文件本身**几乎不用改**，因为它的设计一开始就把宿主能力抽成了接口。
+// 这不是过度抽象 —— 当初只是为了「让整个回合流程可以脱离 DO 单独测」，
 // 结果正好也是让这次移植成本最低的地方。
 //
 // 唯一改的是 `store.markDone()` 现在要 await（存储从同步 SQL 换成了异步 KV）。
+//
+// 2026-09-25：agent 改成通用助手后去掉了宿主方法 `ingest`（抓取并入库 GitHub 仓库）
+// 和对应的 `case "repo"` —— 那整条「导入仓库再问答」的链路已删除。
 
 import { sendText } from "./api.ts";
 import type { FeishuEnv } from "./api.ts";
 import { HELP_TEXT, parseCommand } from "./commands.ts";
 import type { FeishuStore } from "./store.ts";
 import type { FeishuQueueEvent } from "./types.ts";
-import { resolveDefaultBranch } from "../workspace/github.ts";
 
 export interface FeishuTurnHost {
   /**
@@ -30,9 +32,7 @@ export interface FeishuTurnHost {
     messageId: string,
     chatId: string,
   ): Promise<{ text: string; streamed: boolean }>;
-  /** 抓取并入库，返回一句给用户看的回执 */
-  ingest(owner: string, name: string, ref: string): Promise<string>;
-  /** 「当前导入了什么」的一句话 */
+  /** 「当前会话什么状态」的一句话 */
   statusText(): Promise<string>;
   /**
    * 把当前会话历史压成一条摘要，返回给用户看的回执。
@@ -145,32 +145,12 @@ export async function runFeishuTurn(
       await say(await safeReply(() => host.logout()));
       break;
 
-    case "repo": {
-      let ref = cmd.ref;
-      if (!ref) {
-        try {
-          ref = await resolveDefaultBranch(cmd.owner, cmd.name);
-        } catch (e) {
-          // 这一步失败是**永久性**的（仓库不存在/私有），直接说清楚，别重试
-          await say(
-            `${(e as Error).message}\n\n确认一下链接，或者显式写分支：/repo ${cmd.owner}/${cmd.name}@main`,
-          );
-          break;
-        }
-      }
-
-      // 抓取可能要几十秒。先给一条回执，否则用户不知道有没有收到
-      await say(`正在抓取 ${cmd.owner}/${cmd.name}@${ref} …`);
-
-      let reply: string;
-      try {
-        reply = await host.ingest(cmd.owner, cmd.name, ref);
-      } catch (e) {
-        reply = `导入失败：${(e as Error).message}`;
-      }
-      await say(reply);
-      break;
-    }
+    // 2026-09-25：这里原有 `case "repo"`（抓 GitHub 仓库 → 入库 → 回执）。
+    // 改成通用助手后 `Command` 里已经没有 `repo` 这个 kind，分支也随之删除 ——
+    // 留着会编译不过（switch 的 case 必须是联合成员）。
+    //
+    // 注意：`/repo xxx` 现在会被 `parseCommand` 判成「不认识的命令」并回一句提示，
+    // **不会**掉进下面的 `case "ask"` 被当成普通提问送给模型。
 
     case "ask": {
       let reply: string;

@@ -41,7 +41,6 @@ import { MemoryKv, FeishuStore, type StateKv } from "../../src/feishu/store.ts";
 import { runFeishuTurn } from "../../src/feishu/turn.ts";
 import type { FeishuQueueEvent } from "../../src/feishu/types.ts";
 import { UserTokenManager, makeUserTokenStore } from "../../src/feishu/user-token.ts";
-import { WorkspaceRepo, type RepoSnapshot, type RepoSnapshotStore } from "../../src/workspace/repo.ts";
 import {
   createHost,
   makeModelClient,
@@ -51,17 +50,6 @@ import {
 } from "./_host.ts";
 import { clearDiag, diagCounters, recentDiag, resetCounters } from "./_diag.ts";
 import { DIAG_KEY } from "./_host.ts";
-
-/**
- * 语料快照的大小上限。超过就不写进 KV —— 快照写不进去时退化成纯内存，
- * 实例被驱逐后需要重新导入，但**不影响本次对话**。
- *
- * 4MB 是个保守值：语料上限本身就是 4MB（MAX_TOTAL_BYTES），JSON 序列化后
- * 大概 1.2~1.5 倍，再加上平台 KV 的单值压力。调大它之前先确认平台侧的限额。
- */
-const REPO_SNAPSHOT_MAX_BYTES = 6 * 1024 * 1024;
-
-const SNAPSHOT_KEY = "repo.snapshot";
 
 export async function onRequest(context: any) {
   const request = context?.request;
@@ -149,13 +137,11 @@ export async function onRequest(context: any) {
   }
 
   // ── 建宿主 ────────────────────────────────────────────────────────
-  const repo = new WorkspaceRepo(makeSnapshotStore(context, conversationId));
-  await repo.hydrate();
-
+  // 2026-09-25：这里原先还要 `new WorkspaceRepo(makeSnapshotStore(...))` +
+  // `await repo.hydrate()` —— 语料快照（用户导入的仓库）已随仓库层删除。
   const host = createHost({
     env,
     context,
-    repo,
     cache: store.tokenCache(),
     kv: makeStateKv(context),
     openId: evt.openId,
@@ -344,7 +330,7 @@ function serperFingerprint(env: Record<string, unknown>): unknown {
  *
  * ── 为什么需要它 ────────────────────────────────────────────────────
  * bot 回「没答上来：400 status code (no body)」时，`?probe=model` 是 **200** ——
- * 因为探针只发一个极简请求，不带工具、不带语料。
+ * 因为探针只发一个极简请求，不带工具、不带云文档授权。
  * 真正失败的是**真实回合**那个请求，而 SDK 把错误压成了一句话：
  * `400 status code (no body)`，既没有正文也没说是哪个字段。
  *
@@ -721,7 +707,8 @@ async function probeCheck(context: any, _url: URL): Promise<Response> {
 //   ③ GET ?probe=store&op=read             **换一个 Makers-Conversation-Id** 再跑
 //                                          三条路各自的 verdict 就是答案
 //
-// 所有写入都在 `probe-*` 前缀下，不碰 `repo.snapshot` / `feishu.*` 那些真键。
+// 所有写入都在 `probe-*` 前缀下，不碰 `feishu.*` 那些真键。
+// （2026-09-25 前这里还提过 `repo.snapshot` —— 语料快照已随仓库层删除。）
 
 const PROBE_GLOBAL_PREFIX = "probe-global/";
 const PROBE_ROUTE_PREFIX = "probe-route/";
@@ -946,39 +933,6 @@ function makeFeishuStore(context: any): FeishuStore {
     return new FeishuStore(new MemoryKv());
   }
   return new FeishuStore(kv);
-}
-
-/**
- * 语料快照的存储后端。
- *
- * 超过上限就**不写**（`save` 静默返回）—— 与其写一个可能被平台拒掉的超大值，
- * 不如老实退化成纯内存。`snapshot()` 那边会因此拿到 null，`persist()` 返回 false，
- * 调用方（_host.ts）会打一条 warn。
- */
-function makeSnapshotStore(context: any, conversationId: string): RepoSnapshotStore | undefined {
-  const kv = makeStateKv(context);
-  if (!kv) return undefined;
-
-  return {
-    async load(): Promise<RepoSnapshot | null> {
-      try {
-        return await kv.get<RepoSnapshot>(SNAPSHOT_KEY);
-      } catch {
-        return null;
-      }
-    },
-    async save(s: RepoSnapshot): Promise<void> {
-      const bytes = new TextEncoder().encode(JSON.stringify(s)).length;
-      if (bytes > REPO_SNAPSHOT_MAX_BYTES) {
-        throw new Error(`快照 ${bytes} 字节，超过上限 ${REPO_SNAPSHOT_MAX_BYTES}`);
-      }
-      await kv.set(SNAPSHOT_KEY, s);
-      console.log(`[repo] 快照已落盘 cid=${conversationId} ${bytes} 字节`);
-    },
-    async clear(): Promise<void> {
-      await kv.delete(SNAPSHOT_KEY);
-    },
-  };
 }
 
 // ── 小工具 ────────────────────────────────────────────────────────────

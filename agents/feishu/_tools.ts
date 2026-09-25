@@ -1,33 +1,28 @@
 // 工具装配。
 //
-// ── 原版有四个来源 ──────────────────────────────────────────────────
-//   makeTools(env)                     → web_search / fetch_page（自己写的抓页）
-//   makeWorkspaceTools(repo)           → read / ls / grep / find
-//   makeSandboxTools(repo, env, warm)  → run_python / install_python_package
-//   makeGithubTools(ghworkspace)       → ws_ls / ws_read / ws_write / ws_delete
+// ── 现在的四个来源（2026-09-25 改成通用助手之后）────────────────────
+//   makeSearchTools(env)               → web_search                  （自己实现，serper，见 _search.ts）
+//   context.tools.*                    → 平台内置沙箱工具            （见下）
+//   src/feishu/docs.ts                 → feishu_doc_read / feishu_sheet_read / feishu_bitable_read
+//   src/feishu/global-memory.ts        → remember_fact / forget_fact / recall_facts
 //
-// ── EdgeOne 版变成三个来源 ──────────────────────────────────────────
-//   makeWorkspaceTools(repo)           → read / ls / grep / find        （自己实现，见 src/workspace/tools.ts）
-//   makeSearchTools(env)               → web_search                    （自己实现，serper，见 _search.ts）
-//   context.tools.*                    → 平台内置沙箱工具              （替掉原版的 run_python 族）
-//   （ghworkspace 未移植，见 docs/01-架构与移植映射.md）
+// ── 原版（cf-agent-lab）有四个来源，两个已不在 ──────────────────────
+//   makeWorkspaceTools(repo)           → read / ls / grep / find      ← **已删除**
+//   makeGithubTools(ghworkspace)       → ws_ls / ws_read / ws_write   ← 未移植
+//     （前者读用户导入的仓库快照，随仓库层一起删；后者见 docs/01-架构与移植映射.md）
 //
-// ── 为什么平台工具能替掉 run_python 族 ──────────────────────────────
+// ── 为什么平台工具能替掉原版的 run_python 族 ────────────────────────
 // EdgeOne 的 `context.tools` 把沙箱能力原子化成了 14 个工具，其中我们需要的：
-//   · code_interpreter← 替掉原版接 Judge0 / 阿里云沙箱的 run_python
-//   · commands        ← 原版没有的能力（能跑 shell）
-//   · files_* / browser_* ← 原版没有，但正好是「把仓库文件喂进沙箱」的替代品
+//   · code_interpreter    ← 替掉原版接 Judge0 / 阿里云沙箱的 run_python
+//   · commands            ← 原版没有的能力（能跑 shell）
+//   · files_* / browser_* ← 原版没有。files_* 是**沙箱里的**临时工作目录，
+//                           不是用户的磁盘，也不是长期存储（见 _instructions.ts 里那句）
 //
 // ⚠️ **`web_search` 一开始也是从平台拿的，后来换成了自建**（见 `_search.ts`）：
 // 平台那个底层是腾讯云 WSA，本项目没配 `WSA_API_KEY`，一调就报
 // `web_search requires the WSA_API_KEY environment variable.` —— 是坏的。
 // 所以 `platformTools()` 多了一个 `extraExcluded` 参数：自建的那个挂上时，
 // 必须把平台这个同名的摘掉，否则模型可能选中坏的。
-//
-// 换掉之后有一个**真实的能力变化**必须知道：原版的 run_python 有
-// `files` 参数，能把仓库里指定文件的内容一起送进沙箱；平台工具没有这个联动，
-// 模型要先把文件内容读出来、再写进沙箱（files_write）或直接嵌进代码。
-// 这个差别写进了系统提示词，让模型自己走两步。
 //
 // ⚠️ 工具名的来源是官方文档《Using the Agent Framework》里的表。它列的名字是
 // `commands` / `files_read` / ... / `code_interpreter` / `web_search`。
@@ -43,7 +38,14 @@ export interface PlatformTools {
   browser(): unknown[];
 }
 
-/** 平台工具里我们不挂的那几个。理由：和代码问答无关，挂了只会分散模型的注意力 */
+/**
+ * 平台工具里我们不挂的那几个。
+ *
+ * `browser_*` 那几个是「点页面元素」的操作类工具：模型在飞书里答一个问题，
+ * 没机会跟人来回确认点击目标，挂了只会让它乱点一通。要读网页用 `browser_fetch`。
+ * `files_remove` 是删文件 —— 沙箱本来就会过期，不需要模型手动清理，
+ * 留着反而多一个误删自己刚写的数据的机会。
+ */
 const EXCLUDED = new Set([
   "browser_screenshot",
   "browser_click",
@@ -58,7 +60,7 @@ const EXCLUDED = new Set([
  * 用 `all()` 而不是 `files()` + 单独 get —— 因为我们几乎要全套（除了上面那几个）。
  * 用 `get()` 逐个点名的话，哪天平台加了新工具，这里不会自动跟上。
  *
- * `SANDBOX_ENABLED` 设成 0/false/off 时整条不挂：部署时想先把「纯代码问答」
+ * `SANDBOX_ENABLED` 设成 0/false/off 时整条不挂：部署时想先把「纯搜索问答」
  * 跑通、把沙箱留到后面再开，这个开关有用。
  *
  * ⚠️ env 的类型是 `{ SANDBOX_ENABLED?: string }` 而不是 `Record<string, string|undefined>`：
@@ -90,7 +92,7 @@ export function platformTools(
       .all()
       .filter((t) => !skip.has(String((t as { name?: unknown })?.name ?? "")));
   } catch {
-    // 平台工具拿不到不该让整个 Agent 起不来 —— 代码问答是主路径，沙箱是增强
+    // 平台工具拿不到不该让整个 Agent 起不来 —— 搜索和云文档是主路径，沙箱是增强
     return [];
   }
 }
@@ -101,9 +103,9 @@ export function platformTools(
  * 卡片是给人在手机上看的，工具的完整返回值动辄几千字 —— 全倒进去会把真正的
  * 回答淹掉，而且飞书卡片本来就不适合读长文本。所以每类结果只挑最值得看的字段。
  *
- * 这段是从原版 server.ts 的 summarizeToolOutput 搬过来的，一个分支没动 ——
- * 它的分支顺序是踩出来的，不是想出来的：
- *   · 先看 `error`：我们自己那四个工具失败时返回的就是它
+ * 这段是从原版 server.ts 的 summarizeToolOutput 搬过来的，分支顺序是踩出来的，
+ * 不是想出来的：
+ *   · 先看 `error`：自己实现的那些工具（搜索 / 云文档 / 记忆）失败时返回的就是它
  *   · 再看 `ok === false`：**平台沙箱工具**失败时返回的是 `{ok:false, status, stderr}`，
  *     没有 `error` 字段。只看 error 会把它们判成成功，卡片上出现一个骗人的 ✅
  *   · 然后 stdout 首行：code_interpreter / commands 的主要产出
@@ -131,7 +133,8 @@ export function summarizeToolOutput(output: unknown): string {
 
     // 云文档那三个工具（见 src/feishu/docs.ts）。字段名是各自独有的，
     // 特意挑的：不跟上面那些重名，免得卡片上把「表格 3 行」显示成「3 个条目」。
-    // ⚠️ 顺序要紧 —— `ls` 也返回 count，所以 count 这条必须排在最后
+    // ⚠️ 顺序要紧 —— `count` 太通用（多维表格记录数），必须排在最后，
+    // 否则会抢在更具体的字段（totalChars / rowCount / tableList）前面命中
     if (typeof o.totalChars === "number") {
       return o.truncated ? `文档共 ${o.totalChars} 字（还没读完）` : `文档 ${o.totalChars} 字`;
     }

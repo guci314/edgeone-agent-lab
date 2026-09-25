@@ -71,7 +71,7 @@ export function makeSearchTools(env: SearchEnv): unknown[] {
       description:
         "用 Google 搜索公开网页，返回若干条 {title, link, snippet}。" +
         "涉及最新信息、你不确定的事实、或需要给出处时用它。" +
-        "只能搜公网；仓库里的内容要用 grep / find，不要拿它当仓库搜索用。" +
+        "只能搜公网；用户贴的飞书云文档要用 feishu_*_read 那几个工具，不要拿它当文档读取用。" +
         "结果里的 link 是真实可访问地址，引用时把它给出来。",
       parameters: z.object({
         query: z.string().describe("搜索关键词，越具体越好"),

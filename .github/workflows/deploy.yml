@@ -1,0 +1,59 @@
+# 推送 main 自动部署到 EdgeOne Pages（Makers）
+#
+# 项目实测的部署规则（详见 docs/03 或本机 skill edgeone-makers-deploy）：
+# 1. `edgeone makers deploy` 绝不带路径参数 —— 带路径会跳过本地构建、把源码目录
+#    直接上传平台侧重装依赖，产物极易超「单文件 25MiB」限制。
+#    不带路径 CLI 才本地构建进 .edgeone/ 并只上传产物。
+# 2. 部署前删 <项目名>.zip —— CLI 部署完会在项目根留一个打包 zip 且不清理，
+#    下一轮构建把它当静态文件收进 .edgeone/assets/ 导致超限（自吞循环）。
+# 3. -a overseas —— 该项目创建时加速区域就是 overseas（飞书 webhook 需要公网
+#    回调且自定义域名免备案），必须与项目一致。
+# 4. 环境变量（FEISHU_APP_ID 等）都在 EdgeOne 控制台的项目 env 里，
+#    部署快照自动携带，Actions 侧不配任何业务密钥。
+name: Deploy to EdgeOne
+
+on:
+  push:
+    branches: [main]
+  # 手动触发入口：Actions 页面 "Run workflow"
+  workflow_dispatch:
+
+# 同一时间只跑一个部署，后来的排队而不是互相踩
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install
+
+      # 部署前的门禁：类型 + 冒烟测试挂了就不上线
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Smoke tests
+        run: npm test
+
+      - name: Clean stale zip
+        run: rm -f edgeone-agent-lab.zip
+
+      # 不带路径参数（见文件头注释 1）；本地构建约 4~6 分钟，.edgeone/ 200M+
+      - name: Deploy to EdgeOne Pages
+        run: >
+          npx edgeone makers deploy
+          -n edgeone-agent-lab
+          -t "${{ secrets.EDGEONE_API_TOKEN }}"
+          -a overseas
+          --json

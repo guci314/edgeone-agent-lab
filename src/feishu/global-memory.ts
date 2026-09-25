@@ -23,10 +23,20 @@
 //   prefs/<key>              项目级长期事实（技术栈、代码风格、团队约定）
 //   user/<openId>/<key>      按人的偏好（「谷词负责 auth 模块」）
 //
-// ⚠️ Blob 的 `set` 是**整值覆盖，没有 CAS**（和 `context.store.state` 同一条）。
-// 所以这里**一个事实一个键**，不搞一个大 JSON —— 两个会话同时记不同的事
-// 不会互相覆盖。代价是渲染时要 list + 并行 get；边缘节点毫秒级返回，
-// 实测可以接受（渲染只发生在每轮提问的开头一次）。
+// ⚠️ Blob 的 `set` 是**整值覆盖，没有任何可用的条件写**（2026-09-25 实测）：
+//   · SDK 类型里**有** `SetOptions.onlyIfNew`，写着「only write if the key does
+//     not already exist」，还有 `PreconditionFailedError` —— 但**实测它不生效**：
+//     键已存在时带 onlyIfNew 写照样覆盖成功（token 模式；ambient 模式没测）。
+//   · 底层 COS 其实有版本号（响应头 `x-cos-version-id`）和 etag，
+//     但 SDK 没暴露 `if-match` 之类的参数，所以从这一层用不上。
+//   结论：**别依赖任何条件写**。所以这里**一个事实一个键**，不搞一个大 JSON ——
+//   两个会话同时记不同的事不会互相覆盖。代价是渲染时要 list + 并行 get；
+//   边缘节点毫秒级返回，实测可以接受（渲染只发生在每轮提问的开头一次）。
+//
+//   另：`set` 没有 TTL 参数（`SetOptions` 只有 onlyIfNew / cacheControl），
+//   所以这些键**不会自己过期** —— 平台自己那层的 `expiresAt` 是
+//   `createBlobBackedStore` 包出来的，我们走裸 SDK 没有它。好处是「长期记忆」
+//   真的是长期的；代价是增长只能靠 MAX_ENTRIES 兜。
 //
 // ── 为什么要「遗忘机制」─────────────────────────────────────────────
 // 无上限的记忆会无限增长，最后把上下文撑爆。所以有 `MAX_ENTRIES` 硬上限：
@@ -348,8 +358,13 @@ export class GlobalMemory {
   /**
    * 写入/更新一条事实。返回给模型看的一句话。
    *
-   * ⚠️ 这里**不做 CAS**：两个会话同时写同一个键，后写的赢。对「偏好」这类
+   * ⚠️ 这里**没有可用的条件写**：两个会话同时写同一个键，后写的赢。
+   * 别指望 `SetOptions.onlyIfNew` —— 实测不生效（见文件头）。对「偏好」这类
    * 语义是合适的（最后说的算），但别拿它当需要精确累加的地方用。
+   *
+   * 「先查再写」这个序列在并发下**确实可能同时判成新键**，于是 MAX_ENTRIES
+   * 有可能被轻微突破（多出几条）。这是刻意接受的：上限是软保护，
+   * 而为此加锁的代价远大于收益。
    */
   async remember(key: string, value: string, by: string): Promise<string> {
     const v = String(value ?? "").trim();

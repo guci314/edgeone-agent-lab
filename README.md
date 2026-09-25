@@ -3,8 +3,8 @@
 `cf-agent-lab`（Cloudflare Workers + Durable Objects）到 **EdgeOne Makers** 的移植版。
 用 **OpenAI Agents SDK** 重写 Agent 核心，入口只有飞书 —— 没有网页聊天界面。
 
-一个**通用助手**：在飞书里直接问，它会搜网页、读你授权的飞书云文档、跑代码算东西，
-并把该记住的事实跨会话记住。
+一个**通用助手**：在飞书里直接问，它会搜网页、读飞书云文档（共享给机器人的无需授权）、
+读写它自己的 GitHub 工作区仓库、跑代码算东西，并把该记住的事实跨会话记住。
 
 > 2026-09-25：原版是「代码仓库问答」—— 用户先发 `/repo owner/name` 导入一个 GitHub
 > 仓库，再问那个仓库的代码。**`/repo` 命令和整套 `src/workspace/` 语料层已经删掉**，
@@ -21,7 +21,7 @@
 | 代码（约 5800 行） | ✅ 写完 |
 | `npm install` | ✅ **通过** —— 104 个包，约 1 分钟 |
 | `tsc --noEmit` 类型检查 | ✅ **零错误** |
-| `npm test` 冒烟测试 | ✅ **146 项全通过**（验签/解密、命令解析、去重限流、webhook 端到端、回合流程、会话压缩、云文档授权与工具族、跨会话记忆） |
+| `npm test` 冒烟测试 | ✅ **165 项全通过**（验签/解密、命令解析、去重限流、webhook 端到端、回合流程、会话压缩、云文档授权与读写工具族、工作区仓库、跨会话记忆） |
 | `edgeone makers dev` 本地起服务 | ⚠️ **能起来，但 agent 路由本地打不到** —— `agent-node` 不绑定端口（见下） |
 | 跨会话记忆的存储层 | ✅ **已实测**（不靠文档推断：agents 运行时内置 Blob SDK） |
 | 【未知数 1】返回 Response 后后台代码能否跑完 | ✅ **线上实测成立** —— `phase: finished` / `elapsedMs: 15046`，`FEISHU_DISPATCH_MODE` 保持 `async` |
@@ -100,9 +100,9 @@ npm run dev
 摘要写回的形状、那个 36 字符的 `conversation_id` —— **全都不依赖平台**。
 把它们从平台里剥出来单独测，改一行就能验证一次，不用等部署。
 
-覆盖十一节：A 验签解密 ｜ B 事件体解析 ｜ C 命令解析 ｜ D 去重限流 ｜
+覆盖十二节：A 验签解密 ｜ B 事件体解析 ｜ C 命令解析 ｜ D 去重限流 ｜
 E webhook 端到端 ｜ F 回合流程 ｜ G 会话压缩 ｜ H 云文档授权 ｜
-I 用户令牌管理 ｜ J 云文档工具族 ｜ K 跨会话记忆。
+I 用户令牌管理 ｜ J 云文档读写工具族 ｜ K 跨会话记忆 ｜ L 工作区仓库。
 
 ---
 
@@ -124,14 +124,18 @@ edgeone-agent-lab/
 │
 ├── src/                            # 平台无关的业务逻辑（大部分从原版搬来）
 │   ├── shared/
+│   │   ├── base64.ts      ➕ 新增   # 手写 base64（容忍 GitHub 每 60 字符折行）
 │   │   └── util.ts        ➕ 新增   # guarded（工具永不抛的兜底）、UA 等通用零件
+│   ├── ghworkspace/       ➕ 新增   # 工作区仓库（agent 自己的 GitHub 私有仓库）
+│   │   ├── client.ts                #   Contents API 客户端（从 cf 原样移植）
+│   │   └── tools.ts                 #   ws_ls / ws_read / ws_write / ws_rm（zod 版）
 │   └── feishu/
 │       ├── api.ts         ✅ 原样   # tenant_access_token、发文本
 │       ├── card.ts        ✅ 原样   # 流式卡片（cardkit）
 │       ├── commands.ts    🔧 微改   # 命令解析（加 /compact /clear /memory /forget；删 /repo）
 │       ├── compact.ts     ➕ 新增   # 会话压缩的纯函数（渲染历史 / 写回形状）
 │       ├── crypto.ts      ✅ 原样   # 验签 + AES 解密
-│       ├── docs.ts        ➕ 新增   # 飞书云文档三个工具（docx / sheets / bitable）
+│       ├── docs.ts        ➕ 新增   # 飞书云文档六个工具（读 3 + 写 3，应用身份优先）
 │       ├── event.ts       ✅ 原样   # 事件体解析
 │       ├── global-memory.ts ➕ 新增 # **跨会话**记忆（Blob 后端 + 三个工具 + 渲染）
 │       ├── oauth.ts       ➕ 新增   # 云文档授权（state 签名、授权链接）

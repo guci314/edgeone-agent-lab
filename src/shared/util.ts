@@ -9,8 +9,12 @@
 //   · `agents/feishu/_search.ts`（自建 web_search）
 //
 // 教训：**删一层之前先看有没有别人在 import 它里面的通用零件。**
-// （cf-agent-lab 那边的同名文件还多带一个 `utf8Len` / `UA` —— 那是 ghworkspace
-//   需要的；这个仓库没有那一族，所以这里只留真正被用到的。）
+//
+// ── UA / utf8Len ────────────────────────────────────────────────────
+// 2026-09-25 从 cf-agent-lab 的 shared/util.ts 搬来：ghworkspace 那族工具
+// （工作区 GitHub 仓库的 ws_*）移植到这个仓库时需要它们 ——
+//   UA：不带 UA 的请求会被一部分端点直接拒；
+//   utf8Len：ws_read 按字节预算截断行，用 UTF-16 长度会漏算中文（一字 3 字节）。
 
 /**
  * 工具永不抛错。
@@ -27,4 +31,14 @@ export async function guarded<T>(
   } catch (e) {
     return { error: `工具执行失败：${(e as Error).message}` };
   }
+}
+
+/** 出站请求的 UA。没有它的请求会被一部分端点直接拒掉 */
+export const UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+  "(KHTML, like Gecko) Chrome/120.0 Safari/537.36";
+
+/** 字符串的 UTF-8 字节数。截断按字节算预算时必须用它，不能用 `.length` */
+export function utf8Len(s: string): number {
+  return new TextEncoder().encode(s).length;
 }

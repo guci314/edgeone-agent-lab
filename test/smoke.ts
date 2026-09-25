@@ -17,7 +17,9 @@
 //   G. compact  —— 会话压缩的纯函数（渲染历史 / 写回形状 / 门槛）
 //   H. oauth    —— 云文档授权：链接解析 / state 签名 / 授权链接
 //   I. token    —— 用户令牌：续期、轮换不丢 refresh_token、单飞、按人分槽
-//   J. doctools —— 云文档三个工具：wiki 解引用 / 翻页缓存 / 拍平 / 未授权提示
+//   J. doctools —— 云文档六个工具：身份兜底（应用优先/用户兜底）/ wiki 解引用 /
+//      翻页缓存 / 拍平 / 三个写工具
+//   L. ghws     —— 工作区仓库 ws_ls / ws_read / ws_write / ws_rm
 //
 // 2026-09-25：原来还有两节测「仓库语料导入」（`E. repo`）和
 // 「read / ls / find / grep 四个代码工具」（`F. tools`）。改成通用助手后
@@ -47,6 +49,8 @@ import {
   type UserTokenStore,
 } from "../src/feishu/user-token.ts";
 import { makeFeishuDocTools } from "../src/feishu/docs.ts";
+import { ghWorkspaceConfig } from "../src/ghworkspace/client.ts";
+import { makeGithubTools } from "../src/ghworkspace/tools.ts";
 import {
   GlobalMemory,
   InMemoryMemoryBackend,
@@ -1396,14 +1400,43 @@ await describe("J. 云文档工具族", async () => {
 
   const DOC_TEXT = "第一段。".repeat(5) + "第二段内容。".repeat(5);
 
-  /** 三个工具共用的假飞书。按 URL 片段路由 */
-  const docStub = (url: string): Response | undefined => {
-    const json = (v: unknown) =>
-      new Response(JSON.stringify({ code: 0, ...(v as object) }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      });
+  /** 飞书成功响应 / 业务错误响应的快捷构造 */
+  const feishuJson = (v: unknown) =>
+    new Response(JSON.stringify({ code: 0, ...(v as object) }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  const feishuErr = (code: number, msg: string) =>
+    new Response(JSON.stringify({ code, msg }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
 
+  /** 应用身份（tenant token）的内存缓存。每个测试自己一份，互不污染 */
+  const memCache = () => {
+    let v: { token: string; exp: number } | null = null;
+    return {
+      get: async () => v,
+      set: async (x: { token: string; exp: number }) => {
+        v = x;
+      },
+    };
+  };
+
+  /** 六个工具共用的假飞书。按 URL 片段路由 */
+  const docStub = (url: string): Response | undefined => {
+    const json = feishuJson;
+
+    // 应用身份的令牌端点（callDoc 的第一层走它）
+    if (url.includes("/auth/v3/tenant_access_token/internal")) {
+      return json({ tenant_access_token: "tt-1", expire: 7200 });
+    }
+
+    // docx 追加（feishu_docx_write）。⚠️ 必须排在 meta 检查前面 ——
+    // children 的 URL 同样包含 "/docx/v1/documents/DOC1"
+    if (url.includes("/blocks/DOC1/children")) {
+      return json({ data: { children: [] } });
+    }
     if (url.includes("/docx/v1/documents/DOC1/raw_content")) return json({ data: { content: DOC_TEXT } });
     if (url.includes("/docx/v1/documents/DOC1")) return json({ data: { document: { title: "设计文档" } } });
 
@@ -1416,6 +1449,10 @@ await describe("J. 云文档工具族", async () => {
 
     if (url.includes("/sheets/v3/spreadsheets/SH1/sheets/query")) {
       return json({ data: { sheets: [{ sheet_id: "sid1", title: "Sheet1", grid_properties: { row_count: 3, column_count: 2 } }] } });
+    }
+    // 电子表格写入（feishu_sheet_write）：URL 没有 values/ 后缀，用 endsWith 精确区分
+    if (url.endsWith("/sheets/v2/spreadsheets/SH1/values")) {
+      return json({ data: { spreadsheet: [{ title: "Sheet1" }] } });
     }
     if (url.includes("/sheets/v2/spreadsheets/SH1/values/")) {
       return json({
@@ -1466,6 +1503,21 @@ await describe("J. 云文档工具族", async () => {
     }
     // 实测存在「链接里的 table 参数不是 OpenAPI 的 table_id」这种情况：
     // 从地址栏拷的链接、表格停在「页面」侧栏时，那个值是另一套 id
+    // 多维表格批量写（feishu_bitable_write）。⚠️ 必须排在「读 records」的检查
+    // 前面 —— batch_create 的 URL 也包含 "tables/tbl1/records"
+    if (url.includes("/records/batch_create")) {
+      return json({
+        data: {
+          records: [
+            { record_id: "rec-new-1", fields: { 任务: "新任务" } },
+            { record_id: "rec-new-2", fields: { 任务: "另一条" } },
+          ],
+        },
+      });
+    }
+    if (url.includes("/records/batch_update")) {
+      return json({ data: { records: [{ record_id: "rec1", fields: { 任务: "改" } }] } });
+    }
     if (url.includes("/bitable/v1/apps/BT1/tables/notatable/records")) {
       return new Response(JSON.stringify({ code: 1254005, msg: "TableIdNotFound" }), {
         status: 200,
@@ -1486,7 +1538,7 @@ await describe("J. 云文档工具族", async () => {
     return undefined;
   };
 
-  /** 建一套「已授权」的工具 */
+  /** 建一套「已授权」的工具（应用身份照常可用，用户令牌已就位作兜底） */
   const tools = async (skewMs?: number) => {
     const kv = new TokenKv();
     const store = makeUserTokenStore(kv, "ou_1");
@@ -1499,13 +1551,20 @@ await describe("J. 云文档工具族", async () => {
       scope: "",
     });
     const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1", skewMs });
-    const list = makeFeishuDocTools({ env: ENV, tokens: mgr }) as any[];
+    const list = makeFeishuDocTools({ env: ENV, cache: memCache(), tokens: mgr }) as any[];
     return Object.fromEntries(list.map((t) => [t.name, t]));
   };
 
-  await it("三个工具都注册了，名字是 feishu_ 前缀", async () => {
+  await it("六个工具都注册了，名字是 feishu_ 前缀", async () => {
     const t = await tools();
-    eq(Object.keys(t).sort(), ["feishu_bitable_read", "feishu_doc_read", "feishu_sheet_read"]);
+    eq(Object.keys(t).sort(), [
+      "feishu_bitable_read",
+      "feishu_bitable_write",
+      "feishu_doc_read",
+      "feishu_docx_write",
+      "feishu_sheet_read",
+      "feishu_sheet_write",
+    ]);
   });
 
   await it("读 docx：返回标题、正文、字数", async () => {
@@ -1682,7 +1741,9 @@ await describe("J. 云文档工具族", async () => {
     ok(typeof r.error === "string" && r.error.length > 0, "该让它看见错误，而不是偷偷换成别的表");
   });
 
-  await it("没授权时给的是「发 /login」的可执行提示，而且不发任何请求", async () => {
+  // ── 身份：应用优先、用户兜底（2026-09-25）───────────────────────────
+
+  await it("没用户授权也能读：走应用身份，正文请求带的是 tenant token", async () => {
     const kv = new TokenKv();
     const mgr = new UserTokenManager({
       store: makeUserTokenStore(kv, "ou_new"),
@@ -1690,16 +1751,19 @@ await describe("J. 云文档工具族", async () => {
       openId: "ou_new",
     });
     const t = Object.fromEntries(
-      (makeFeishuDocTools({ env: ENV, tokens: mgr }) as any[]).map((x) => [x.name, x]),
+      (makeFeishuDocTools({ env: ENV, cache: memCache(), tokens: mgr }) as any[]).map(
+        (x) => [x.name, x],
+      ),
     );
-    const calls = stubFetch(() => undefined);
-
+    const calls = stubFetch(docStub);
     const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/docx/DOC1" });
-    ok(r.error.includes("/login"), r.error);
-    eq(calls.length, 0, "没授权就别浪费一次网络往返");
+    eq(r.content, DOC_TEXT, "没 /login 也能读共享给机器人的文档");
+    ok(calls.some((c) => c.url.includes("tenant_access_token")), "要先取应用令牌");
+    const doc = calls.find((c) => c.url.includes("/raw_content"));
+    eq(doc!.init.headers.authorization, "Bearer tt-1", "正文请求带的是应用身份");
   });
 
-  await it("令牌失效(99991663) → 续期后自动重试一次", async () => {
+  await it("应用身份被拒 → 自动换用户身份重试；用户令牌失效先续期", async () => {
     const kv = new TokenKv();
     const store = makeUserTokenStore(kv, "ou_1");
     await store.set({
@@ -1712,11 +1776,13 @@ await describe("J. 云文档工具族", async () => {
     });
     const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
     const t = Object.fromEntries(
-      (makeFeishuDocTools({ env: ENV, tokens: mgr }) as any[]).map((x) => [x.name, x]),
+      (makeFeishuDocTools({ env: ENV, cache: memCache(), tokens: mgr }) as any[]).map(
+        (x) => [x.name, x],
+      ),
     );
 
-    let docCalls = 0;
-    const calls = stubFetch((url) => {
+    const calls = stubFetch((url, init) => {
+      const auth = String(init?.headers?.authorization ?? "");
       if (url.includes("/oauth/v3/token")) {
         return new Response(
           JSON.stringify({ access_token: "at-fresh", refresh_token: "rt-2", expires_in: 7200 }),
@@ -1724,29 +1790,62 @@ await describe("J. 云文档工具族", async () => {
         );
       }
       if (url.includes("/raw_content")) {
-        docCalls++;
-        // 第一次说令牌无效 —— 模拟用户在飞书侧撤销了授权（exp 还没到）
-        if (docCalls === 1) {
-          return new Response(JSON.stringify({ code: 99991663, msg: "token invalid" }), {
-            status: 200,
-            headers: { "content-type": "application/json" },
-          });
-        }
-        return new Response(JSON.stringify({ code: 0, data: { content: "正文" } }), {
-          status: 200,
-          headers: { "content-type": "application/json" },
-        });
+        // 应用身份：没权限（文档没共享给机器人）
+        if (auth === "Bearer tt-1") return feishuErr(99991672, "forbidden");
+        // 用户身份：令牌在飞书侧被撤销（exp 还没到，光看时间发现不了）
+        if (auth === "Bearer at-stale") return feishuErr(99991663, "token invalid");
+        return feishuJson({ data: { content: "正文" } });
       }
       return docStub(url);
     });
 
     const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/docx/DOC1" });
-    eq(r.content, "正文", "应重试成功");
-    eq(docCalls, 2, "该重试恰好一次");
-    ok(calls.some((c) => c.url.includes("/oauth/v3/token")), "重试前要先续期");
-    // 重试用的是新令牌
-    const retry = calls.filter((c) => c.url.includes("/raw_content"))[1];
-    eq(retry.init.headers.authorization, "Bearer at-fresh");
+    eq(r.content, "正文", "兜底链路最终要读到");
+    ok(calls.some((c) => c.url.includes("/oauth/v3/token")), "用户令牌失效要先续期");
+    const docCalls = calls.filter((c) => c.url.includes("/raw_content"));
+    eq(docCalls.length, 3, "应用一次 → 用户过期一次 → 续期后一次");
+    eq(docCalls[0].init.headers.authorization, "Bearer tt-1", "第一层必须是应用身份");
+    eq(docCalls[1].init.headers.authorization, "Bearer at-stale");
+    eq(docCalls[2].init.headers.authorization, "Bearer at-fresh", "重试用的是续期后的新令牌");
+  });
+
+  await it("两边身份都读不到：给「共享给机器人 或 /login」的可执行提示", async () => {
+    const kv = new TokenKv();
+    const mgr = new UserTokenManager({
+      store: makeUserTokenStore(kv, "ou_new"),
+      env: ENV,
+      openId: "ou_new",
+    });
+    const t = Object.fromEntries(
+      (makeFeishuDocTools({ env: ENV, cache: memCache(), tokens: mgr }) as any[]).map(
+        (x) => [x.name, x],
+      ),
+    );
+    stubFetch((url) => {
+      if (url.includes("tenant_access_token")) return feishuJson({ tenant_access_token: "tt-1", expire: 7200 });
+      if (url.includes("/raw_content")) return feishuErr(99991672, "forbidden");
+      return undefined;
+    });
+    const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/docx/DOC1" });
+    ok(r.error.includes("99991672"), "要带上应用身份的原始错误：" + r.error);
+    ok(r.error.includes("/login"), r.error);
+    ok(r.error.includes("共享给机器人"), r.error);
+  });
+
+  await it("tokens 为 null（没接 kv）：只剩应用身份，读不到就报应用的错，不提 /login", async () => {
+    const t = Object.fromEntries(
+      (makeFeishuDocTools({ env: ENV, cache: memCache(), tokens: null }) as any[]).map(
+        (x) => [x.name, x],
+      ),
+    );
+    stubFetch((url) => {
+      if (url.includes("tenant_access_token")) return feishuJson({ tenant_access_token: "tt-1", expire: 7200 });
+      if (url.includes("/raw_content")) return feishuErr(99991672, "forbidden");
+      return undefined;
+    });
+    const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/docx/DOC1" });
+    ok(r.error.includes("99991672"), r.error);
+    ok(!r.error.includes("/login"), "没有用户身份可兜底，就不该引导去 /login：" + r.error);
   });
 
   await it("网络抛错时返回 { error }，不把异常抛出去", async () => {
@@ -1766,6 +1865,118 @@ await describe("J. 云文档工具族", async () => {
     stubFetch(() => undefined); // 不该有请求
     const r = await callTool(t.feishu_doc_read, { url: "https://x.feishu.cn/slides/S1" });
     ok(typeof r.error === "string" && r.error.length > 0, JSON.stringify(r));
+  });
+
+  // ── 写工具 ─────────────────────────────────────────────────────────
+
+  await it("多维表格写：add 走 batch_create，字段按提交原文发", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_bitable_write, {
+      url: "https://x.feishu.cn/base/BT1",
+      table_id: "tbl1",
+      action: "add",
+      records: [{ fields: { 任务: "新任务", 完成: "false" } }],
+    });
+    eq(r.added, 2);
+    const call = calls.find((c) => c.url.includes("batch_create"));
+    ok(call, "该调 batch_create");
+    eq(call!.init.method, "POST");
+    eq(JSON.parse(call!.init.body).records[0].fields["任务"], "新任务");
+  });
+
+  await it("多维表格写：update 缺 record_id 当场报错，不发请求", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_bitable_write, {
+      url: "https://x.feishu.cn/base/BT1",
+      table_id: "tbl1",
+      action: "update",
+      records: [{ fields: { 任务: "改" } }],
+    });
+    ok(r.error.includes("record_id"), r.error);
+    eq(calls.filter((c) => c.url.includes("batch_update")).length, 0, "不该发请求");
+  });
+
+  await it("多维表格写：update 走 batch_update 且带上 record_id", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_bitable_write, {
+      url: "https://x.feishu.cn/base/BT1",
+      table_id: "tbl1",
+      action: "update",
+      records: [{ record_id: "rec1", fields: { 完成: "true" } }],
+    });
+    eq(r.updated, 1);
+    const call = calls.find((c) => c.url.includes("batch_update"));
+    eq(call!.init.method, "PUT");
+    eq(JSON.parse(call!.init.body).records[0].record_id, "rec1");
+  });
+
+  await it("电子表格写：覆盖式写入，updatedCells 报单元格数", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_sheet_write, {
+      url: "https://x.feishu.cn/sheets/SH1",
+      range: "sid1!A1:B2",
+      values: [["甲", "乙"], ["丙", "丁"]],
+    });
+    eq(r.updatedCells, 4);
+    const call = calls.find((c) => c.url.endsWith("/sheets/v2/spreadsheets/SH1/values"));
+    ok(call, "该调 v2 values 写入接口");
+    eq(call!.init.method, "PUT");
+    eq(JSON.parse(call!.init.body).valueRange.range, "sid1!A1:B2");
+  });
+
+  await it("电子表格写：链接带 ?sheet= 时给 range 补工作表前缀", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_sheet_write, {
+      url: "https://x.feishu.cn/sheets/SH1?sheet=sid9",
+      range: "A1",
+      values: [["x"]],
+    });
+    eq(r.updatedCells, 1);
+    const call = calls.find((c) => c.url.endsWith("/sheets/v2/spreadsheets/SH1/values"));
+    eq(JSON.parse(call!.init.body).valueRange.range, "sid9!A1");
+  });
+
+  await it("电子表格写：range 缺工作表前缀且链接没带 sheet → 给可自纠的提示", async () => {
+    const t = await tools();
+    stubFetch(docStub);
+    const r = await callTool(t.feishu_sheet_write, {
+      url: "https://x.feishu.cn/sheets/SH1",
+      range: "A1",
+      values: [["x"]],
+    });
+    ok(r.error.includes("feishu_sheet_read"), r.error);
+  });
+
+  await it("docx 写：按换行切段、空行丢弃、index=-1 追加到末尾", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_docx_write, {
+      url: "https://x.feishu.cn/docx/DOC1",
+      content: "第一段\n\n第二段\n",
+    });
+    eq(r.appended, 2, "空行不该算一段");
+    const call = calls.find((c) => c.url.includes("/blocks/DOC1/children"));
+    ok(call, "该调 children 接口");
+    eq(call!.init.method, "POST");
+    const body = JSON.parse(call!.init.body);
+    eq(body.index, -1, "index=-1 才是追加到末尾");
+    eq(body.children.length, 2);
+    eq(body.children[0].paragraph.elements[0].text_run.content, "第一段");
+  });
+
+  await it("docx 写：类型对不上时点名 feishu_docx_write", async () => {
+    const t = await tools();
+    stubFetch(docStub);
+    const r = await callTool(t.feishu_docx_write, {
+      url: "https://x.feishu.cn/sheets/SH1",
+      content: "x",
+    });
+    ok(r.error.includes("feishu_docx_write"), r.error);
   });
 });
 
@@ -2207,6 +2418,163 @@ await describe("K. 跨会话记忆", async () => {
       if (saved === undefined) delete g.__EDGEONE_AGENT_RUNTIME__;
       else g.__EDGEONE_AGENT_RUNTIME__ = saved;
     }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// L. 工作区仓库（ws_*，agent 自己的 GitHub 私有仓库）
+// ═══════════════════════════════════════════════════════════════════════
+
+await describe("L. 工作区仓库（ws_*）", async () => {
+  const ENV = { GITHUB_WORKSPACE_TOKEN: "gh-t", GITHUB_WORKSPACE_REPO: "owner/repo" };
+
+  const GH_TEXT = "你好工作区";
+  const GH_TEXT_B64 = Buffer.from(GH_TEXT, "utf8").toString("base64");
+
+  /** 四个工具共用的假 GitHub Contents API。按路径 + 方法路由 */
+  const ghStub = (url: string, init: any): Response | undefined => {
+    const json = (v: unknown, status = 200) =>
+      new Response(JSON.stringify(v), { status, headers: { "content-type": "application/json" } });
+    const notFound = () =>
+      new Response(JSON.stringify({ message: "Not Found" }), {
+        status: 404,
+        headers: { "content-type": "application/json" },
+      });
+
+    // 根目录列表。⚠️ 排在文件检查后面会被 "/contents/hello.md" 撞上，所以用 endsWith
+    if (url.endsWith("/repos/owner/repo/contents")) {
+      return json([
+        { name: "notes", path: "notes", type: "dir", size: 0 },
+        { name: "hello.md", path: "hello.md", type: "file", size: 15 },
+      ]);
+    }
+    if (url.includes("/contents/hello.md")) {
+      if (init?.method === "PUT") {
+        return json({ content: { sha: "sha-new" }, commit: { sha: "abcdef1234567890" } });
+      }
+      if (init?.method === "DELETE") {
+        return json({ commit: { sha: "fedcba0987654321" } });
+      }
+      return json({
+        name: "hello.md",
+        path: "hello.md",
+        sha: "sha-old",
+        size: 15,
+        encoding: "base64",
+        content: GH_TEXT_B64,
+      });
+    }
+    return undefined;
+  };
+
+  const tools = () =>
+    Object.fromEntries(
+      (makeGithubTools(ghWorkspaceConfig(ENV)) as any[]).map((t) => [t.name, t]),
+    );
+
+  await it("没配 TOKEN 一个工具都不挂", async () => {
+    eq((makeGithubTools(null) as unknown[]).length, 0);
+  });
+
+  await it("四个工具都注册，名字 ws_ 前缀", async () => {
+    eq(Object.keys(tools()).sort(), ["ws_ls", "ws_read", "ws_rm", "ws_write"]);
+  });
+
+  await it("ws_ls：目录在前、文件带 size", async () => {
+    const t = tools();
+    stubFetch(ghStub);
+    const r = await callTool(t.ws_ls, {});
+    eq(r.entries[0].name, "notes/", "目录名以 / 结尾且排前");
+    eq(r.entries[1].name, "hello.md");
+    eq(r.entries[1].size, 15);
+    eq(r.truncated, false);
+  });
+
+  await it("ws_read：base64 解码回中文正文，带行号", async () => {
+    const t = tools();
+    stubFetch(ghStub);
+    const r = await callTool(t.ws_read, { path: "hello.md" });
+    ok(r.content.includes("你好工作区"), r.content);
+    eq(r.totalLines, 1);
+    eq(r.truncated, false);
+  });
+
+  await it("ws_read：文件不存在给「先 ws_ls」的可执行提示", async () => {
+    const t = tools();
+    stubFetch((url) =>
+      url.includes("/contents/missing.md")
+        ? new Response(JSON.stringify({ message: "Not Found" }), {
+            status: 404,
+            headers: { "content-type": "application/json" },
+          })
+        : undefined,
+    );
+    const r = await callTool(t.ws_read, { path: "missing.md" });
+    ok(r.error.includes("ws_ls"), r.error);
+  });
+
+  await it("ws_write：覆盖已有文件时自动带当前 sha，commit 取前 7 位", async () => {
+    const t = tools();
+    const calls = stubFetch(ghStub);
+    const r = await callTool(t.ws_write, { path: "hello.md", content: "新内容" });
+    eq(r.created, false);
+    eq(r.commit, "abcdef1", "commit sha 取前 7 位");
+    const put = calls.find((c) => c.init?.method === "PUT");
+    ok(put, "该发 PUT");
+    eq(JSON.parse(put!.init.body).sha, "sha-old", "覆盖要带读到的 sha");
+  });
+
+  await it("ws_write：文件不存在时自动创建（PUT 不带 sha）", async () => {
+    const t = tools();
+    const calls = stubFetch((url, init) => {
+      if (url.includes("/contents/new.md")) {
+        // 先 GET 探 sha：404 = 创建
+        if ((init?.method ?? "GET") === "GET") {
+          return new Response(JSON.stringify({ message: "Not Found" }), {
+            status: 404,
+            headers: { "content-type": "application/json" },
+          });
+        }
+        return new Response(
+          JSON.stringify({ content: { sha: "s" }, commit: { sha: "1234567890abcdef" } }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      return undefined;
+    });
+    const r = await callTool(t.ws_write, { path: "new.md", content: "hi" });
+    eq(r.created, true);
+    const put = calls.find((c) => c.init?.method === "PUT");
+    ok(put, "该发 PUT");
+    ok(!("sha" in JSON.parse(put!.init.body)), "创建不该带 sha");
+  });
+
+  await it("ws_rm：先取 sha 再删", async () => {
+    const t = tools();
+    const calls = stubFetch(ghStub);
+    const r = await callTool(t.ws_rm, { path: "hello.md" });
+    eq(r.commit, "fedcba0");
+    const del = calls.find((c) => c.init?.method === "DELETE");
+    ok(del, "该发 DELETE");
+    eq(JSON.parse(del!.init.body).sha, "sha-old");
+  });
+
+  // GitHub 对「路径不存在 / 仓库名错 / PAT 没授权」故意都回 404 ——
+  // 提示必须三种都列出来，否则模型会照着「文件不存在」的结论去找文件
+  await it("404 的三种原因要全说", async () => {
+    const t = tools();
+    stubFetch((url) =>
+      url.includes("/contents/x")
+        ? new Response(JSON.stringify({ message: "Not Found" }), {
+            status: 404,
+            headers: { "content-type": "application/json" },
+          })
+        : undefined,
+    );
+    const r = await callTool(t.ws_ls, { path: "x" });
+    ok(r.error.includes("路径不存在"), r.error);
+    ok(r.error.includes("仓库名"), r.error);
+    ok(r.error.includes("PAT"), r.error);
   });
 });
 

@@ -42,13 +42,15 @@ import {
   makeMemoryTools,
   renderMemoryList,
 } from "../../src/feishu/global-memory.ts";
+import { ghWorkspaceConfig } from "../../src/ghworkspace/client.ts";
+import { makeGithubTools } from "../../src/ghworkspace/tools.ts";
 import { buildAuthorizeUrl, signState, type OAuthEnv } from "../../src/feishu/oauth.ts";
 import type { StateKv } from "../../src/feishu/store.ts";
 import { FeishuStreamer } from "../../src/feishu/streamer.ts";
 import type { FeishuTurnHost } from "../../src/feishu/turn.ts";
 import { sanitizeAndAppend } from "../../src/feishu/session-sanitize.ts";
 import { UserTokenManager, makeUserTokenStore } from "../../src/feishu/user-token.ts";
-import { INSTRUCTIONS } from "./_instructions.ts";
+import { INSTRUCTIONS, WORKSPACE_PROMPT } from "./_instructions.ts";
 import { diagCounters, modelFetch, type DiagEntry } from "./_diag.ts";
 import { makeSearchTools } from "./_search.ts";
 import { platformTools, summarizeToolOutput, toolFailed } from "./_tools.ts";
@@ -110,6 +112,18 @@ export interface AgentEnv extends FeishuEnv, OAuthEnv {
    * **没配时搜索工具整个不挂**，模型也就不会去撞一堵必然失败的墙。
    */
   SERPER_API_KEY?: string;
+  /**
+   * 工作区仓库（ws_ls / ws_read / ws_write / ws_rm）的 fine-grained PAT。
+   * 只授予 guci314/cf-agent-workspace 这一个仓库的 Contents 读写。
+   *
+   * ⚠️ 必须是**普通环境变量**，别放进 AI_GATEWAY_* —— 那三个键每次 deploy
+   * 都会被平台覆盖回平台值（见 AgentEnv 顶部那段说明）。
+   *
+   * 没配时工作区工具整个不挂（见 ghWorkspaceConfig 的注释）。
+   */
+  GITHUB_WORKSPACE_TOKEN?: string;
+  /** 覆盖工作区仓库名。默认 guci314/cf-agent-workspace（见 ghworkspace/client.ts） */
+  GITHUB_WORKSPACE_REPO?: string;
   /**
    * 自制内部令牌。webhook 转发时带 `x-internal-token`，agent 这边比对。
    * `agents/` 路由是公网可达的，没这道门谁都能拿它烧模型额度。
@@ -352,11 +366,12 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
    * 云文档令牌管理器。
    *
    * **每个回合建一个**（createHost 一次 = 一轮消息），工具族闭包捕获它 ——
-   * 于是同一轮里模型连着调三个文档工具时，它们共用同一个「内存副本 + 单飞续期」，
+   * 于是同一轮里模型连着调多个文档工具时，它们共用同一个「内存副本 + 单飞续期」，
    * 不会各续各的（见 user-token.ts 里 inflight 的注释）。
    *
-   * 没有 kv 或没有 openId 时不建也不挂工具。挂一个永远回「未授权」的工具，
-   * 只会让模型把幻觉当成权限问题，白绕几圈。
+   * 没有 kv 或没有 openId 时是 null：文档工具**照样挂**（2026-09-25 起应用身份
+   * 不依赖它），只是这个人没有「用户身份兜底」这层，读不到没共享的文档时
+   * callDoc 会直接报应用身份的错误。
    */
   const userTokens =
     deps.kv && deps.openId
@@ -376,6 +391,15 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
    * 工具列表里，模型可能选中那个坏的（缺 WSA_API_KEY）。
    */
   const searchTools = makeSearchTools(env);
+
+  /**
+   * 工作区仓库（ws_* 四个工具，agent 自己的 GitHub 私有仓库）。
+   *
+   * **在 createHost 里算一次**：cfg 只取决于 env，一个实例生命周期内不会变；
+   * 没配 GITHUB_WORKSPACE_TOKEN 时返回 null，工具一个都不挂 —— 挂一族
+   * 必然失败的工具只会让模型反复去撞（规矩同 searchTools 的挂载条件）。
+   */
+  const ghCfg = ghWorkspaceConfig(env);
 
   /**
    * 跨会话记忆。**每个回合建一个**（createHost 一次 = 一轮消息）——
@@ -411,6 +435,13 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
     return memorySnapshot;
   };
 
+  /**
+   * 基础提示词。工作区仓库那段**按配置拼接**：没配 PAT 时工具不存在，
+   * 提示词也不能提 —— 「说了但手上没有的能力，模型会去调然后白烧一轮」
+   * （规矩见 _instructions.ts 文件头）。记忆那段是每轮快照，单独拼。
+   */
+  const baseInstructions = INSTRUCTIONS + (ghCfg ? WORKSPACE_PROMPT : "");
+
   const buildAgent = (): Agent =>
     new Agent({
       // 名字只是个标识（会出现在日志和 trace 里），不参与行为。
@@ -426,7 +457,9 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
       // 拿不到记忆（本地调试 / 运行时没暴露 Blob）时**退回静态字符串** ——
       // 不只是省一次 await，更重要的是提示词里不会出现「你有长期记忆」这种
       // 骗人的话（模型会去调一个没挂上的工具）。
-      instructions: memory ? async () => INSTRUCTIONS + (await memoryText()) : INSTRUCTIONS,
+      instructions: memory
+        ? async () => baseInstructions + (await memoryText())
+        : baseInstructions,
       model: getModel(),
       modelSettings: { maxTokens: MAX_OUTPUT_TOKENS },
       tools: [
@@ -435,8 +468,14 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
         // 跨会话记忆的三个工具（remember_fact / forget_fact / recall_facts）。
         // 挂不上就整个不挂，理由同上。
         ...((memory ? makeMemoryTools(memory, deps.openId) : []) as any[]),
-        // 用户身份读飞书云文档。工具拿不到 context，只能靠闭包捕获上面的管理器
-        ...(userTokens ? (makeFeishuDocTools({ env, tokens: userTokens }) as any[]) : []),
+        // 云文档读写（六个工具）。应用身份（tenant token）只要有应用凭证就可用
+        // —— 读的是共享给机器人的文档；用户身份有则带上，应用读不到时兜底。
+        // 所以挂载条件只需要应用凭证齐备，**不再要求这个人 /login 过**。
+        ...(env.FEISHU_APP_ID && env.FEISHU_APP_SECRET
+          ? (makeFeishuDocTools({ env, cache, tokens: userTokens }) as any[])
+          : []),
+        // 工作区仓库（agent 自己的 GitHub 私有仓库）。没配 PAT 就整个不挂
+        ...(ghCfg ? (makeGithubTools(ghCfg) as any[]) : []),
         // 自建 web_search（serper）。挂了它就必须摘掉平台内置的那个
         ...(searchTools as any[]),
         // 平台内置沙箱工具。类型是平台注入的「framework 适配对象」，
@@ -586,7 +625,8 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
         "",
         url,
         "",
-        "权限是只读的，只能读你自己有权限的文档。随时发 /logout 撤销。",
+        "授权后能以你自己的身份读写你有权限的文档；共享给机器人的文档不需要这个授权也能读。" +
+        "随时发 /logout 撤销。",
       ].join("\n");
     },
 

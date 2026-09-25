@@ -1,15 +1,18 @@
 // 工具装配。
 //
-// ── 现在的四个来源（2026-09-25 改成通用助手之后）────────────────────
+// ── 现在的五个来源（2026-09-25）────────────────────────────────────
 //   makeSearchTools(env)               → web_search                  （自己实现，serper，见 _search.ts）
 //   context.tools.*                    → 平台内置沙箱工具            （见下）
-//   src/feishu/docs.ts                 → feishu_doc_read / feishu_sheet_read / feishu_bitable_read
+//   src/feishu/docs.ts                 → feishu_{doc,sheet,bitable}_read + 三个 *_write
+//                                        （读：应用身份优先、用户身份兜底；写：bitable 记录 / sheet 单元格 / docx 追加）
 //   src/feishu/global-memory.ts        → remember_fact / forget_fact / recall_facts
+//   src/ghworkspace/tools.ts           → ws_ls / ws_read / ws_write / ws_rm
+//                                        （agent 自己的 GitHub 私有仓库，配了 GITHUB_WORKSPACE_TOKEN 才挂）
 //
-// ── 原版（cf-agent-lab）有四个来源，两个已不在 ──────────────────────
+// ── 原版（cf-agent-lab）有五个来源，一个已不在 ──────────────────────
 //   makeWorkspaceTools(repo)           → read / ls / grep / find      ← **已删除**
-//   makeGithubTools(ghworkspace)       → ws_ls / ws_read / ws_write   ← 未移植
-//     （前者读用户导入的仓库快照，随仓库层一起删；后者见 docs/01-架构与移植映射.md）
+//     （读用户导入的仓库快照，随仓库层一起删。ws_* 那族已经补移植上来了，
+//      就是上面第五个来源 —— 见 docs/01-架构与移植映射.md）
 //
 // ── 为什么平台工具能替掉原版的 run_python 族 ────────────────────────
 // EdgeOne 的 `context.tools` 把沙箱能力原子化成了 14 个工具，其中我们需要的：
@@ -131,15 +134,30 @@ export function summarizeToolOutput(output: unknown): string {
     // 不会和上面任何一个撞。空数组走 else 分支，卡片上显示「无结果」
     if (Array.isArray(o.results)) return o.results.length ? `${o.results.length} 条结果` : "无结果";
 
-    // 云文档那三个工具（见 src/feishu/docs.ts）。字段名是各自独有的，
+    // 工作区仓库 ws_write / ws_rm（见 src/ghworkspace/tools.ts）。
+    // path+commit 组合是它独有的。这一族**改了 GitHub 上的东西**，
+    // 摘要必须说清改了什么 —— 只回「完成」用户没法对账
+    if (typeof o.commit === "string" && typeof o.path === "string") {
+      const op = o.deleted ? "已删除" : o.created ? "已创建" : "已更新";
+      return `${op} ${String(o.path).slice(0, 60)}`;
+    }
+
+    // 云文档读的三个工具（见 src/feishu/docs.ts）。字段名是各自独有的，
     // 特意挑的：不跟上面那些重名，免得卡片上把「表格 3 行」显示成「3 个条目」。
-    // ⚠️ 顺序要紧 —— `count` 太通用（多维表格记录数），必须排在最后，
+    // ⚠️ 顺序要紧 —— `count` 太通用（多维表格记录数），必须排在后面，
     // 否则会抢在更具体的字段（totalChars / rowCount / tableList）前面命中
     if (typeof o.totalChars === "number") {
       return o.truncated ? `文档共 ${o.totalChars} 字（还没读完）` : `文档 ${o.totalChars} 字`;
     }
     if (typeof o.rowCount === "number") return `表格 ${o.rowCount} 行`;
     if (Array.isArray(o.tableList)) return `${o.tableList.length} 张数据表`;
+
+    // 云文档写的三个工具（同样见 docs.ts）。字段名也是特意挑的独有名字
+    if (typeof o.updatedCells === "number") return `写入 ${o.updatedCells} 个单元格`;
+    if (typeof o.appended === "number") return `追加 ${o.appended} 段`;
+    if (typeof o.added === "number") return `新增 ${o.added} 条记录`;
+    if (typeof o.updated === "number") return `更新 ${o.updated} 条记录`;
+
     if (typeof o.count === "number") return `${o.count} 条记录`;
   }
   return "完成";

@@ -21,14 +21,21 @@ const ACCOUNTS_BASE = "https://accounts.feishu.cn";
 /**
  * 要用户授予的权限。
  *
- * `offline_access` 是为了拿 refresh_token（见文件头 ②）。其余四个分别对应
- * docx / wiki / 多维表格 / 电子表格的只读。
+ * `offline_access` 是为了拿 refresh_token（见文件头 ②）。docx / wiki / 多维表格 /
+ * 电子表格各一：`:readonly` 四个管读，另外三个不带 readonly 的管写
+ * （`feishu_bitable_write` / `feishu_sheet_write` / `feishu_docx_write`，见 docs.ts）。
+ *
+ * ⚠️ 2026-09-25 加了三个写权限：**已经授权过的用户不会自动拿到新 scope**，
+ * 要重新发一次 /login 走完整授权流程才行。
  */
 export const DOC_SCOPES = [
   "docx:document:readonly",
   "wiki:wiki:readonly",
   "bitable:app:readonly",
   "sheets:spreadsheet:readonly",
+  "docx:document",
+  "bitable:app",
+  "sheets:spreadsheet",
   "offline_access",
 ];
 

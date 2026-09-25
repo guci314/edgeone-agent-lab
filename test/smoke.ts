@@ -50,6 +50,7 @@ import {
   MAX_ENTRIES,
   MAX_VALUE_CHARS,
   blobMemoryBackend,
+  makeMemoryTools,
   memoryBackendStatus,
   normalizeMemoryKey,
   projectKey,
@@ -2157,6 +2158,71 @@ await describe("M. 跨会话记忆", async () => {
     eq(await m.forget("prefs/技术栈"), true);
     eq(await m.forget("prefs/技术栈"), false, "删第二次应返回 false");
     eq((await m.entries()).length, 0);
+  });
+
+  await it("recall 在写入前后读数不同是**正常**的（线上踩过，别当成 bug）", async () => {
+    // 线上真实序列：模型先 recall（记忆是空的 → 0 条），再 remember 两条。
+    // 那时它同时看到「系统提示词末尾列着 2 条」和「工具返回 0 条」，
+    // 就判定成「我的读取不稳定」，然后在飞书里当众撤回了一个正确答案。
+    //
+    // 结论是**代码没问题**（list 写后立即可见，实测过），纯粹是提示词末尾的
+    // 清单是**本轮快照**、而 recall 是实时查询。这个测试把「合法序列」钉住，
+    // 免得以后有人看到 0 → 2 的变化去改存储层。
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    const tools = makeMemoryTools(m, "ou_alice");
+    const byName = Object.fromEntries(tools.map((t) => [t.name, t]));
+
+    const r0 = await callTool(byName.recall_facts, {});
+    eq(r0.total, 0, "写入前查就是 0 条 —— 这不是故障");
+
+    await callTool(byName.remember_fact, { key: "内部代号", value: "青鸟-7" });
+    await callTool(byName.remember_fact, { key: "发布分支", value: "release/2026q4" });
+
+    const r1 = await callTool(byName.recall_facts, {});
+    eq(r1.total, 2, "写入后立刻查就该看到 —— 写后读必须一致");
+    eq(r1.entries.map((e: any) => e.key).sort(), ["prefs/内部代号", "prefs/发布分支"]);
+  });
+
+  await it("「一个 key 装一件事」这条规则**写在工具描述里**（线上踩过：只写在注释里等于没写）", async () => {
+    // 实测 2026-09-25：这条规则原先只在 global-memory.ts 的文件头注释里，
+    // 模型看不到 —— 于是它把「内部代号」和「发布分支」并成了一个 key
+    // `prefs/项目代号与发布分支`，换个跑法又拆成两个，行为不稳定。
+    // 并 key 的代价是丢掉「不丢更新」这个保证（写入是整值覆盖、无条件写）。
+    //
+    // 这个测试不验模型行为（验不了），只钉住「规则确实在模型看得见的地方」——
+    // 免得以后有人重构工具描述时把它删了，重演同一个坑。
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    const tools = makeMemoryTools(m, "ou_alice");
+    const byName = Object.fromEntries(tools.map((t: any) => [t.name, t]));
+
+    ok(
+      String(byName.remember_fact.description).includes("一个 key 只装一件事"),
+      "remember_fact 的描述里要有「一个 key 只装一件事」",
+    );
+    // 反例也要有 —— 抽象的「别合并」不如举出实测里真被合并的那两个
+    ok(
+      String(byName.remember_fact.description).includes("发布分支"),
+      "最好举出真实被合并过的例子（内部代号 / 发布分支），比抽象说法有效",
+    );
+    ok(
+      String(byName.remember_fact.parameters?.properties?.key?.description ?? "").includes("一件事一个 key"),
+      "key 的字段说明里也要带一遍（模型读字段说明比读整段描述更细）",
+    );
+  });
+
+  await it("recall_facts 支持按前缀过滤", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    const tools = makeMemoryTools(m, "ou_alice");
+    const byName = Object.fromEntries(tools.map((t) => [t.name, t]));
+    await callTool(byName.remember_fact, { key: "技术栈", value: "pnpm" });
+    await callTool(byName.remember_fact, { key: "负责模块", value: "auth", scope: "user" });
+
+    const proj = await callTool(byName.recall_facts, { prefix: "prefs/" });
+    eq(proj.total, 1);
+    eq(proj.entries[0].key, "prefs/技术栈");
+    const mine = await callTool(byName.recall_facts, { prefix: "user/" });
+    eq(mine.total, 1);
+    eq(mine.entries[0].key, "user/ou_alice/负责模块");
   });
 
   await it("空值 / 超长值被拒绝，且不落盘", async () => {

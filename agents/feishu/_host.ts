@@ -392,6 +392,32 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
    */
   const memory = makeGlobalMemory(env);
 
+  /**
+   * 记忆文本**一轮只渲染一次**（快照）。
+   *
+   * ── 为什么必须快照（2026-09-25 实测踩出来的）──────────────────────
+   * `instructions` 传函数时，SDK 是**每次模型调用**都重新求值一次 ——
+   * `@openai/agents-core/dist/run.mjs` 的 `#prepareModelCall` 里
+   * `await executionAgent.getSystemPrompt(...)`，而它在一轮的轮次循环里被反复调用。
+   *
+   * 于是出现一个很坏的现象：一轮里模型先调 `remember_fact` 写了两条，
+   * 下一次模型调用时**系统提示词变了** —— 从「（目前还是空的）」变成列出那两条。
+   * 而模型可能在这之前刚调过 `recall_facts`（那时确实是空的，返回 0 合法），
+   * 于是它同时看到「提示词里有 2 条」和「工具说 0 条」，判定成「我的读取不稳定」，
+   * 接着在飞书里**当众撤回一个正确的答案**，下一轮又撤回上一条撤回。
+   * 用户看到的是「它反复横跳，不可信」——这比记不住更伤。
+   *
+   * 快照之后：本轮内提示词稳定（就是本轮开头那一刻的记忆），
+   * 「现在到底有什么」由 `recall_facts` 负责 —— 职责分开，不会互相打脸。
+   */
+  let memorySnapshot: string | null = null;
+  const memoryText = async (): Promise<string> => {
+    // 调用点已经保证 memory 非空，但 TS 不会跨闭包收窄，这里显式挡一次
+    if (!memory) return "";
+    if (memorySnapshot === null) memorySnapshot = await memory.renderForPrompt(deps.openId);
+    return memorySnapshot;
+  };
+
   const buildAgent = (): Agent =>
     new Agent({
       name: "code-repo-reader",
@@ -400,12 +426,12 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
       // `(runContext, agent) => string | Promise<string>`
       // （见 node_modules/@openai/agents-core/dist/agent.d.ts）。
       //
+      // 函数本身会被反复调用，但里面的记忆文本是快照（见上面的 memoryText）。
+      //
       // 拿不到记忆（本地调试 / 运行时没暴露 Blob）时**退回静态字符串** ——
       // 不只是省一次 await，更重要的是提示词里不会出现「你有长期记忆」这种
       // 骗人的话（模型会去调一个没挂上的工具）。
-      instructions: memory
-        ? async () => INSTRUCTIONS + (await memory.renderForPrompt(deps.openId))
-        : INSTRUCTIONS,
+      instructions: memory ? async () => INSTRUCTIONS + (await memoryText()) : INSTRUCTIONS,
       model: getModel(),
       modelSettings: { maxTokens: MAX_OUTPUT_TOKENS },
       tools: [

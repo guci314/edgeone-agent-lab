@@ -3,8 +3,10 @@
 // ── 现在的五个来源（2026-09-25）────────────────────────────────────
 //   makeSearchTools(env)               → web_search                  （自己实现，serper，见 _search.ts）
 //   context.tools.*                    → 平台内置沙箱工具            （见下）
-//   src/feishu/docs.ts                 → feishu_{doc,sheet,bitable}_read + 三个 *_write
-//                                        （读：应用身份优先、用户身份兜底；写：bitable 记录 / sheet 单元格 / docx 追加）
+//   src/feishu/docs.ts                 → feishu_{doc,sheet,bitable}_read + feishu_docx_create
+//                                        + 三个 *_write
+//                                        （读：应用身份优先、用户身份兜底；写：bitable 记录 / sheet 单元格 / docx 追加；
+//                                          create：新建空文档，正文仍走 docx_write 的追加）
 //   src/feishu/global-memory.ts        → remember_fact / forget_fact / recall_facts
 //   src/ghworkspace/tools.ts           → ws_ls / ws_read / ws_write / ws_rm
 //                                        （agent 自己的 GitHub 私有仓库，配了 GITHUB_WORKSPACE_TOKEN 才挂）
@@ -148,6 +150,13 @@ export function summarizeToolOutput(output: unknown): string {
     // 否则会抢在更具体的字段（totalChars / rowCount / tableList）前面命中
     if (typeof o.totalChars === "number") {
       return o.truncated ? `文档共 ${o.totalChars} 字（还没读完）` : `文档 ${o.totalChars} 字`;
+    }
+    // feishu_docx_create。必须排在下面 `appended` 那条**前面** ——
+    // 建文档时如果带了正文，两个字段会同时出现，「已建文档」比「追加 N 段」更该先说。
+    // 判据用 docUrl（这一族独有），别用 `created`：ws_write 也是 created，
+    // 而那条已经在上面的 commit+path 分支里被接走了
+    if (o.created === true && typeof o.docUrl === "string") {
+      return typeof o.appended === "number" ? `已建文档并写入 ${o.appended} 段` : "已建文档";
     }
     if (typeof o.rowCount === "number") return `表格 ${o.rowCount} 行`;
     if (Array.isArray(o.tableList)) return `${o.tableList.length} 张数据表`;

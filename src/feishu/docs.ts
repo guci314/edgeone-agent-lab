@@ -11,13 +11,18 @@
 //   ③ 两边都失败，给一条**可执行**的合并错误：要么共享给机器人，要么发 /login。
 //
 // ── 为什么读是三个工具、写也是三个工具 ──────────────────────────────
-// 文档类型有四种，工具只有三个 —— 因为**知识库不是一种文档，是一种链接形态**。
+// 文档类型有四种，被操作的资源只有三个 —— 因为**知识库不是一种文档，是一种链接形态**。
 // 每个工具都先做一次 wiki 解引用，所以 `/wiki/xxx` 在所有工具里都能直接用。
 // 写只有三种：多维表格记录、电子表格区域、文档正文**追加**。新版文档的块级
 // 编辑 API 又重又容易写坏版式，不值得 —— 要改已有正文，让用户自己在飞书里改。
 //
+// 2026-09-25 补了**第七个**工具 `feishu_docx_create`（新建空文档）。补之前这六个
+// 无一例外都要求一个**已存在**的资源链接，于是「写一份报告」这类请求全做不了 ——
+// agent 自己在工作区仓库报了这条（`reports/bug-feishu-docx-create.md`）。
+// 它只做「建」，正文仍走 docx_write 的追加，两者共用 `appendDocxParagraphs`。
+//
 // ── 和别的工具族的关系 ──────────────────────────────────────────────
-// 这里六个工具读写**飞书云文档**，`_search.ts` 那个读**公开网页**，数据源不同
+// 这里七个工具读写**飞书云文档**，`_search.ts` 那个读**公开网页**，数据源不同
 // 所以分文件；但约定必须一致，否则模型会看到两种风格：
 //   · 返回一律 JSON 字符串；出错返回 `{ error }` 而不是抛（复用 `guarded`）
 //   · 截断必须**显式标注**并给出继续读的办法，绝不能让半截内容被当成全文
@@ -68,6 +73,15 @@ const DOC_CACHE_TTL_MS = 10 * 60 * 1000;
 /** 一次最多追加多少段、多少字。往文档里灌一整本书不属于这个工具的职责 */
 const DOCX_WRITE_MAX_PARAS = 500;
 const DOCX_WRITE_MAX_CHARS = 20_000;
+
+/**
+ * 文档标题长度上限。
+ *
+ * 来自实测（2026-09-25 打真实 API）：标题 2000 字时飞书回
+ * `99992402 field validation failed: {"field":"title","description":"the max len is 800"}`。
+ * 在本地挡掉，模型能一眼看懂；送到飞书去换一个 field_violations 结构就得多烧一轮。
+ */
+const DOCX_TITLE_MAX_CHARS = 800;
 /** 一次最多写多少表格单元格。超出就该让模型分批 */
 const SHEET_WRITE_MAX_CELLS = 10_000;
 /** 多维表格批量写。飞书接口自身的单批上限就是 500，这里取保守值 */
@@ -286,8 +300,51 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
     };
   };
 
-  const docUrl = (ref: DocRef) =>
-    ref.kind === "docx" ? `https://feishu.cn/docx/${ref.token}` : "";
+  /** 文档 token → 给人看的链接。**新建和读取共用**，别在两处各拼一遍 */
+  const docxUrl = (token: string) => `https://feishu.cn/docx/${token}`;
+
+  /**
+   * 往一篇文档末尾追加段落。
+   *
+   * **新建（feishu_docx_create）和追加（feishu_docx_write）共用这一段**：
+   * 飞书的创建接口只收标题、不支持带内容创建（实测：title 是唯一被校验的字段），
+   * 所以「建一篇带正文的文档」必然是 create + append 两步 ——
+   * 两处各写一遍迟早漂移，比如只在一处丢掉空行。
+   *
+   * 返回 `{ appended }`，或 `{ error }`（由调用方原样交给模型，不抛）。
+   */
+  const appendDocxParagraphs = async (
+    token: string,
+    content: string,
+  ): Promise<{ appended: number } | { error: string }> => {
+    // 空行丢掉：正文里它只是 Markdown 的分段符，落进文档反而多出空段落
+    const paras = String(content ?? "")
+      .split("\n")
+      .map((l) => l.replace(/\s+$/, ""))
+      .filter((l) => l.length > 0);
+    if (!paras.length) return { error: "content 里没有实际内容。" };
+    if (paras.length > DOCX_WRITE_MAX_PARAS || content.length > DOCX_WRITE_MAX_CHARS) {
+      return {
+        error: `一次最多追加 ${DOCX_WRITE_MAX_PARAS} 段 / ${DOCX_WRITE_MAX_CHARS} 字，分几次追加。`,
+      };
+    }
+
+    const doc = encodeURIComponent(token);
+    await callDoc("POST", `/docx/v1/documents/${doc}/blocks/${doc}/children`, {
+      // index=-1 = 追加到文档末尾。这也是这个工具「只能追加」的实现根基
+      index: -1,
+      children: paras.map((line) => ({
+        block_type: 2,
+        // ⚠️ 字段名是 `text`，**不是 `paragraph`**。2026-09-25 用真实凭证实测：
+        // 写成 `paragraph` 时飞书回 `1770001 invalid param`（不给是哪个字段），
+        // 改成 `text` 立刻成功。`paragraph` 是旧版 /docs/ 文档的字段名，docx v1
+        // 的 block_type 2（文本）用 `text` —— 抄错版本，症状却只是一个光秃秃的
+        // invalid param，光看错误码查不出来。冒烟测试里有一条钉住这个字段名。
+        text: { elements: [{ text_run: { content: line } }] },
+      })),
+    });
+    return { appended: paras.length };
+  };
 
   // ── feishu_doc_read ───────────────────────────────────────────────
   const docRead = tool({
@@ -343,7 +400,7 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
             return {
               kind: "docx",
               title: hit.title,
-              docUrl: docUrl(ref),
+              docUrl: docxUrl(ref.token),
               content: "",
               offset: 0,
               totalChars: 0,
@@ -361,7 +418,7 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
           return {
             kind: "docx",
             title: hit.title,
-            docUrl: docUrl(ref),
+            docUrl: docxUrl(ref.token),
             content,
             offset: startAt,
             chars: content.length,
@@ -742,39 +799,97 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
           const ref = s.ref;
           if (ref.kind !== "docx") return wrongKind(ref, "feishu_docx_write");
 
-          // 空行丢掉：正文里它只是 Markdown 的分段符，落进文档反而多出空段落
-          const paras = content
-            .split("\n")
-            .map((l) => l.replace(/\s+$/, ""))
-            .filter((l) => l.length > 0);
-          if (!paras.length) return { error: "content 里没有实际内容。" };
-          if (paras.length > DOCX_WRITE_MAX_PARAS || content.length > DOCX_WRITE_MAX_CHARS) {
-            return {
-              error: `一次最多追加 ${DOCX_WRITE_MAX_PARAS} 段 / ${DOCX_WRITE_MAX_CHARS} 字，分几次追加。`,
-            };
-          }
-
-          const doc = encodeURIComponent(ref.token);
-          await callDoc("POST", `/docx/v1/documents/${doc}/blocks/${doc}/children`, {
-            // index=-1 = 追加到文档末尾。这也是这个工具「只能追加」的实现根基
-            index: -1,
-            children: paras.map((line) => ({
-              block_type: 2,
-              paragraph: { elements: [{ text_run: { content: line } }] },
-            })),
-          });
+          const a = await appendDocxParagraphs(ref.token, content);
+          if ("error" in a) return a;
 
           return {
             kind: "docx",
-            appended: paras.length,
-            docUrl: docUrl(ref),
+            appended: a.appended,
+            docUrl: docxUrl(ref.token),
             note: "已追加到文档末尾。这个工具改不了已有内容。",
           };
         }),
       ),
   });
 
-  return [docRead, sheetRead, bitableRead, bitableWrite, sheetWrite, docxWrite];
+  // ── feishu_docx_create ────────────────────────────────────────────
+  //
+  // ── 为什么需要它（2026-09-25 补）──────────────────────────────────
+  // 补之前，六个工具**无一例外**都要求一个已存在的资源链接（`start(url)` 解析
+  // 出的 token）。于是「写一份报告」「建个会议纪要」这类请求全都做不了 ——
+  // 机器人只能往**用户先手动建好、再共享给它**的文档里贴一段。
+  // 这个缺口是 agent 自己在工作区仓库里报的（`reports/bug-feishu-docx-create.md`）。
+  //
+  // 身份沿用 `callDoc` 的**应用身份优先**，不特殊化。曾经担心过「应用身份建的
+  // 文档会落在应用自己的云空间、用户打不开」，于是 2026-09-25 用真实凭证建了
+  // 一篇、再用浏览器以用户身份打开：**正常打开、可编辑**（标题、正文、分享按钮
+  // 都在）。所以那个担心不成立，不必为了它把身份顺序反过来、多要求一次 /login。
+  const docxCreate = tool({
+    name: "feishu_docx_create",
+    description:
+      "**新建**一篇飞书云文档，返回它的链接。用户说「写一份报告 / 建个会议纪要 / 把结论整理成文档」" +
+      "这类要**新容器**的请求时用这个 —— feishu_docx_write 只能往已有文档追加，建不出新的。" +
+      "飞书的创建接口只收标题、**不支持带内容创建**，所以正文用 content 参数给。" +
+      `标题 1~${DOCX_TITLE_MAX_CHARS} 字。建完把链接给用户。`,
+    parameters: z.object({
+      title: z.string().describe(`文档标题，1~${DOCX_TITLE_MAX_CHARS} 字`),
+      content: z
+        .string()
+        .optional()
+        .describe("可选正文。换行分段，每个非空行一个段落（规则同 feishu_docx_write）"),
+    }),
+    execute: async ({ title, content }) =>
+      json(
+        await guarded(async () => {
+          const t = String(title ?? "").trim();
+          if (!t) return { error: "title 不能为空。" };
+          // 实测飞书的上限就是 800（超了回 99992402 field validation failed）。
+          // 在本地挡掉，模型一眼能看懂；送到飞书去换一个 field_violations 就得多烧一轮
+          if (t.length > DOCX_TITLE_MAX_CHARS) {
+            return {
+              error: `标题 ${t.length} 字，超过上限 ${DOCX_TITLE_MAX_CHARS} 字。缩短一点再建。`,
+            };
+          }
+
+          // ⚠️ 这个端点**只收 title**（实测：title 是唯一被校验的字段），
+          // 没有任何 content / children 参数。正文只能建完再追加
+          const r = await callDoc("POST", "/docx/v1/documents", { title: t });
+          const id = String(r.data?.document?.document_id ?? "");
+          if (!id) {
+            return { error: "飞书没有返回 document_id，文档可能没建成。别把链接给用户。" };
+          }
+
+          const out: Record<string, unknown> = {
+            kind: "docx",
+            created: true,
+            title: t,
+            docUrl: docxUrl(id),
+          };
+
+          // 正文可选。**追加失败不回滚** —— 文档已经建出来了，删掉才是真的把用户的
+          // 东西弄没了。如实报出「建好了但正文没写进去」，让模型决定重试还是先交链接
+          const text = String(content ?? "").trim();
+          if (text) {
+            try {
+              const a = await appendDocxParagraphs(id, text);
+              if ("error" in a) out.contentError = a.error;
+              else out.appended = a.appended;
+            } catch (e) {
+              out.contentError = `正文没写进去：${short(e)}`;
+            }
+          }
+
+          out.note =
+            "文档已创建。" +
+            ("contentError" in out
+              ? "⚠️ 但正文没写进去，链接是有效的，可以再用 feishu_docx_write 补。"
+              : "把 docUrl 给用户。");
+          return out;
+        }),
+      ),
+  });
+
+  return [docRead, docxCreate, docxWrite, sheetRead, bitableRead, bitableWrite, sheetWrite];
 }
 
 /** 给 `/logout` 和状态展示用：这个会话背后的人授权了没 */

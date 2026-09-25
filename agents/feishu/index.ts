@@ -64,7 +64,7 @@ export async function onRequest(context: any) {
   // 「第一个请求已经结束了，它启动的后台任务还在不在」。
   if (probe === "start") return probeStart(context, url);
   if (probe === "check") return probeCheck(context, url);
-  if (probe === "env") return probeEnv(context);
+  if (probe === "env") return probeEnv(context, url);
   if (probe === "model") return probeModel(context, url);
   if (probe === "last") return probeLast(context, url);
   if (probe === "search") return probeSearch(context, url);
@@ -280,6 +280,31 @@ async function notify(
 
 // ── 自测探针 ──────────────────────────────────────────────────────────
 
+/**
+ * 探针的统一门禁：`?token=INTERNAL_TOKEN`。
+ *
+ * ── 为什么要抽成一个函数（2026-09-25 评审修的）──────────────────────
+ * 原先每个探针各自抄一遍这三行，结果是 `probe=env` 那一处**漏了** ——
+ * 而它恰恰是泄漏最多的那个（INTERNAL_TOKEN 与 SERPER_API_KEY 的长度和首尾、
+ * serper key 的 FNV 指纹、env 变量名清单），实测线上 `?probe=env` 无令牌 200。
+ * 讽刺的是 `probeStore` 和 `serperFingerprint` 的注释都明写着「这个端点是
+ * 公网可达的」—— 说明风险是知道的，只是漏了没抄的那一支。
+ *
+ * **门禁按「这个端点会不会泄漏东西」开，不按「谁在用」开。** 逐个调用点
+ * 手抄 = 新增一个探针就会忘一次，所以收口在这里。
+ *
+ * 例外只有 `probe=start` / `probe=check`：状态页要在浏览器里直接点它们，
+ * 把 INTERNAL_TOKEN 塞进静态页等于公开它。它们只读写自己那个会话的
+ * `probe.bg` 键，泄漏面为零（见 docs/03 的说明）。
+ */
+function tokenGate(context: any, url: URL): Response | null {
+  const env = (context?.env ?? {}) as Record<string, unknown>;
+  const expect = String(env.INTERNAL_TOKEN ?? "");
+  const got = String(url.searchParams.get("token") ?? "");
+  if (!expect || got !== expect) return json({ error: "需要 token=INTERNAL_TOKEN" }, 401);
+  return null;
+}
+
 const PROBE_KEY = "probe.bg";
 
 /**
@@ -340,10 +365,8 @@ function serperFingerprint(env: Record<string, unknown>): unknown {
  * 用法：先 `?probe=clear` 清一下，再去飞书发一条消息复现，然后 `?probe=last`。
  */
 async function probeLast(context: any, url: URL): Promise<Response> {
-  const env = (context?.env ?? {}) as AgentEnv;
-  const expect = String(env.INTERNAL_TOKEN ?? "");
-  const got = String(url.searchParams.get("token") ?? "");
-  if (!expect || got !== expect) return json({ error: "需要 token=INTERNAL_TOKEN" }, 401);
+  const denied = tokenGate(context, url);
+  if (denied) return denied;
 
   if (url.searchParams.get("op") === "clear") {
     clearDiag();
@@ -404,9 +427,8 @@ async function probeLast(context: any, url: URL): Promise<Response> {
  */
 async function probeModel(context: any, url: URL): Promise<Response> {
   const env = (context?.env ?? {}) as AgentEnv;
-  const expect = String(env.INTERNAL_TOKEN ?? "");
-  const got = String(url.searchParams.get("token") ?? "");
-  if (!expect || got !== expect) return json({ error: "需要 token=INTERNAL_TOKEN" }, 401);
+  const denied = tokenGate(context, url);
+  if (denied) return denied;
 
   const route = resolveModelRoute(env);
   const baseUrl = String(route.baseURL ?? "");
@@ -511,9 +533,8 @@ async function probeModel(context: any, url: URL): Promise<Response> {
  */
 async function probeSearch(context: any, url: URL): Promise<Response> {
   const env = (context?.env ?? {}) as Record<string, unknown>;
-  const expect = String(env.INTERNAL_TOKEN ?? "");
-  const got = String(url.searchParams.get("token") ?? "");
-  if (!expect || got !== expect) return json({ error: "需要 token=INTERNAL_TOKEN" }, 401);
+  const denied = tokenGate(context, url);
+  if (denied) return denied;
 
   const key = String(env.SERPER_API_KEY ?? "").trim();
   if (!key) return json({ ok: false, error: "没有 SERPER_API_KEY" }, 503);
@@ -551,7 +572,10 @@ async function probeSearch(context: any, url: URL): Promise<Response> {
   }
 }
 
-async function probeEnv(context: any): Promise<Response> {
+async function probeEnv(context: any, url: URL): Promise<Response> {
+  const denied = tokenGate(context, url);
+  if (denied) return denied;
+
   // 交叉类型：既要按 AgentEnv 取已知字段（有类型），又要按 Record 遍历所有键
   // （`Object.keys` 只认索引签名，光 `as AgentEnv` 会报「缺 FEISHU_APP_ID」）
   const env = (context?.env ?? {}) as AgentEnv & Record<string, unknown>;
@@ -743,13 +767,9 @@ function redactEnvValue(k: string, v: string | undefined): unknown {
 
 async function probeStore(context: any, url: URL): Promise<Response> {
   // ⚠️ 必须挡令牌：`op=write` 会往**共享**命名空间里写键，`op=shape` 会回显
-  // 存储相关的环境变量名。`probe=start` / `probe=check` 之所以不挡，是因为
-  // 状态页要在浏览器里直接点它们 —— 把 INTERNAL_TOKEN 塞进静态页等于公开它。
-  // 这个端点没有那个约束：跑它的人本来就在 shell 里。
-  const gateEnv = (context?.env ?? {}) as Record<string, unknown>;
-  const expect = String(gateEnv.INTERNAL_TOKEN ?? "");
-  const got = String(url.searchParams.get("token") ?? "");
-  if (!expect || got !== expect) return json({ error: "需要 token=INTERNAL_TOKEN" }, 401);
+  // 存储相关的环境变量名。（门禁的例外只有状态页那两个，理由见 tokenGate）
+  const denied = tokenGate(context, url);
+  if (denied) return denied;
 
   const op = url.searchParams.get("op") ?? "shape";
   const cid = String(context?.conversation_id ?? "");

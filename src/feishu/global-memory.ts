@@ -283,6 +283,25 @@ export function userKey(openId: string, name: string): string | null {
   return `${USER_PREFIX}${who}/${k}`;
 }
 
+/**
+ * 这条记忆归不归这个人。
+ *
+ * ⚠️ **权限边界只在这一个函数里实现**，别在调用点各写一遍。
+ * 2026-09-25 的实测教训：这条规则原先在 `renderForPrompt` / `renderMemoryList` /
+ * `forgetAll` 三处各写了一遍，也各测了一遍 —— 看起来覆盖得很好，
+ * 于是**模型唯一持有的那个入口 `recall_facts` 没人想起来要加**，
+ * 它在群聊里把所有人的个人记忆连内容一起返回了。
+ * 三个实现 + 三条测试的冗余度，反而掩盖了第四个入口没人管。
+ *
+ * 所以：凡是「列出 / 读取 / 删除记忆」的路径，一律先过这个函数。
+ * 新增入口时如果发现自己在手写 `startsWith(PROJECT_PREFIX)`，那就是走错路了。
+ */
+export function isVisibleTo(key: string, openId: string): boolean {
+  if (String(key ?? "").startsWith(PROJECT_PREFIX)) return true;
+  const who = String(openId ?? "").trim();
+  return !!who && key.startsWith(`${USER_PREFIX}${who}/`);
+}
+
 // ── 记忆本体 ──────────────────────────────────────────────────────────
 
 export interface MemoryEntry {
@@ -356,6 +375,17 @@ export class GlobalMemory {
     return this.cache;
   }
 
+  /**
+   * 这个人**有权看到**的全部条目：项目级 + 他自己的按人记忆。
+   *
+   * 所有面向人与面向模型的读取都要从这里走，别直接 `entries()`
+   * （理由见 `isVisibleTo` 的注释）。`entries()` 只留给「统计总数」这类
+   * 不暴露内容的用途。
+   */
+  async visibleEntries(openId: string): Promise<MemoryEntry[]> {
+    return (await this.entries()).filter((e) => isVisibleTo(e.key, openId));
+  }
+
   /** 这条键在不在。用来区分「新建」和「覆盖」—— 上限只对新键生效 */
   private async exists(key: string): Promise<boolean> {
     return (await this.entries()).some((e) => e.key === key);
@@ -422,6 +452,9 @@ export class GlobalMemory {
     if (uk) candidates.push(uk);
 
     for (const c of candidates) {
+      // ⚠️ 手打键名这条路也能删别人的（人可以在群里照着 /memory 的提示猜出
+      // `user/ou_xxx/xxx` 的形状），所以同样要过可见性
+      if (!isVisibleTo(c, openId)) continue;
       if (await this.forget(c)) return c;
     }
     return null;
@@ -429,8 +462,7 @@ export class GlobalMemory {
 
   /** 清空这个 openId 名下的**全部**记忆（项目级 + 这个人自己的）。给 /forget all 用 */
   async forgetAll(openId: string): Promise<number> {
-    const entries = await this.entries();
-    const mine = entries.filter((e) => e.key.startsWith(PROJECT_PREFIX) || e.key.startsWith(`${USER_PREFIX}${openId}/`));
+    const mine = await this.visibleEntries(openId);
     await Promise.all(mine.map((e) => this.backend.remove(e.key).catch(() => {})));
     this.cache = null;
     return mine.length;
@@ -443,11 +475,7 @@ export class GlobalMemory {
    * 群聊里把别人的个人偏好铺进上下文既是噪声也是越界。
    */
   async renderForPrompt(openId: string): Promise<string> {
-    const all = await this.entries();
-    const minePrefix = `${USER_PREFIX}${openId}/`;
-    const visible = all.filter(
-      (e) => e.key.startsWith(PROJECT_PREFIX) || (openId && e.key.startsWith(minePrefix)),
-    );
+    const visible = await this.visibleEntries(openId);
 
     const head =
       "\n\n## 长期记忆（跨会话共享，不是本会话的对话历史）\n" +
@@ -558,12 +586,23 @@ export function makeMemoryTools(memory: GlobalMemory, openId: string) {
     name: "forget_fact",
     description:
       "从长期记忆里删掉一条。key 要和 recall_facts 或系统提示词里显示的**完全一致**（含 prefs/ 或 user/ 前缀）。 " +
+      "只能删项目级（prefs/…）和**自己的**按人记忆 —— 别人的个人记忆删不了，也不该删。" +
       "只在事实确实过时、或用户明确要求删掉时用；不确定就先问用户。",
     parameters: z.object({
       key: z.string().describe("要删的逻辑键，如 prefs/技术栈"),
     }),
     execute: async ({ key }) => {
       const k = String(key ?? "").trim();
+      // ⚠️ 删和读用同一条可见性规则（见 isVisibleTo）：**能看到的才能删**。
+      // 少了这一道，群里的 A 可以让 bot 把 B 的个人记忆删掉 ——
+      // 而 B 根本看不到发生过什么。
+      if (k && !isVisibleTo(k, openId)) {
+        return json({
+          error:
+            `删不了 ${k}：那是别人的个人记忆。按人记忆只有本人能看和删；` +
+            `你能删的是项目级（prefs/…）或自己的 user/${openId}/…。`,
+        });
+      }
       const ok = await memory.forget(k);
       return json({
         result: ok ? `已删掉 ${k}` : `没找到 ${k}。用 recall_facts 看一下现有的键。`,
@@ -574,18 +613,24 @@ export function makeMemoryTools(memory: GlobalMemory, openId: string) {
   const recall = tool({
     name: "recall_facts",
     description:
-      "列出长期记忆里的全部条目（系统提示词里只显示了前若干条，需要完整清单时用这个）。" +
-      "返回 key 和内容。想知道「我之前记过什么」时用。",
+      "列出长期记忆里的条目（系统提示词里只显示了前若干条，需要完整清单时用这个）。" +
+      "返回 key 和内容。想知道「我之前记过什么」时用。" +
+      "看到的是**项目级 + 提问人自己的**按人记忆 —— 别人的个人记忆不在这里面，这是有意的。",
     parameters: z.object({
       prefix: z
         .string()
         .optional()
-        .describe("可选，只看某一类：prefs/ 看项目级，user/ 看按人的"),
+        .describe("可选，只看某一类：prefs/ 看项目级，user/ 看提问人自己的"),
     }),
     execute: async ({ prefix }) => {
       const p = String(prefix ?? "").trim();
-      const all = await memory.entries();
-      const hit = p ? all.filter((e) => e.key.startsWith(p)) : all;
+      // ⚠️ 这里**必须**走 visibleEntries，不能用 entries()。
+      // 实测（2026-09-25 评审）：这个工具原先返回全部条目，包括
+      // `user/<别人的openId>/*` 的**内容** —— 而 renderForPrompt / /memory /
+      // forgetAll 三处都按人过滤了，只有模型手上这个入口漏了。
+      // 群聊里任何人问一句「把长期记忆列出来」就能拿到别人的个人事实。
+      const visible = await memory.visibleEntries(openId);
+      const hit = p ? visible.filter((e) => e.key.startsWith(p)) : visible;
       return json({
         total: hit.length,
         entries: hit.map((e) => ({ key: e.key, value: e.value })),
@@ -614,10 +659,11 @@ export async function renderMemoryList(
     return "还没有任何长期记忆。\n\n问我一些能沉淀下来的事（团队技术栈、代码风格、谁负责哪块），我会记下来，之后换个群也记得。";
   }
 
-  const minePrefix = `${USER_PREFIX}${openId}/`;
-  const project = all.filter((e) => e.key.startsWith(PROJECT_PREFIX));
-  const mine = all.filter((e) => openId && e.key.startsWith(minePrefix));
-  const others = all.length - project.length - mine.length;
+  // 可见性走同一个函数，别在这里重写一遍 —— 见 isVisibleTo 的注释
+  const visible = await memory.visibleEntries(openId);
+  const project = visible.filter((e) => e.key.startsWith(PROJECT_PREFIX));
+  const own = visible.filter((e) => e.key.startsWith(`${USER_PREFIX}${openId}/`));
+  const others = all.length - visible.length;
 
   const lines: string[] = [];
   lines.push(`长期记忆共 ${all.length} 条（跨会话共享）：`);
@@ -627,10 +673,10 @@ export async function renderMemoryList(
     lines.push("【项目级 · 所有会话都看得到】");
     for (const e of project) lines.push(`- ${e.key}：${e.value}`);
   }
-  if (mine.length) {
+  if (own.length) {
     lines.push("");
     lines.push("【只跟你有关】");
-    for (const e of mine) lines.push(`- ${e.key}：${e.value}`);
+    for (const e of own) lines.push(`- ${e.key}：${e.value}`);
   }
   if (others > 0) {
     // 别人的按人记忆不显示内容 —— 群聊里那是越界

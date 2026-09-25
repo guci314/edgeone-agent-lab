@@ -57,6 +57,7 @@ import {
   MAX_ENTRIES,
   MAX_VALUE_CHARS,
   blobMemoryBackend,
+  isVisibleTo,
   makeMemoryTools,
   memoryBackendStatus,
   normalizeMemoryKey,
@@ -1432,10 +1433,16 @@ await describe("J. 云文档工具族", async () => {
       return json({ tenant_access_token: "tt-1", expire: 7200 });
     }
 
-    // docx 追加（feishu_docx_write）。⚠️ 必须排在 meta 检查前面 ——
-    // children 的 URL 同样包含 "/docx/v1/documents/DOC1"
-    if (url.includes("/blocks/DOC1/children")) {
+    // docx 追加（feishu_docx_write / feishu_docx_create 的第二步）。
+    // 按形状匹配、不写死 DOC1 —— 新建出来的 NEW1 也要走这条。
+    // ⚠️ 必须排在 meta 检查前面 —— children 的 URL 同样包含 "/docx/v1/documents/"
+    if (url.includes("/blocks/") && url.endsWith("/children")) {
       return json({ data: { children: [] } });
+    }
+    // 新建文档（feishu_docx_create）。⚠️ 必须排在下面的 meta 检查前面 ——
+    // 建出来的 NEW1/DOC1 也要能被 children 分支接住（见上一条）
+    if (url.endsWith("/docx/v1/documents")) {
+      return json({ data: { document: { document_id: "NEW1", title: "新文档" } } });
     }
     if (url.includes("/docx/v1/documents/DOC1/raw_content")) return json({ data: { content: DOC_TEXT } });
     if (url.includes("/docx/v1/documents/DOC1")) return json({ data: { document: { title: "设计文档" } } });
@@ -1555,16 +1562,97 @@ await describe("J. 云文档工具族", async () => {
     return Object.fromEntries(list.map((t) => [t.name, t]));
   };
 
-  await it("六个工具都注册了，名字是 feishu_ 前缀", async () => {
+  await it("七个工具都注册了，名字是 feishu_ 前缀", async () => {
     const t = await tools();
     eq(Object.keys(t).sort(), [
       "feishu_bitable_read",
       "feishu_bitable_write",
       "feishu_doc_read",
+      "feishu_docx_create",
       "feishu_docx_write",
       "feishu_sheet_read",
       "feishu_sheet_write",
     ]);
+  });
+
+  // ── feishu_docx_create（2026-09-25 补）──────────────────────────────
+  // 补之前六个工具全都要求一个已存在的链接，「写一份报告」这类请求全做不了。
+  await it("建文档：只发 title，返回链接", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_docx_create, { title: "季度报告" });
+    eq(r.created, true);
+    eq(r.docUrl, "https://feishu.cn/docx/NEW1");
+
+    const create = calls.find((c) => c.url.endsWith("/docx/v1/documents"));
+    ok(create, "必须打 POST /docx/v1/documents");
+    eq(create!.init.method, "POST");
+    const body = JSON.parse(create!.init.body);
+    eq(body.title, "季度报告");
+    // ⚠️ 飞书的创建接口**只收 title**，多带字段不会让它写正文，只会让人误以为能写
+    eq(Object.keys(body), ["title"], "这个端点只接受 title");
+    ok(!calls.some((c) => c.url.includes("/children")), "没给 content 就不该发追加请求");
+    ok(r.docUrl, "必须把链接给出去 —— 这是用户唯一能打开文档的途径");
+  });
+
+  await it("建文档带正文：先建、再往**新建的那个 id** 追加", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_docx_create, {
+      title: "会议纪要",
+      content: "第一段\n\n第二段",
+    });
+    eq(r.appended, 2, "空行不算段落");
+    eq(r.contentError, undefined);
+
+    // 关键：追加要打到新建出来的 NEW1，不是别的 token（写错就写进别人文档里了）
+    const children = calls.find((c) => c.url.includes("/children"));
+    ok(children, "带了 content 就必须追一次");
+    ok(children!.url.includes("/documents/NEW1/blocks/NEW1/children"), children!.url);
+    const cb = JSON.parse(children!.init.body);
+    eq(cb.children.length, 2);
+    // 同 docx_write 那条：字段名必须钉住，写错了真实 API 只会回一个 invalid param
+    ok(!("paragraph" in cb.children[0]), "段落载荷字段是 text，不是 paragraph");
+  });
+
+  await it("建文档：标题空 / 超 800 字在本地就挡掉，不发请求", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const empty = await callTool(t.feishu_docx_create, { title: "   " });
+    ok(empty.error.includes("title"), empty.error);
+    // 800 是实测到的飞书上限（回 99992402 field validation failed）
+    const tooLong = await callTool(t.feishu_docx_create, { title: "x".repeat(801) });
+    ok(tooLong.error.includes("800"), tooLong.error);
+    eq(calls.filter((c) => c.url.endsWith("/docx/v1/documents")).length, 0, "本地能判的错别送到飞书去");
+  });
+
+  await it("建文档时正文写失败：**链接照样给出**，不回滚", async () => {
+    const t = await tools();
+    // 建成功、追加失败 —— 真会这样：文档已经存在了，把链接吞掉才是更坏的结果
+    stubFetch((url) => {
+      if (url.includes("/auth/v3/tenant_access_token/internal")) {
+        return new Response(JSON.stringify({ code: 0, tenant_access_token: "tt-1", expire: 7200 }), {
+          status: 200, headers: { "content-type": "application/json" },
+        });
+      }
+      if (url.includes("/children")) {
+        return new Response(JSON.stringify({ code: 1770001, msg: "no permission" }), {
+          status: 200, headers: { "content-type": "application/json" },
+        });
+      }
+      if (url.endsWith("/docx/v1/documents")) {
+        return new Response(
+          JSON.stringify({ code: 0, data: { document: { document_id: "NEW1" } } }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      return undefined;
+    });
+    const r = await callTool(t.feishu_docx_create, { title: "带正文但会失败", content: "正文" });
+    eq(r.created, true);
+    eq(r.docUrl, "https://feishu.cn/docx/NEW1", "文档真建出来了，链接必须给");
+    ok(typeof r.contentError === "string" && r.contentError.length > 0, "失败要如实说，不能假装写进去了");
+    ok(r.note.includes("feishu_docx_write"), "要给一条下一条路：链接有效，可以再追加");
   });
 
   await it("读 docx：返回标题、正文、字数", async () => {
@@ -1966,7 +2054,16 @@ await describe("J. 云文档工具族", async () => {
     const body = JSON.parse(call!.init.body);
     eq(body.index, -1, "index=-1 才是追加到末尾");
     eq(body.children.length, 2);
-    eq(body.children[0].paragraph.elements[0].text_run.content, "第一段");
+
+    // ⚠️ 段落的载荷字段名是 `text`。这条断言原先写的是 `paragraph` ——
+    // 也就是**把 bug 抄成了期望值**，于是测试一直是绿的，而真实 API 每次
+    // 都回 `1770001 invalid param`（2026-09-25 用真实凭证才撞出来）。
+    // 教训：stub 测试能挡住"发出去的形状不对"，但前提是期望值本身得对 ——
+    // 断言里的字段名必须来自**真实响应/文档**，不能来自刚写完的实现。
+    const para = body.children[0];
+    eq(para.block_type, 2);
+    eq(para.text.elements[0].text_run.content, "第一段");
+    ok(!("paragraph" in para), "docx v1 的字段是 text，不是 paragraph（旧版 /docs/ API 才是）");
   });
 
   await it("docx 写：类型对不上时点名 feishu_docx_write", async () => {
@@ -2101,6 +2198,21 @@ await describe("K. 跨会话记忆", async () => {
     eq(userKey("", "负责模块"), null);
   });
 
+  await it("isVisibleTo：权限边界只有这一份实现（新增入口必须先过它）", () => {
+    // 项目级人人可见
+    eq(isVisibleTo("prefs/技术栈", "ou_alice"), true);
+    // 按人的只有本人
+    eq(isVisibleTo("user/ou_alice/负责模块", "ou_alice"), true);
+    eq(isVisibleTo("user/ou_bob/负责模块", "ou_alice"), false);
+    // 拿不到身份时什么按人的都看不到（宁可少给，不可多给）
+    eq(isVisibleTo("user/ou_alice/负责模块", ""), false);
+    // 前缀相近但不是同一个人的，别被 startsWith 骗过去
+    eq(isVisibleTo("user/ou_al/负责模块", "ou_alice"), false);
+    eq(isVisibleTo("user/ou_alice2/负责模块", "ou_alice"), false);
+    // 非记忆键（手工写进去的裸文本）不因前缀沾光
+    eq(isVisibleTo("别的/东西", "ou_alice"), false);
+  });
+
   await it("remember → entries → forget 往返", async () => {
     const m = new GlobalMemory(new InMemoryMemoryBackend());
     // 用真实形状的 openId（ou_ + 一长串），因为 by 是截尾的，短假名会掩盖截断逻辑
@@ -2188,6 +2300,67 @@ await describe("K. 跨会话记忆", async () => {
     const mine = await callTool(byName.recall_facts, { prefix: "user/" });
     eq(mine.total, 1);
     eq(mine.entries[0].key, "user/ou_alice/负责模块");
+  });
+
+  await it("recall_facts **不返回别人的按人记忆**（模型侧是第四个入口，曾经漏了）", async () => {
+    // ⚠️ 2026-09-25 评审发现的真漏洞：renderForPrompt / renderMemoryList /
+    // forgetAll 三处都按人过滤了、也各有一条测试，唯独**模型手上这个工具**
+    // 返回全部条目（含 `user/<别人的openId>/*` 的**内容**）——
+    // 群聊里任何人问一句「把长期记忆列出来」就能拿到别人的个人事实。
+    // 三条测试的冗余度掩盖了第四个入口没人管，所以这里专门钉住它。
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    const tools = makeMemoryTools(m, "ou_alice");
+    const byName = Object.fromEntries(tools.map((t) => [t.name, t]));
+
+    await callTool(byName.remember_fact, { key: "技术栈", value: "pnpm" });
+    await callTool(byName.remember_fact, { key: "负责模块", value: "auth", scope: "user" });
+    // 别人的：直接落库（模拟另一个会话写的），不走 alice 的工具
+    await m.remember("user/ou_bob/负责模块", "支付", "ou_bob");
+
+    // 不带 prefix（最容易泄的那种问法）
+    const all = await callTool(byName.recall_facts, {});
+    const keys = all.entries.map((e: any) => e.key);
+    ok(!keys.some((k: string) => k.includes("ou_bob")), `不该看到别人的键：${keys.join(",")}`);
+    ok(!JSON.stringify(all).includes("支付"), "更不该看到别人的内容");
+    eq(all.total, 2, "项目级 + 自己的，共 2 条");
+
+    // 显式按 user/ 前缀捞 —— 这个最容易写成「全部 user/ 都给我」
+    const byUser = await callTool(byName.recall_facts, { prefix: "user/" });
+    eq(byUser.total, 1, "user/ 只看自己的那一条");
+    eq(byUser.entries[0].key, "user/ou_alice/负责模块");
+
+    // 换个人来问，看到的必须是另一套
+    const bobTools = makeMemoryTools(m, "ou_bob");
+    const bobByName = Object.fromEntries(bobTools.map((t: any) => [t.name, t]));
+    const asBob = await callTool(bobByName.recall_facts, {});
+    ok(!JSON.stringify(asBob).includes("auth"), "bob 看不到 alice 的");
+    ok(asBob.entries.some((e: any) => e.key === "user/ou_bob/负责模块"), "bob 看得到自己的");
+  });
+
+  await it("forget_fact 删不掉别人的按人记忆（能看到的才能删）", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    const tools = makeMemoryTools(m, "ou_alice");
+    const byName = Object.fromEntries(tools.map((t) => [t.name, t]));
+
+    await m.remember("user/ou_bob/负责模块", "支付", "ou_bob");
+    await callTool(byName.remember_fact, { key: "负责模块", value: "auth", scope: "user" });
+
+    const denied = await callTool(byName.forget_fact, { key: "user/ou_bob/负责模块" });
+    ok(typeof denied.error === "string", `应被拒绝，实际：${JSON.stringify(denied)}`);
+    eq((await m.entries()).length, 2, "别人的那条必须还在");
+
+    // 自己那条照样能删
+    const okDel = await callTool(byName.forget_fact, { key: "user/ou_alice/负责模块" });
+    ok(typeof okDel.result === "string" && okDel.result.includes("已删掉"), JSON.stringify(okDel));
+    eq((await m.entries()).length, 1);
+  });
+
+  await it("forgetLoose 也不能删别人的（手打键名这条路同样要过可见性）", async () => {
+    const m = new GlobalMemory(new InMemoryMemoryBackend());
+    await m.remember("user/ou_bob/负责模块", "支付", "ou_bob");
+    // 人在群里照着 /memory 的提示猜出形状，手打完整键名
+    eq(await m.forgetLoose("user/ou_bob/负责模块", "ou_alice"), null);
+    eq((await m.entries()).length, 1, "别人的那条必须还在");
   });
 
   await it("空值 / 超长值被拒绝，且不落盘", async () => {

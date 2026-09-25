@@ -8,15 +8,21 @@
 //
 // ── EdgeOne 版变成三个来源 ──────────────────────────────────────────
 //   makeWorkspaceTools(repo)           → read / ls / grep / find        （自己实现，见 src/workspace/tools.ts）
-//   context.tools.*                    → 平台内置沙箱工具              （替换掉原版的 web_search + run_python 两族）
+//   makeSearchTools(env)               → web_search                    （自己实现，serper，见 _search.ts）
+//   context.tools.*                    → 平台内置沙箱工具              （替掉原版的 run_python 族）
 //   （ghworkspace 未移植，见 docs/01-架构与移植映射.md）
 //
-// ── 为什么平台工具能替掉两族 ────────────────────────────────────────
+// ── 为什么平台工具能替掉 run_python 族 ──────────────────────────────
 // EdgeOne 的 `context.tools` 把沙箱能力原子化成了 14 个工具，其中我们需要的：
-//   · web_search      ← 替掉原版自己写的 web_search
 //   · code_interpreter← 替掉原版接 Judge0 / 阿里云沙箱的 run_python
 //   · commands        ← 原版没有的能力（能跑 shell）
 //   · files_* / browser_* ← 原版没有，但正好是「把仓库文件喂进沙箱」的替代品
+//
+// ⚠️ **`web_search` 一开始也是从平台拿的，后来换成了自建**（见 `_search.ts`）：
+// 平台那个底层是腾讯云 WSA，本项目没配 `WSA_API_KEY`，一调就报
+// `web_search requires the WSA_API_KEY environment variable.` —— 是坏的。
+// 所以 `platformTools()` 多了一个 `extraExcluded` 参数：自建的那个挂上时，
+// 必须把平台这个同名的摘掉，否则模型可能选中坏的。
 //
 // 换掉之后有一个**真实的能力变化**必须知道：原版的 run_python 有
 // `files` 参数，能把仓库里指定文件的内容一起送进沙箱；平台工具没有这个联动，
@@ -27,6 +33,7 @@
 // `commands` / `files_read` / ... / `code_interpreter` / `web_search`。
 // 这些名字是模型用来选工具的唯一依据，写错就等于工具不存在 ——
 // 部署后请对着本地 `/agent-metrics` 面板确认一遍实际注册的名字。
+// （`web_search` 现在是我们自己挂的那个，名字故意保持一样，模型无需知道来源变了。）
 
 /** `context.tools` 的形状（平台注入，无类型声明可用，这里按文档收窄） */
 export interface PlatformTools {
@@ -60,6 +67,15 @@ const EXCLUDED = new Set([
 export function platformTools(
   context: { tools?: PlatformTools },
   env: { SANDBOX_ENABLED?: string },
+  /**
+   * 额外要摘掉的工具名。
+   *
+   * 目前只有一个用处：我们自己挂了 `web_search`（见 `_search.ts`）时，
+   * 把平台内置的同名工具摘掉 —— 两个同名同用途的工具同时在列表里，
+   * 模型选哪个全看运气，而内置那个在本项目里是**坏的**（缺 WSA_API_KEY）。
+   * 官方文档接第三方搜索时也要求这么做。
+   */
+  extraExcluded: readonly string[] = [],
 ): unknown[] {
   const flag = String(env.SANDBOX_ENABLED ?? "1").toLowerCase();
   if (flag === "0" || flag === "false" || flag === "off") return [];
@@ -67,10 +83,12 @@ export function platformTools(
   const bag = context.tools;
   if (!bag || typeof bag.all !== "function") return [];
 
+  const skip = new Set([...EXCLUDED, ...extraExcluded]);
+
   try {
     return bag
       .all()
-      .filter((t) => !EXCLUDED.has(String((t as { name?: unknown })?.name ?? "")));
+      .filter((t) => !skip.has(String((t as { name?: unknown })?.name ?? "")));
   } catch {
     // 平台工具拿不到不该让整个 Agent 起不来 —— 代码问答是主路径，沙箱是增强
     return [];
@@ -106,6 +124,10 @@ export function summarizeToolOutput(output: unknown): string {
     if (Array.isArray(o.paths)) return `${o.paths.length} 个路径`;
     if (Array.isArray(o.entries)) return `${o.entries.length} 个条目`;
     if (typeof o.totalLines === "number") return `共 ${o.totalLines} 行`;
+
+    // 自建 web_search（见 _search.ts）。字段名 results 是它独有的，
+    // 不会和上面任何一个撞。空数组走 else 分支，卡片上显示「无结果」
+    if (Array.isArray(o.results)) return o.results.length ? `${o.results.length} 条结果` : "无结果";
 
     // 云文档那三个工具（见 src/feishu/docs.ts）。字段名是各自独有的，
     // 特意挑的：不跟上面那些重名，免得卡片上把「表格 3 行」显示成「3 个条目」。

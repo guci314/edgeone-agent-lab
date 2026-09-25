@@ -42,6 +42,7 @@ import { makeWorkspaceTools } from "../../src/workspace/tools.ts";
 import type { WorkspaceRepo } from "../../src/workspace/repo.ts";
 import { serveIngest } from "../../src/workspace/serve-ingest.ts";
 import { INSTRUCTIONS } from "./_instructions.ts";
+import { makeSearchTools } from "./_search.ts";
 import { platformTools, summarizeToolOutput, toolFailed } from "./_tools.ts";
 
 /** 模型调用与平台密钥 */
@@ -51,6 +52,16 @@ export interface AgentEnv extends FeishuEnv, OAuthEnv {
   AI_GATEWAY_MODEL?: string;
   OPENCODE_SESSION?: string;
   SANDBOX_ENABLED?: string;
+  /**
+   * serper 的 key，给自建的 `web_search` 用（见 `_search.ts`）。
+   *
+   * 为什么不用平台内置的 `web_search`：它底层是腾讯云 WSA，缺 `WSA_API_KEY`
+   * 时报 `web_search requires the WSA_API_KEY environment variable.`，
+   * 而 WSA 要单独开通付费。serper 的 key 是现成的。
+   *
+   * **没配时搜索工具整个不挂**，模型也就不会去撞一堵必然失败的墙。
+   */
+  SERPER_API_KEY?: string;
   /**
    * 自制内部令牌。webhook 转发时带 `x-internal-token`，agent 这边比对。
    * `agents/` 路由是公网可达的，没这道门谁都能拿它烧模型额度。
@@ -222,6 +233,15 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
         })
       : null;
 
+  /**
+   * 自建联网搜索。**在 createHost 里算一次**（不是每回合重算）——
+   * 它只取决于 env 里的 key，而 key 一个实例生命周期内不会变。
+   *
+   * 拿到它之后要把平台内置的同名工具摘掉，否则两个 web_search 同时在
+   * 工具列表里，模型可能选中那个坏的（缺 WSA_API_KEY）。
+   */
+  const searchTools = makeSearchTools(env);
+
   const buildAgent = (): Agent =>
     new Agent({
       name: "code-repo-reader",
@@ -232,9 +252,15 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
         ...makeWorkspaceTools(repo),
         // 用户身份读飞书云文档。工具拿不到 context，只能靠闭包捕获上面的管理器
         ...(userTokens ? (makeFeishuDocTools({ env, tokens: userTokens }) as any[]) : []),
+        // 自建 web_search（serper）。挂了它就必须摘掉平台内置的那个
+        ...(searchTools as any[]),
         // 平台内置沙箱工具。类型是平台注入的「framework 适配对象」，
         // 拿不到官方 TS 类型，所以这里按 unknown[] 收进来
-        ...(platformTools(context, env) as any[]),
+        ...(platformTools(
+          context,
+          env,
+          searchTools.length ? ["web_search"] : [],
+        ) as any[]),
       ],
     });
 

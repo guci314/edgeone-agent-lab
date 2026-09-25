@@ -52,7 +52,7 @@ tail -f /tmp/feishu-bridge.log
 Linux 服务器同理，写个 systemd unit；或者 `docker run -d` / `pm2 start`。
 唯一的要求是**网络能出公网 + 进程别死**。
 
-## 环境变量（`.env`）
+## 环境变量（`~/.config/edgeone-bridge/.env`）
 
 | 变量 | 来源 | 说明 |
 |---|---|---|
@@ -63,7 +63,12 @@ Linux 服务器同理，写个 systemd unit；或者 `docker run -d` / `pm2 star
 
 云端改了这些值 → `npm run sync-env` → 重启 bridge。
 
-`.env` 已在 `.gitignore` 里，不会进 git。
+⚠️ **env 文件放在项目目录外（`~/.config/edgeone-bridge/.env`），不要挪回 `bridge/.env`。**
+2026-09-25 踩过：EdgeOne 部署会把**整个项目目录**当静态资源上传，静态资源公网可读 ——
+`https://eolab.yujizi.org/bridge/.env` 曾返回 200，飞书 APP_SECRET / ENCRYPT_KEY /
+INTERNAL_TOKEN 明文挂在网上两天。`.gitignore` 只挡 git，**挡不住部署**；平台也没有
+「部署忽略清单」这种配置（`edgeone.json` 的 schema 里没有 exclude / ignore 字段）。
+结论：**含密钥的文件一律不能待在项目目录里。**
 
 ## 两个已经踩过的坑（改代码前先看）
 

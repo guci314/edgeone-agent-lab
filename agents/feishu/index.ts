@@ -68,6 +68,7 @@ export async function onRequest(context: any) {
   if (probe === "start") return probeStart(context, url);
   if (probe === "check") return probeCheck(context, url);
   if (probe === "env") return probeEnv(context);
+  if (probe === "search") return probeSearch(context, url);
 
   if (method !== "POST") {
     return json({ error: "只接受 POST" }, 405);
@@ -304,6 +305,85 @@ const PROBE_KEY = "probe.bg";
  *   · 指纹和控制台一致 → 值对，是调用方传错了
  *   · 指纹和控制台不一致 → 部署快照，重新部署才能生效
  */
+/**
+ * 搜索 key 的指纹：长度 + 首尾各 4 字符 + FNV-1a 32 位哈希。
+ *
+ * 不回显明文 —— 这个端点是公网可达的（这也正是 9/25 那次泄露的教训）。
+ * 本地对同一个值算一次，指纹一致就说明运行时读到的值没错。
+ */
+function serperFingerprint(env: Record<string, unknown>): unknown {
+  const k = String(env.SERPER_API_KEY ?? "");
+  if (!k) return null;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < k.length; i++) {
+    h ^= k.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return {
+    len: k.length,
+    head: k.slice(0, 4),
+    tail: k.slice(-4),
+    fnv: h.toString(16).padStart(8, "0"),
+  };
+}
+
+/**
+ * 从**运行时内部**真的发一次 serper 搜索请求，把原始状态码和结果回显出来。
+ *
+ * ── 为什么需要它 ────────────────────────────────────────────────────
+ * 「工具能不能用」这件事被两层遮着：模型得先跑起来（网关鉴权/额度），
+ * 才会去调工具。模型一挂，搜索就完全测不了 —— 于是没法回答
+ * 「到底是搜索坏了，还是模型坏了」。
+ *
+ * 这个探针把模型那层摘掉，只测「运行时 → serper」这一段：
+ *   · 200 + 有结果 → 出网正常、key 有效，问题在模型侧
+ *   · 401/403      → key 或额度问题
+ *   · 超时/DNS 错  → 运行时出网被限制（EdgeOne 侧没有代理，只能直连）
+ *
+ * ⚠️ 会消耗一次 serper 配额，所以用 INTERNAL_TOKEN 挡一道，不公开。
+ */
+async function probeSearch(context: any, url: URL): Promise<Response> {
+  const env = (context?.env ?? {}) as Record<string, unknown>;
+  const expect = String(env.INTERNAL_TOKEN ?? "");
+  const got = String(url.searchParams.get("token") ?? "");
+  if (!expect || got !== expect) return json({ error: "需要 token=INTERNAL_TOKEN" }, 401);
+
+  const key = String(env.SERPER_API_KEY ?? "").trim();
+  if (!key) return json({ ok: false, error: "没有 SERPER_API_KEY" }, 503);
+
+  const q = String(url.searchParams.get("q") ?? "EdgeOne Makers").slice(0, 100);
+  const t0 = Date.now();
+  try {
+    const res = await fetch("https://google.serper.dev/search", {
+      method: "POST",
+      headers: { "X-API-KEY": key, "content-type": "application/json" },
+      body: JSON.stringify({ q, num: 3 }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    const text = await res.text();
+    let parsed: any = null;
+    try {
+      parsed = JSON.parse(text);
+    } catch {}
+    return json({
+      ok: res.ok,
+      status: res.status,
+      ms: Date.now() - t0,
+      // 直连出网时，serper 在 Google Cloud 上；这个 IP 能说明运行时走的哪条路
+      query: q,
+      titles: (parsed?.organic ?? []).map((r: any) => r?.title ?? "").slice(0, 3),
+      bodyHead: res.ok ? null : text.slice(0, 200),
+    });
+  } catch (e) {
+    return json({
+      ok: false,
+      ms: Date.now() - t0,
+      error: `${(e as Error).name}: ${(e as Error).message}`,
+      hint: "超时或 DNS 失败 = 运行时出网被限制，不是 key 的问题。",
+    });
+  }
+}
+
 async function probeEnv(context: any): Promise<Response> {
   const env = (context?.env ?? {}) as Record<string, unknown>;
   const v = String(env.INTERNAL_TOKEN ?? "");
@@ -320,8 +400,27 @@ async function probeEnv(context: any): Promise<Response> {
   const gotHeader = readInternalToken(req, null);
   return json({
     ok: true,
-    envKeys: Object.keys(env).filter((k) => /FEISHU|INTERNAL|AI_|AGENT|SANDBOX/.test(k)).sort(),
+    envKeys: Object.keys(env)
+      .filter((k) => /FEISHU|INTERNAL|AI_|AGENT|SANDBOX|SERPER/.test(k))
+      .sort(),
     internalToken: v ? { len: v.length, head: v.slice(0, 4), tail: v.slice(-4) } : null,
+    /**
+     * 搜索 key 的**指纹**，不是明文。
+     *
+     * 踩过：这里原来的过滤正则没有 SERPER，于是「运行时到底有没有这个 key」
+     * 一直看不出来 —— 误判成环境变量没生效，白排查半天。
+     * 现在给一个 sha256 前 12 位，本地算一次比一下就知道值对不对。
+     */
+    serper: serperFingerprint(env),
+    /**
+     * 模型名与网关地址（都不是密钥，可以直接回显）。
+     *
+     * 踩过：AI Gateway 的模型名**必须带 provider 前缀**（免费档 `@makers/<model>`），
+     * 写成裸 `deepseek-v4.1-flash` 会 400。本地 .env 里一度就是裸的，
+     * 而运行时到底读到哪个值，之前根本看不出来。
+     */
+    model: String(env.AI_GATEWAY_MODEL ?? ""),
+    baseUrl: String(env.AI_GATEWAY_BASE_URL ?? ""),
     requestShape: {
       ctor: req?.constructor?.name ?? null,
       keys: Object.keys(req ?? {}).slice(0, 30),

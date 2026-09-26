@@ -51,6 +51,8 @@ import {
 import { makeFeishuDocTools } from "../src/feishu/docs.ts";
 import { ghWorkspaceConfig } from "../src/ghworkspace/client.ts";
 import { makeGithubTools } from "../src/ghworkspace/tools.ts";
+import { checkRepo, ghIssueConfig } from "../src/ghworkspace/issues.ts";
+import { makeGithubIssueTools } from "../src/ghworkspace/issue-tools.ts";
 import {
   GlobalMemory,
   InMemoryMemoryBackend,
@@ -2858,6 +2860,134 @@ await describe("L. 工作区仓库（ws_*）", async () => {
     ok(r.error.includes("路径不存在"), r.error);
     ok(r.error.includes("仓库名"), r.error);
     ok(r.error.includes("PAT"), r.error);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// M. GitHub issue（gh_issue_*）—— 独立凭证 + 仓库白名单
+//
+// 这一族和 L 节最大的区别是**副作用对外可见**：issue 发出去别人就看得到、
+// 通知也发出去了。所以测试重点不在「能不能开」，而在**边界**：
+// 白名单外必须拒绝、没配必须不挂、token 绝不能进错误信息。
+// ═══════════════════════════════════════════════════════════════════════
+
+await describe("M. GitHub issue 工具族", async () => {
+  const TOKEN = "gh-issue-secret-token";
+  // ⚠️ 白名单故意写成混合大小写：GitHub 的 owner/repo **不分大小写**，
+  // 配置里写 `Owner/One` 而模型传 `owner/one` 是常态，不该被判成白名单外
+  const ENV = { GITHUB_ISSUE_TOKEN: TOKEN, GITHUB_ISSUE_REPOS: "Owner/One, owner/two" };
+
+  const issueStub = (url: string, init: any): Response | undefined => {
+    const json = (v: unknown, status = 200) =>
+      new Response(JSON.stringify(v), { status, headers: { "content-type": "application/json" } });
+    if (url.endsWith("/repos/owner/one/issues") && init?.method === "POST") {
+      const body = JSON.parse(init.body);
+      return json({ number: 42, html_url: "https://github.com/owner/one/issues/42", title: body.title });
+    }
+    if (url.endsWith("/repos/owner/two/issues/7/comments") && init?.method === "POST") {
+      return json({ html_url: "https://github.com/owner/two/issues/7#issuecomment-1" });
+    }
+    return undefined;
+  };
+
+  const issueTools = () =>
+    Object.fromEntries((makeGithubIssueTools(ghIssueConfig(ENV)) as any[]).map((t) => [t.name, t]));
+
+  await it("没配 token / 没配白名单 → 整族不挂（不是挂上但一调就错）", () => {
+    eq((makeGithubIssueTools(null) as unknown[]).length, 0);
+    eq(ghIssueConfig({}), null);
+    // 只有 token 没有白名单 = 「这把 token 能开的仓库全都能开」，是最不该有的形态
+    eq(ghIssueConfig({ GITHUB_ISSUE_TOKEN: "t" }), null);
+    // 白名单里全是非法格式，等于没有白名单
+    eq(ghIssueConfig({ GITHUB_ISSUE_TOKEN: "t", GITHUB_ISSUE_REPOS: " , 不是仓库 , " }), null);
+  });
+
+  await it("两个工具都注册，名字 gh_ 前缀", () => {
+    eq(Object.keys(issueTools()).sort(), ["gh_issue_comment", "gh_issue_create"]);
+  });
+
+  await it("白名单大小写不敏感（配置 Owner/One，模型传 OWNER/one 也该放行）", () => {
+    const cfg = ghIssueConfig(ENV);
+    ok(cfg, "这份 ENV 应该能配出来");
+    eq(cfg!.repos, ["owner/one", "owner/two"]);
+    eq(checkRepo(cfg!, "OWNER/One"), "owner/one");
+  });
+
+  await it("⚠️ 白名单外的仓库：拒绝、**列出允许哪些**、且一个请求都不发", async () => {
+    const t = issueTools();
+    const calls = stubFetch(issueStub);
+    const r = await callTool(t.gh_issue_create, { repo: "someone/else", title: "标题", body: "正文" });
+    ok(typeof r.error === "string", `要报错：${JSON.stringify(r)}`);
+    ok(r.error.includes("owner/one"), `只说「不允许」模型会去猜，要列出来：${r.error}`);
+    eq(calls.length, 0, "白名单都没过，一个请求都不该发出去");
+  });
+
+  await it("开 issue：返回编号和链接", async () => {
+    const t = issueTools();
+    const calls = stubFetch(issueStub);
+    const r = await callTool(t.gh_issue_create, {
+      repo: "owner/one",
+      title: "会话压缩没触发",
+      body: "## 现象\n\n...",
+    });
+    eq(r.created, true);
+    eq(r.number, 42);
+    eq(r.issueUrl, "https://github.com/owner/one/issues/42");
+    ok(r.note.includes("撤回不了"), "要提醒用户这是对外可见的、撤不回");
+
+    const post = calls.find((c) => c.url.endsWith("/repos/owner/one/issues"));
+    ok(post, "要打 POST /repos/{owner}/{repo}/issues");
+    eq(post!.init.method, "POST");
+    const body = JSON.parse(post!.init.body);
+    // 端点只该收到 title/body —— 多塞字段不会生效，只会让人以为写了
+    eq(Object.keys(body).sort(), ["body", "title"]);
+    ok(String(post!.init.headers.authorization).includes(TOKEN), "凭证走请求头");
+  });
+
+  await it("加评论：issue 号必须是正整数，本地挡掉不发请求", async () => {
+    const t = issueTools();
+    const calls = stubFetch(issueStub);
+    for (const bad of [0, -3, 1.5]) {
+      const r = await callTool(t.gh_issue_comment, { repo: "owner/one", number: bad, body: "x" });
+      ok(typeof r.error === "string", `${bad} 应该被拒：${JSON.stringify(r)}`);
+    }
+    const empty = await callTool(t.gh_issue_comment, { repo: "owner/one", number: 7, body: "   " });
+    ok(typeof empty.error === "string", "空评论要拒");
+    eq(calls.length, 0, "本地能判的错别送到 GitHub 去");
+
+    const okr = await callTool(t.gh_issue_comment, { repo: "owner/two", number: 7, body: "查到原因了" });
+    eq(okr.commented, true);
+    eq(okr.commentUrl, "https://github.com/owner/two/issues/7#issuecomment-1");
+  });
+
+  await it("⚠️ token 绝不出现在错误信息里（403 那条最容易被顺手带出去）", async () => {
+    const t = issueTools();
+    // 故意让 GitHub 的 message 里不含 token，但错误文案要是不小心回显请求头就会漏
+    stubFetch(() =>
+      new Response(JSON.stringify({ message: "Resource not accessible by personal access token" }), {
+        status: 403,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+    const r = await callTool(t.gh_issue_create, { repo: "owner/one", title: "x", body: "y" });
+    ok(typeof r.error === "string", `要报错：${JSON.stringify(r)}`);
+    ok(!r.error.includes(TOKEN), `错误信息里出现了 token —— 它会被模型读、被卡片渲染、被用户复制出去：${r.error}`);
+    ok(r.error.includes("Issues: Read and write"), `要说清缺哪个权限：${r.error}`);
+    // GitHub 自己的 message 附上去能省模型一轮试错
+    ok(r.error.includes("Resource not accessible"), r.error);
+    eq(r.issueUrl, undefined, "没开成就绝不能给链接");
+  });
+
+  await it("401 要说清「需要人去换凭证」，不是让模型重试", async () => {
+    const t = issueTools();
+    stubFetch(() => new Response(JSON.stringify({ message: "Bad credentials" }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    }));
+    const r = await callTool(t.gh_issue_create, { repo: "owner/one", title: "x", body: "y" });
+    ok(typeof r.error === "string", JSON.stringify(r));
+    ok(r.error.includes("人去"), `要指明这是人该处理的：${r.error}`);
+    ok(!r.error.includes(TOKEN), r.error);
   });
 });
 

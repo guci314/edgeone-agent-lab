@@ -45,13 +45,15 @@ import {
 } from "../../src/feishu/global-memory.ts";
 import { ghWorkspaceConfig } from "../../src/ghworkspace/client.ts";
 import { makeGithubTools } from "../../src/ghworkspace/tools.ts";
+import { ghIssueConfig } from "../../src/ghworkspace/issues.ts";
+import { makeGithubIssueTools } from "../../src/ghworkspace/issue-tools.ts";
 import { buildAuthorizeUrl, signState, type OAuthEnv } from "../../src/feishu/oauth.ts";
 import type { StateKv } from "../../src/feishu/store.ts";
 import { FeishuStreamer } from "../../src/feishu/streamer.ts";
 import type { FeishuTurnHost } from "../../src/feishu/turn.ts";
 import { sanitizeAndAppend } from "../../src/feishu/session-sanitize.ts";
 import { UserTokenManager, makeUserTokenStore } from "../../src/feishu/user-token.ts";
-import { INSTRUCTIONS, WORKSPACE_PROMPT } from "./_instructions.ts";
+import { INSTRUCTIONS, ISSUE_PROMPT, WORKSPACE_PROMPT } from "./_instructions.ts";
 import { diagCounters, modelFetch, type DiagEntry } from "./_diag.ts";
 import { makeSearchTools } from "./_search.ts";
 import { platformTools, summarizeToolOutput, toolFailed } from "./_tools.ts";
@@ -125,6 +127,21 @@ export interface AgentEnv extends FeishuEnv, OAuthEnv {
   GITHUB_WORKSPACE_TOKEN?: string;
   /** 覆盖工作区仓库名。默认 guci314/cf-agent-workspace（见 ghworkspace/client.ts） */
   GITHUB_WORKSPACE_REPO?: string;
+  /**
+   * 提 GitHub issue 用的 fine-grained PAT。**必须与上面那把分开** ——
+   * 上面只授 Contents，而 Issues API 不属于 Contents 范围，拿它提 issue 会 403。
+   * 权限只要 Issues: Read and write，且仓库访问范围只勾白名单里那几个。
+   *
+   * ⚠️ 混用一把 token 会让「改工作区凭证」这个动作意外影响 issue 能力，反之亦然。
+   */
+  GITHUB_ISSUE_TOKEN?: string;
+  /**
+   * 允许开 issue 的仓库白名单，逗号分隔的 "owner/name"。
+   *
+   * **留空 = 整个工具族不挂**（见 ghIssueConfig 的注释）：没有白名单就意味着
+   * 「这把 token 能开的仓库全都能开」，而 issue 是对外可见的，不能这样。
+   */
+  GITHUB_ISSUE_REPOS?: string;
   /**
    * 自制内部令牌。webhook 转发时带 `x-internal-token`，agent 这边比对。
    * `agents/` 路由是公网可达的，没这道门谁都能拿它烧模型额度。
@@ -479,6 +496,7 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
    * 必然失败的工具只会让模型反复去撞（规矩同 searchTools 的挂载条件）。
    */
   const ghCfg = ghWorkspaceConfig(env);
+  const ghIssueCfg = ghIssueConfig(env);
 
   /**
    * 跨会话记忆。**每个回合建一个**（createHost 一次 = 一轮消息）——
@@ -519,7 +537,8 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
    * 提示词也不能提 —— 「说了但手上没有的能力，模型会去调然后白烧一轮」
    * （规矩见 _instructions.ts 文件头）。记忆那段是每轮快照，单独拼。
    */
-  const baseInstructions = INSTRUCTIONS + (ghCfg ? WORKSPACE_PROMPT : "");
+  const baseInstructions =
+    INSTRUCTIONS + (ghCfg ? WORKSPACE_PROMPT : "") + (ghIssueCfg ? ISSUE_PROMPT : "");
 
   const buildAgent = (): Agent =>
     new Agent({
@@ -555,6 +574,9 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
           : []),
         // 工作区仓库（agent 自己的 GitHub 私有仓库）。没配 PAT 就整个不挂
         ...(ghCfg ? (makeGithubTools(ghCfg) as any[]) : []),
+        // 提 GitHub issue。**独立的一份凭证和白名单**，没配全就整个不挂 ——
+        // issue 是对外可见的副作用，宁可没有工具也不要挂出能往任意仓库写的形态
+        ...(ghIssueCfg ? (makeGithubIssueTools(ghIssueCfg) as any[]) : []),
         // 自建 web_search（serper）。挂了它就必须摘掉平台内置的那个
         ...(searchTools as any[]),
         // 平台内置沙箱工具。类型是平台注入的「framework 适配对象」，

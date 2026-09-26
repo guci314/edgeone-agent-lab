@@ -21,7 +21,7 @@
 | 代码（约 5800 行） | ✅ 写完 |
 | `npm install` | ✅ **通过** —— 104 个包，约 1 分钟 |
 | `tsc --noEmit` 类型检查 | ✅ **零错误** |
-| `npm test` 冒烟测试 | ✅ **179 项全通过**（验签/解密、命令解析、去重限流、webhook 端到端、回合流程、会话压缩、云文档授权与读写工具族、工作区仓库、跨会话记忆） |
+| `npm test` 冒烟测试 | ✅ **187 项全通过**（验签/解密、命令解析、去重限流、webhook 端到端、回合流程、会话压缩、云文档授权与读写工具族、工作区仓库、跨会话记忆） |
 | `edgeone makers dev` 本地起服务 | ⚠️ **能起来，但 agent 路由本地打不到** —— `agent-node` 不绑定端口（见下） |
 | 跨会话记忆的存储层 | ✅ **已实测**（不靠文档推断：agents 运行时内置 Blob SDK） |
 | 【未知数 1】返回 Response 后后台代码能否跑完 | ✅ **线上实测成立** —— `phase: finished` / `elapsedMs: 15046`，`FEISHU_DISPATCH_MODE` 保持 `async` |
@@ -147,7 +147,7 @@ edgeone-agent-lab/
 │       └── types.ts       ➕ 新增   # FeishuQueueEvent 从 router.ts 挪出来
 │
 ├── test/
-│   └── smoke.ts                    # 冒烟测试：179 项，裸 Node 跑，不依赖 EdgeOne
+│   └── smoke.ts                    # 冒烟测试：187 项，裸 Node 跑，不依赖 EdgeOne
 │
 └── docs/
     ├── 01-架构与移植映射.md         # 逐模块对照、跨会话记忆、两个未知数、刻意没做的事

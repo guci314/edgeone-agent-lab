@@ -1702,6 +1702,28 @@ await describe("J. 云文档工具族", async () => {
     eq(calls.filter((c) => c.url.endsWith("/docx/v1/documents")).length, 0);
   });
 
+  // 2026-09-26 线上实测踩到：授权还在，但那几个写 scope 是后加的，
+  // **刷新令牌不会带来新 scope**。飞书原文只说 "request user re-authorization"，
+  // 不说为什么 —— 有令牌的人会以为自己授权过了，跑去翻代码。
+  await it("用户授权缺 scope（99991679）：说清「旧授权不会自动带新 scope」", async () => {
+    const t = await tools();
+    stubFetch((url) => {
+      if (url.endsWith("/docx/v1/documents")) {
+        return new Response(
+          JSON.stringify({ code: 99991679, msg: "Unauthorized. Please request user re-authorization." }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      return undefined;
+    });
+    const r = await callTool(t.feishu_docx_create, { title: "缺 scope" });
+    ok(typeof r.error === "string", `要报错：${JSON.stringify(r)}`);
+    ok(r.error.includes("/login"), `要给出 /login 这条路：${r.error}`);
+    ok(r.error.includes("不会自动带上"), `要说清为什么旧的授权不行：${r.error}`);
+    ok(r.error.includes("docs/02"), `重授权仍失败时的兜底要指向配置文档：${r.error}`);
+    eq(r.docUrl, undefined, "没建成就绝不能给链接");
+  });
+
   await it("读 docx：返回标题、正文、字数", async () => {
     const t = await tools();
     stubFetch(docStub);

@@ -224,7 +224,25 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
    */
   const callUserOnly = async (method: string, path: string, body?: unknown) => {
     if (!tokens) throw new Error(CREATE_AUTH_HINT);
-    return await callUser(tokens, method, path, body);
+    try {
+      return await callUser(tokens, method, path, body);
+    } catch (e) {
+      // 99991679 = 这次操作要的 scope 不在**这个人当前授权**的范围里。
+      //
+      // 飞书的原文只说 "Please request user re-authorization"，**不解释为什么** ——
+      // 于是有令牌的人会以为自己授权过了、是别的问题，去翻代码。
+      // 真实原因几乎总是同一个：**scope 是 2026-09-25 才加进 DOC_SCOPES 的，
+      // 而刷新令牌不会带来新 scope**（见 oauth.ts 顶部注释）。重新走一次 /login 才行。
+      // 2026-09-26 线上实测踩到，报错里补上这句。
+      if (e instanceof FeishuError && e.code === 99991679) {
+        throw new Error(
+          `${short(e)} —— 这次要的权限不在你的授权范围里。` +
+            "以前授权过的话：**旧的授权不会自动带上后加的权限**，重新发一次 `/login` 就好。" +
+            "重新授权后仍失败，则多半是应用侧没把 `docx:document` 开给「用户身份」，见 docs/02 第 2 节。",
+        );
+      }
+      throw e;
+    }
   };
 
   /**

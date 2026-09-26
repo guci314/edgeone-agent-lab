@@ -340,3 +340,143 @@ export async function deleteFile(
   const d = (await res.json()) as { commit?: { sha?: string } };
   return { commit: String(d.commit?.sha ?? "").slice(0, 7) };
 }
+
+// ── 一次提交多个文件（ws_commit）────────────────────────────────────
+//
+// 为什么需要它：`putFile` 一次一个文件 = 一个 commit。而工作区里
+// `projects/<名字>/` 下面每个目录都是**一个接自动部署的项目** —— 一次调整往往
+// 动五六个文件，那就是五六个 commit、触发五次 CI、部署五次中间态。
+// 用 Git Data API 把这批文件合成**一个 commit**，CI 只跑一次、只部署一个完整版本。
+//
+// ⚠️ 走的是 `/git/*` 端点，不是 `/contents/*`。两者在 fine-grained PAT 上都算
+// **Contents** 权限，所以现有那把 token 不用换。
+
+/** `ws_commit` 要写的一个文件 */
+export interface CommitFile {
+  path: string;
+  content: string;
+}
+
+/**
+ * 一次提交的上限。**挡在本地**：超了直接说清楚，别送到 GitHub 换一个
+ * 看不懂的 413/422 —— 那种错模型只会重试或者道歉。
+ */
+export const COMMIT_MAX_FILES = 60;
+export const COMMIT_MAX_BYTES = 512 * 1024;
+
+export interface CommitResult {
+  commit: string;
+  url: string;
+  /** 这次实际动了多少个文件（含删除） */
+  count: number;
+}
+
+/**
+ * 把一批文件写进一个分支，**一个 commit**。
+ *
+ * 六步（Git Data API 的标准流程，没有更短的走法）：
+ *   ① 取分支头的 commit → ② 取它的 tree → ③ 每个文件建一个 blob
+ *   → ④ 拿 base_tree + 新条目建一棵新 tree → ⑤ 建 commit → ⑥ 挪分支指针
+ *
+ * `remove` 里的路径会从树里删掉（树条目 `sha: null` 就是删除）。
+ */
+export async function commitFiles(
+  cfg: GhWorkspaceConfig,
+  branch: string,
+  message: string,
+  files: readonly CommitFile[],
+  remove: readonly string[] = [],
+): Promise<CommitResult> {
+  const base = `${cfg.apiBase}/repos/${cfg.repo}`;
+  const call = async (method: string, path: string, body?: unknown): Promise<Response> => {
+    try {
+      return await fetch(`${base}${path}`, {
+        method,
+        headers: {
+          authorization: `Bearer ${cfg.token}`,
+          accept: "application/vnd.github+json",
+          "x-github-api-version": "2022-11-28",
+          "user-agent": UA,
+          ...(body === undefined ? {} : { "content-type": "application/json" }),
+        },
+        ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+        signal: AbortSignal.timeout(WRITE_TIMEOUT_MS),
+      });
+    } catch (e) {
+      const name = (e as Error).name;
+      throw new Error(
+        name === "TimeoutError" || name === "AbortError"
+          ? `连接 GitHub 超时（等了 ${Math.round(WRITE_TIMEOUT_MS / 1000)} 秒）`
+          : `连不上 GitHub：${(e as Error).message}`,
+      );
+    }
+  };
+  const need = async <T>(res: Response, what: string): Promise<T> => {
+    if (!res.ok) await fail(res, what);
+    return (await res.json()) as T;
+  };
+
+  // ① 分支头
+  const ref = await need<{ object?: { sha?: string } }>(
+    await call("GET", `/git/ref/heads/${encodeURIComponent(branch)}`),
+    `读分支 ${branch}`,
+  );
+  const headSha = String(ref.object?.sha ?? "");
+  if (!headSha) throw new Error(`分支 ${branch} 的指针读不出来，先确认分支名对不对。`);
+
+  // ② 头提交对应的树
+  const head = await need<{ tree?: { sha?: string } }>(
+    await call("GET", `/git/commits/${headSha}`),
+    `读提交 ${headSha.slice(0, 7)}`,
+  );
+  const baseTree = String(head.tree?.sha ?? "");
+  if (!baseTree) throw new Error("拿不到当前目录树，没法在这基础上改。");
+
+  // ③ 每个文件一个 blob。用 encoding=utf-8 省掉一次 base64 编解码
+  const blobs = await Promise.all(
+    files.map(async (f) => {
+      const b = await need<{ sha?: string }>(
+        await call("POST", "/git/blobs", { content: f.content, encoding: "utf-8" }),
+        `写 ${f.path} 的内容`,
+      );
+      const sha = String(b.sha ?? "");
+      if (!sha) throw new Error(`${f.path} 的内容没被 GitHub 收下（没返回 blob sha）。`);
+      return { path: f.path, sha };
+    }),
+  );
+
+  // ④ 新树。base_tree 保证**没提到的文件原样保留** —— 这是这个工具能只送
+  // 「本次改动的文件」而不是整个项目快照的原因
+  const tree = [
+    ...blobs.map((b) => ({ path: b.path, mode: "100644", type: "blob", sha: b.sha })),
+    // sha: null = 从树里删掉这个路径
+    ...remove.map((p) => ({ path: p, mode: "100644", type: "blob", sha: null })),
+  ];
+  const newTree = await need<{ sha?: string }>(
+    await call("POST", "/git/trees", { base_tree: baseTree, tree }),
+    "组装新目录树",
+  );
+  const treeSha = String(newTree.sha ?? "");
+  if (!treeSha) throw new Error("新目录树没建出来。");
+
+  // ⑤ 建 commit
+  const commit = await need<{ sha?: string; html_url?: string }>(
+    await call("POST", "/git/commits", { message, tree: treeSha, parents: [headSha] }),
+    "创建提交",
+  );
+  const commitSha = String(commit.sha ?? "");
+  if (!commitSha) throw new Error("提交没建出来。");
+
+  // ⑥ 挪分支指针。**必须 fast-forward**（force=false 是默认），
+  // 免得把别人这期间的提交冲掉
+  await need(
+    await call("PATCH", `/git/refs/heads/${encodeURIComponent(branch)}`, { sha: commitSha }),
+    `更新分支 ${branch}`,
+  );
+
+  return {
+    commit: commitSha.slice(0, 7),
+    url: String(commit.html_url ?? ""),
+    count: blobs.length + remove.length,
+  };
+}

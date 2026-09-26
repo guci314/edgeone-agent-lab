@@ -20,12 +20,15 @@ import { z } from "zod";
 import { guarded, utf8Len } from "../shared/util.ts";
 import type { GhFile } from "./client.ts";
 import {
+  COMMIT_MAX_BYTES,
+  COMMIT_MAX_FILES,
+  UsageError,
   checkPath,
+  commitFiles,
   deleteFile,
   getFile,
   listDir,
   putFile,
-  UsageError,
   type GhWorkspaceConfig,
 } from "./client.ts";
 
@@ -65,6 +68,9 @@ async function usageError<T>(fn: () => Promise<T>): Promise<T | { error: string 
     throw e;
   }
 }
+
+/** 工作区分支。Git Data API 要显式给分支名 */
+const BRANCH = "main";
 
 const REPO_FRAMING =
   "**工作区仓库** —— agent 自己的 GitHub 私有仓库，可读写，每次写都是一次真实的 commit。" +
@@ -311,5 +317,77 @@ export function makeGithubTools(cfg: GhWorkspaceConfig | null): unknown[] {
       }),
   });
 
-  return [ls, read, write, rm];
+  // ── ws_commit：一次提交多个文件 ─────────────────────────────────────
+  //
+  // 为什么需要它：`ws_write` 一次一个文件 = 一个 commit。而 `projects/<名字>/`
+  // 下面每个目录都是**一个接自动部署的项目** —— 调一次往往动五六个文件，
+  // 那就是五六个 commit、跑五次 CI、部署五次中间态。这个工具把这批合成一个。
+  const commit = tool({
+    name: "ws_commit",
+    description:
+      "把**多个文件一次提交**到工作区仓库（一个 commit，不是 N 个）。" +
+      "改 `projects/` 下面那些会自动部署的项目时**优先用它** —— " +
+      "分成多次 ws_write 会触发多次部署，中间态还可能部署失败。\n" +
+      "只送本次改动的文件就行：没提到的文件 GitHub 那边原样保留。" +
+      `一次最多 ${COMMIT_MAX_FILES} 个文件 / 合计 ${Math.round(COMMIT_MAX_BYTES / 1024)} KB。`,
+    parameters: z.object({
+      message: z.string().describe("commit 说明，一句话说清这次改了什么"),
+      files: z
+        .array(
+          z.object({
+            path: z.string().describe("仓库内相对路径"),
+            content: z.string().describe("文件的完整内容（覆盖式，不是补丁）"),
+          }),
+        )
+        .describe("要写入/覆盖的文件"),
+      remove: z.array(z.string()).optional().describe("要删除的路径，可选"),
+    }),
+    execute: async ({ message, files, remove }) =>
+      guarded(async () => {
+        const msg = String(message ?? "").trim().slice(0, 200);
+        if (!msg) return { error: "message 不能为空 —— 提交说明是以后查历史的唯一线索。" };
+
+        const list = Array.isArray(files) ? files : [];
+        const del = Array.isArray(remove) ? remove.map((p) => String(p ?? "").trim()).filter(Boolean) : [];
+        if (!list.length && !del.length) return { error: "files 和 remove 都是空的，没什么可提交的。" };
+        if (list.length > COMMIT_MAX_FILES) {
+          return { error: `一次最多 ${COMMIT_MAX_FILES} 个文件，收到 ${list.length} 个。分两批提交。` };
+        }
+
+        const out: { path: string; content: string }[] = [];
+        let bytes = 0;
+        for (const f of list) {
+          const c = checkPath(f?.path);
+          if (c.error) return { error: c.error };
+          const text = String(f?.content ?? "");
+          bytes += utf8Len(text);
+          out.push({ path: c.path, content: text });
+        }
+        for (const p of del) {
+          const c = checkPath(p);
+          if (c.error) return { error: c.error };
+        }
+        if (bytes > COMMIT_MAX_BYTES) {
+          return {
+            error: `这批内容合计 ${Math.round(bytes / 1024)} KB，超过上限 ${Math.round(
+              COMMIT_MAX_BYTES / 1024,
+            )} KB。拆成几次提交。`,
+          };
+        }
+
+        const r = await usageError(() => commitFiles(cfg, BRANCH, msg, out, del));
+        if ("error" in r) return r;
+        return {
+          ok: true,
+          commit: r.commit,
+          commitUrl: r.url,
+          changed: r.count,
+          note:
+            "已提交到 main。如果改的是 projects/ 下的项目，GitHub Actions 会自动跑测试并部署 —— " +
+            "但**结果你看不到**，要如实告诉用户去 Actions 页面看。",
+        };
+      }),
+  });
+
+  return [ls, read, write, rm, commit];
 }

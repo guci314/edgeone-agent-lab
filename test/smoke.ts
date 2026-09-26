@@ -2761,8 +2761,8 @@ await describe("L. 工作区仓库（ws_*）", async () => {
     eq((makeGithubTools(null) as unknown[]).length, 0);
   });
 
-  await it("四个工具都注册，名字 ws_ 前缀", async () => {
-    eq(Object.keys(tools()).sort(), ["ws_ls", "ws_read", "ws_rm", "ws_write"]);
+  await it("五个工具都注册，名字 ws_ 前缀", async () => {
+    eq(Object.keys(tools()).sort(), ["ws_commit", "ws_ls", "ws_read", "ws_rm", "ws_write"]);
   });
 
   await it("ws_ls：目录在前、文件带 size", async () => {
@@ -2861,6 +2861,109 @@ await describe("L. 工作区仓库（ws_*）", async () => {
     ok(r.error.includes("仓库名"), r.error);
     ok(r.error.includes("PAT"), r.error);
   });
+  // ── ws_commit：一次提交多个文件 ───────────────────────────────────
+  // 这个工具存在的唯一理由是**减少 commit 次数**（projects/ 下面每个目录都会
+  // 触发一次部署）。所以最关键的断言是「多个文件只产生一个 commit」——
+  // 少了这条，它退化成 N 次 ws_write 的包装，等于没做。
+  await it("ws_commit：一次提交多个文件，**只产生一个 commit**", async () => {
+    const t = tools();
+    const calls = stubFetch((url, init) => {
+      const json = (v: unknown) =>
+        new Response(JSON.stringify(v), { status: 200, headers: { "content-type": "application/json" } });
+      if (url.includes("/git/commits/c1")) return json({ tree: { sha: "t1" } });
+      if (url.endsWith("/git/blobs")) {
+        return json({ sha: `blob${calls.filter((c) => c.url.endsWith("/git/blobs")).length}` });
+      }
+      if (url.endsWith("/git/trees")) return json({ sha: "t2" });
+      if (url.endsWith("/git/commits") && init?.method === "POST") {
+        return json({ sha: "c2aaaaaaabbbbbbbbccccccccddddddddeeeeeeee", html_url: "https://github.com/owner/repo/commit/c2" });
+      }
+      if (url.includes("/git/ref/heads/main") && (!init?.method || init.method === "GET")) {
+        return json({ object: { sha: "c1" } });
+      }
+      if (url.includes("/git/refs/heads/main") && init?.method === "PATCH") return json({ ok: true });
+      return undefined;
+    });
+
+    const r = await callTool(t.ws_commit, {
+      message: "改三个文件",
+      files: [
+        { path: "projects/x/index.html", content: "<h1>a</h1>" },
+        { path: "projects/x/app.js", content: "console.log(1)" },
+        { path: "projects/x/README.md", content: "# x" },
+      ],
+      remove: ["projects/x/old.txt"],
+    });
+
+    eq(r.ok, true);
+    eq(r.commit, "c2aaaaa", "commit 取前 7 位");
+    eq(r.changed, 4, "3 个写入 + 1 个删除");
+    ok(r.note.includes("Actions"), "要提醒部署结果它看不到");
+
+    // ★ 核心：POST /git/commits 只能有一次
+    const commits = calls.filter((c) => c.url.endsWith("/git/commits") && c.init?.method === "POST");
+    eq(commits.length, 1, "多文件必须合成**一个** commit，否则又变成 N 次部署");
+    eq(calls.filter((c) => c.url.endsWith("/git/blobs")).length, 3, "每个文件一个 blob");
+    // 分支指针要挪到新 commit
+    const patch = calls.find((c) => c.init?.method === "PATCH");
+    ok(patch, "要更新分支指针");
+    eq(JSON.parse(patch!.init.body).sha, "c2aaaaaaabbbbbbbbccccccccddddddddeeeeeeee");
+  });
+
+  await it("ws_commit：base_tree 保证**没提到的文件原样保留**", async () => {
+    const t = tools();
+    const calls = stubFetch((url, init) => {
+      const json = (v: unknown) =>
+        new Response(JSON.stringify(v), { status: 200, headers: { "content-type": "application/json" } });
+      if (url.includes("/git/commits/c1")) return json({ tree: { sha: "t1" } });
+      if (url.endsWith("/git/blobs")) return json({ sha: "b1" });
+      if (url.endsWith("/git/trees")) return json({ sha: "t2" });
+      if (url.endsWith("/git/commits") && init?.method === "POST") return json({ sha: "c2", html_url: "u" });
+      if (url.includes("/git/ref/heads/main")) return json({ object: { sha: "c1" } });
+      if (url.includes("/git/refs/heads/main")) return json({ ok: true });
+      return undefined;
+    });
+    await callTool(t.ws_commit, { message: "m", files: [{ path: "projects/x/a.js", content: "a" }], remove: ["projects/x/gone.js"] });
+
+    const tree = calls.find((c) => c.url.endsWith("/git/trees"));
+    ok(tree, "要建新树");
+    const body = JSON.parse(tree!.init.body);
+    // 少了 base_tree，GitHub 会用这棵树**替换整棵树** —— 未提到的文件全没了
+    eq(body.base_tree, "t1", "必须带 base_tree，否则会误删未提到的文件");
+    eq(body.tree.length, 2);
+    // sha:null = 从树里删掉这个路径
+    const del = body.tree.find((e: any) => e.path === "projects/x/gone.js");
+    eq(del.sha, null, "删除用 sha:null 表达");
+    eq(del.type, "blob");
+    eq(del.mode, "100644");
+  });
+
+  await it("ws_commit：本地挡掉「太多文件 / 说明为空 / 全空」，不发请求", async () => {
+    const t = tools();
+    const calls = stubFetch(() => {
+      throw new Error("不该发出任何请求");
+    });
+    const many = await callTool(t.ws_commit, {
+      message: "m",
+      files: Array.from({ length: 61 }, (_, i) => ({ path: `p/f${i}.js`, content: "x" })),
+    });
+    ok(String(many.error).includes("60"), `要说出上限：${many.error}`);
+
+    const noMsg = await callTool(t.ws_commit, { message: "   ", files: [{ path: "p/a.js", content: "x" }] });
+    ok(typeof noMsg.error === "string", "说明为空要拒 —— 它是以后查历史的唯一线索");
+
+    const empty = await callTool(t.ws_commit, { message: "m", files: [] });
+    ok(typeof empty.error === "string", "全空要拒");
+
+    const badPath = await callTool(t.ws_commit, {
+      message: "m",
+      files: [{ path: "../escape.js", content: "x" }],
+    });
+    ok(typeof badPath.error === "string", "路径越界要拒");
+
+    eq(calls.length, 0, "本地能判的错一个请求都不该发");
+  });
+
 });
 
 // ═══════════════════════════════════════════════════════════════════════

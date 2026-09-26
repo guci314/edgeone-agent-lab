@@ -70,6 +70,7 @@ import {
   SUMMARY_SYSTEM_PROMPT,
   compactReply,
   renderTranscript,
+  shouldCompact,
   summaryItem,
 } from "../src/feishu/compact.ts";
 import { FeishuStore, MemoryKv } from "../src/feishu/store.ts";
@@ -1030,6 +1031,46 @@ await describe("G. 会话压缩的纯函数", async () => {
     ok(t.includes("https://example.com/report"), "开头的来源链接必须留下");
     ok(t.includes("中间省略"), "应有省略标注");
     ok(t.includes("第39轮问"), "尾部的最近讨论必须留下");
+  });
+
+  // ── shouldCompact：自动压缩的判据（2026-09-26 加）──────────────────
+  // 判据必须等价于「renderTranscript 会不会被截断」—— 压缩实际喂给模型的就是
+  // renderTranscript 的输出，看别的长度就是看错了东西。
+  await it("shouldCompact：没超限不压，超限才压", () => {
+    const mk = (n: number) =>
+      Array.from({ length: n }, () => ({ role: "user", content: "x".repeat(4000) }));
+
+    eq(shouldCompact([]), false);
+    eq(shouldCompact(mk(1)), false);
+    eq(shouldCompact(mk(28)), false, "28 条渲染 112,138 字，还没到 120k 上限");
+    eq(shouldCompact(mk(30)), true, "30 条渲染 120,031 字，已超限");
+    eq(shouldCompact(mk(60)), true);
+  });
+
+  await it("shouldCompact：看的是「有没有被截断」，**不是**比长度", () => {
+    const items = Array.from({ length: 30 }, () => ({ role: "user", content: "x".repeat(4000) }));
+    const len = renderTranscript(items).length;
+
+    // 钉住这个数字本身，是为了让后来者看见「用 length 判超限」有多勉强：
+    // 截断后是 120_000 + 省略提示那约 31 个字，只越线这么一点。
+    // 谁把省略文案改短，`length > 120000` 就静默失效 —— 而 shouldCompact 不受影响。
+    ok(len > 120_000 && len < 120_200, `超限量应该刚好擦线，实际 ${len}`);
+
+    // ⚠️ **这条才是钉子**。shouldCompact 挂在「省略提示里那一小段文字」上，
+    // 所以必须钉住它真的出现在截断输出里：谁改那句文案，会在这里被拦住，
+    // 而不是让自动压缩从此永不触发、还一声不吭。
+    ok(
+      renderTranscript(items).includes("中间省略约"),
+      "判据依赖的标记必须真的出现在截断输出里 —— 改省略文案会让自动压缩静默失效",
+    );
+    eq(shouldCompact(items), true);
+  });
+
+  await it("shouldCompact：**不**拿条数当判据（平台窗口本来就锁 100 条）", () => {
+    // 100 条短消息：条数顶到窗口上限，但渲染出来离 120k 差得远。
+    // 这种历史压了只会更糟 —— compact() 自己的注释写着「历史太短时摘要比原文还长」
+    const tiny = Array.from({ length: 100 }, () => ({ role: "user", content: "好的" }));
+    eq(shouldCompact(tiny), false, "条数多不等于该压");
   });
 
   await it("摘要写回的形状：user role + 固定前缀", () => {

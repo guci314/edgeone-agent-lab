@@ -90,12 +90,25 @@ export const diagCounters = {
   droppedOrphanTools: 0,
   /** 累计丢掉的空 assistant 消息数 */
   droppedEmptyAssistants: 0,
+
+  /**
+   * 自动压缩「判定该压」的次数（2026-09-26 加）。
+   *
+   * 和下面的 `autoCompactions` 一起，让「自动压缩到底有没有在工作」可观测 ——
+   * 这条链路上有**两处会静默失效**：判据恒 false（历史没超限），或者压缩那一步
+   * 抛错被吞掉。只看聊天记录分不清是「没到该压的时候」还是「坏了」。
+   */
+  compactWanted: 0,
+  /** 自动压缩**成功**的次数（摘要非空、写回完成）。失败不计 */
+  autoCompactions: 0,
 };
 
 export function resetCounters(): void {
   diagCounters.sessionInputCalls = 0;
   diagCounters.droppedOrphanTools = 0;
   diagCounters.droppedEmptyAssistants = 0;
+  diagCounters.compactWanted = 0;
+  diagCounters.autoCompactions = 0;
 }
 
 export function recentDiag(): DiagEntry[] {

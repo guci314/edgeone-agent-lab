@@ -38,6 +38,15 @@ const MAX_TRANSCRIPT_CHARS = 120_000;
 /** 超限时头部保留多少字符，其余留给尾部 */
 const HEAD_CHARS = 30_000;
 
+/**
+ * 截断时插进 transcript 的那句提示里最独特的一小段。
+ *
+ * `clampTranscript` 用它组提示文案，`shouldCompact` 用它判断「有没有被截断」——
+ * **两处必须共用这一个常量**：分开写死两遍的话，改文案的人不会知道
+ * 自动压缩的判据正挂在它身上，改完判据就静默失效（永不触发、也不报错）。
+ */
+const CLAMP_MARKER = "中间省略约";
+
 export const SUMMARY_SYSTEM_PROMPT = [
   "你在压缩一段「用户与通用助手」的对话记录，供后续轮次当作背景使用。",
   "",
@@ -86,6 +95,29 @@ export function renderTranscript(items: readonly unknown[]): string {
     if (line) parts.push(line);
   }
   return clampTranscript(parts.join("\n\n"));
+}
+
+/**
+ * 该不该**自动**压缩。纯函数，`test/smoke.ts` 的 G 节直接测它。
+ *
+ * 判据只有一条：**渲染出来会不会被截断**。`renderTranscript` 超过
+ * `MAX_TRANSCRIPT_CHARS` 时会插一句省略提示，出现它就说明「要送去摘要的原文
+ * 已经超限」—— 正是该压的信号。这也是 `compact()` 实际喂给模型的那份文本，
+ * 判据和动作看的是同一个东西。
+ *
+ * ⚠️ **别**写成 `renderTranscript(items).length > MAX_TRANSCRIPT_CHARS`。
+ * 它**碰巧也能用**（截断后的结果是 `120000 + 省略提示那约 31 个字`，刚好越线），
+ * 但正确性建立在那 31 个字的长度上：谁把提示文案改短或删掉，判据就**静默失效**
+ * —— 永不触发压缩，且不报任何错。2026-09-26 实测：28 条 → 112,138 字（false）；
+ * 30 条 → 120,031 字（true）。所以改用「有没有出现标记」，语义直白、不赌长度。
+ *
+ * ⚠️ **刻意不用「条数」当判据**：平台的会话窗口本来就锁死在最近 100 条
+ * （`getItems()` 不传 limit，见 docs/01 第七节），100 条短消息远到不了 120k 字；
+ * 拿条数触发只会白压一次 —— 而 `compact()` 的注释写得很清楚：历史太短时
+ * 摘要比原文还长，压了是**负收益**。
+ */
+export function shouldCompact(items: readonly unknown[]): boolean {
+  return renderTranscript(items).includes(CLAMP_MARKER);
 }
 
 function renderItem(item: unknown): string {
@@ -179,7 +211,7 @@ function clampTranscript(s: string): string {
   const omitted = s.length - MAX_TRANSCRIPT_CHARS;
   return [
     s.slice(0, HEAD_CHARS),
-    `……（中间省略约 ${omitted} 字，多为重复的问答往返）……`,
+    `……（${CLAMP_MARKER} ${omitted} 字，多为重复的问答往返）……`,
     s.slice(-(MAX_TRANSCRIPT_CHARS - HEAD_CHARS)),
   ].join("\n\n");
 }

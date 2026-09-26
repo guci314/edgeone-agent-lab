@@ -33,6 +33,7 @@ import {
   buildSummaryUserPrompt,
   compactReply,
   renderTranscript,
+  shouldCompact,
   summaryItem,
 } from "../../src/feishu/compact.ts";
 import { authStateText, makeFeishuDocTools } from "../../src/feishu/docs.ts";
@@ -363,6 +364,84 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
   };
 
   /**
+   * 压缩的**唯一实现**：`/compact`（用户主动）和**自动压缩**共用这一段。
+   *
+   * 两处各写一遍迟早漂移 —— 尤其是下面那两条安全约束（摘要空着别动、先取完再清空），
+   * 少写一条就是「把整段对话记忆抹掉」级别的事故。所以只留这一个入口。
+   *
+   * `reason` 是**可以直接给用户看**的一句话：手动那条路原样显示，
+   * 自动那条路丢掉（不打扰用户），只记诊断。
+   */
+  const runCompact = async (): Promise<
+    { done: true; before: number; chars: number } | { done: false; reason: string }
+  > => {
+    const s = session();
+    if (!s) {
+      return {
+        done: false,
+        reason: "这个会话没接上平台的会话存储（多半是本地调试环境），没有可压缩的历史。",
+      };
+    }
+
+    const items = await s.getItems();
+    if (items.length < MIN_ITEMS_TO_COMPACT) {
+      return { done: false, reason: `这个会话只有 ${items.length} 项历史，没什么可压缩的。` };
+    }
+
+    const summary = await summarize(renderTranscript(items));
+
+    // ⚠️ 摘要空着就**什么都别动**。此前清了 session 却没东西写回，
+    // 等于把整个对话记忆抹掉 —— 而用户只是想让它变短。宁可这次失败重来。
+    if (!summary) {
+      return {
+        done: false,
+        reason: "摘要没生成出来（模型返回了空内容）。历史原样保留，稍后再试一次。",
+      };
+    }
+
+    // 顺序要紧：历史已经取完（上面的 getItems），才轮到清空 + 写回。
+    // 写回的**只有这一条摘要** —— 触发压缩的动作本身不留痕，
+    // 否则下次压缩又会把那条指令当成历史项压一遍。
+    await s.clearSession();
+    await s.addItems([summaryItem(summary)]);
+
+    return { done: true, before: items.length, chars: summary.length };
+  };
+
+  /**
+   * 回合结束后跑一次自动压缩，返回要告诉用户的那句话（没压/压败则空串）。
+   *
+   * **失败绝不能影响这一轮的回答** —— 答案是用户要的东西，压缩只是维护。
+   * 所以这里把所有异常都吞掉，只往诊断里记一笔。
+   */
+  const autoCompactNote = async (): Promise<string> => {
+    const diag = (payload: Record<string, unknown>) =>
+      void deps.kv?.set(DIAG_KEY, { t: Date.now(), ...payload }).catch(() => {});
+    try {
+      const s = session();
+      if (!s) return "";
+      // 用**当下**的历史判，不用 sessionInputCallback 里那份 —— 那是本回合
+      // **开始前**的快照，这轮问答本身可能又加了不少东西
+      if (!shouldCompact(await s.getItems())) return "";
+      diagCounters.compactWanted++;
+
+      const r = await runCompact();
+      if (!r.done) {
+        // 「判据说该压、实际却没压成」本身是个信号（多半是摘要返回空），记下来。
+        // 没有这条记录的话，只看得见 compactWanted 涨、autoCompactions 不涨，
+        // 分不清是并发问题还是模型抽风
+        diag({ kind: "auto-compact-skipped", reason: r.reason });
+        return "";
+      }
+      diagCounters.autoCompactions++;
+      return `历史过长，已自动压缩成摘要（${r.before} 条 → 约 ${r.chars} 字）`;
+    } catch (e) {
+      diag({ kind: "auto-compact-failed", msg: String((e as Error)?.message ?? e).slice(0, 200) });
+      return "";
+    }
+  };
+
+  /**
    * 云文档令牌管理器。
    *
    * **每个回合建一个**（createHost 一次 = 一轮消息），工具族闭包捕获它 ——
@@ -563,14 +642,28 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
         throw e;
       }
 
+      // ── 回合结束：该压就压（2026-09-26 加）───────────────────────────
+      // 位置有两处讲究：
+      //   · **在这里**，不在 `sessionInputCallback` 里 —— 那个回调是**同步**的，
+      //     而摘要要调模型（异步）；也不放回合开头，那会让这一轮的回答白等压缩跑完。
+      //   · **在 `streamer.finish` 之前** —— 提示才能跟着答案进同一张卡片。
+      //     此时答案已经流式显示完了，多等几秒只是卡片晚点收尾，不是「卡住」。
+      //
+      // 不走「后台不 await」那条路：那条**只实测过模型回合**（README 的 probe=start），
+      // 压缩是又一跳异步（还要再调一次模型），能不能跑完是未验证前提。
+      // 这里 await 掉，正确性不赌在未验证的前提上。
+      const compactNote = await autoCompactNote();
+
       if (streaming) {
+        if (compactNote) streamer.pushNote(compactNote);
         // fallbackText 是一道保险：增量一个都没收到时，卡片会永远停在「…」，
         // 而调用方又因为 streamed=true 不再补发文本消息 —— 用户什么都看不到
         await streamer.finish(answer);
         return { text: answer, streamed: true };
       }
 
-      return { text: answer, streamed: false };
+      // 没卡片就退回纯文本，提示并进同一条消息
+      return { text: compactNote ? `${answer}\n\n（${compactNote}）` : answer, streamed: false };
     },
 
     // 2026-09-25：这里原有 `async ingest(owner, name, ref)`（抓 GitHub 仓库入库 +
@@ -639,31 +732,10 @@ export function createHost(deps: HostDeps): FeishuTurnHost {
     },
 
     async compact() {
-      const s = session();
-      if (!s) {
-        return "这个会话没接上平台的会话存储（多半是本地调试环境），没有可压缩的历史。";
-      }
-
-      const items = await s.getItems();
-      if (items.length < MIN_ITEMS_TO_COMPACT) {
-        return `这个会话只有 ${items.length} 项历史，没什么可压缩的。`;
-      }
-
-      const summary = await summarize(renderTranscript(items));
-
-      // ⚠️ 摘要空着就**什么都别动**。此前清了 session 却没东西写回，
-      // 等于把整个对话记忆抹掉 —— 而用户只是想让它变短。宁可这次失败重来。
-      if (!summary) {
-        return "摘要没生成出来（模型返回了空内容）。历史原样保留，稍后再试一次。";
-      }
-
-      // 顺序要紧：历史已经取完（上面的 getItems），才轮到清空 + 写回。
-      // 写回的**只有这一条摘要** —— 「用户发了 /compact」这个动作本身不留痕，
-      // 否则下次压缩又会把这条指令当成历史项压一遍。
-      await s.clearSession();
-      await s.addItems([summaryItem(summary)]);
-
-      return compactReply(items.length, summary.length);
+      // 三步全在 runCompact 里，这里只把结果说给用户 ——
+      // 手动和自动必须是**同一份实现**，理由见 runCompact 的注释
+      const r = await runCompact();
+      return r.done ? compactReply(r.before, r.chars) : r.reason;
     },
 
     async clear() {

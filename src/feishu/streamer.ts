@@ -102,6 +102,16 @@ export class FeishuStreamer {
     this.buffer += `\n${ok ? "✅" : "❌"} ${summary}`;
   }
 
+  /**
+   * 追加一句**不是工具结果**的说明。目前只有「历史已自动压缩」用它。
+   *
+   * 不复用 `pushToolResult`：那条会画成「✅ 一行」，而这个提示跟工具没有任何关系
+   * —— 借用它会让用户以为刚才调了什么工具，凭空多出一次「机器人干了什么」的误读。
+   */
+  pushNote(text: string): void {
+    this.buffer += `\n\n${text}`;
+  }
+
   /** 出错时把说明直接写进卡片，用户看到的是「回答的位置上写着为什么没答上来」 */
   async fail(message: string): Promise<void> {
     this.push(`\n\n⚠️ ${message}`);

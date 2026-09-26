@@ -10,6 +10,12 @@
 //      换用户身份再试一次** —— 用户身份能读他自己有权限的一切。
 //   ③ 两边都失败，给一条**可执行**的合并错误：要么共享给机器人，要么发 /login。
 //
+//   ⚠️ **例外：新建文档（`feishu_docx_create`）只用用户身份，不兜底到应用身份。**
+//   应用身份建出来的文档归**应用**，用户打开只有**只读** —— 改不了、删不掉，
+//   连「申请编辑权限」都拿不到（2026-09-25 用真人身份点 UI 实测）。退回应用身份
+//   等于又造一篇用户既改不了也删不掉的死文档，所以那边是刻意的硬要求。
+//   见 `docxCreate` 的实现注释与 `callUserOnly`。
+//
 // ── 为什么读是三个工具、写也是三个工具 ──────────────────────────────
 // 文档类型有四种，被操作的资源只有三个 —— 因为**知识库不是一种文档，是一种链接形态**。
 // 每个工具都先做一次 wiki 解引用，所以 `/wiki/xxx` 在所有工具里都能直接用。
@@ -113,6 +119,19 @@ const AUTH_HINT =
   "把它共享给机器人（无需授权即可读）；或者用户发 `/login` 完成一次授权，" +
   "之后就能以他自己的身份读写他有权限的文档。请不要自己编链接。";
 
+/**
+ * 新建文档拿不到用户身份时的提示。
+ *
+ * 与 `AUTH_HINT` 分开：那条说「共享或 /login 二选一」，这条**只有 /login 一条路** ——
+ * 建文档没有「共享给机器人」这个选项。
+ */
+const CREATE_AUTH_HINT =
+  "新建云文档必须用你自己的身份：应用身份建出来的文档你只有**只读**权限，" +
+  "改不了也删不掉。请先发 `/login` 完成一次授权，再让我建。";
+
+/** 「往哪儿发这次请求」—— 由调用方决定用哪个身份（`callDoc` / `callUserOnly`） */
+type DocCall = (method: string, path: string, body?: unknown) => Promise<any>;
+
 /** 单元格 → 一行文本。飞书字段值的形状很杂，认不出的压成 JSON 截断 */
 function cellText(v: unknown): string {
   if (v === null || v === undefined) return "";
@@ -189,6 +208,23 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
       }
       throw e;
     }
+  };
+
+  /**
+   * **只用用户身份**发，**不**兜底到应用身份。新建文档走这条。
+   *
+   * 为什么不兜底：应用身份建出来的文档归**应用自己的云空间**，用真人身份打开
+   * 实测是**只读** —— 菜单里是「申请编辑权限」、往正文打字打不进、连右键删除都回
+   * 「无权限操作」（2026-09-25 实测，推翻了我先前「能打开就等于能编辑」的推断）。
+   * 更麻烦的是**应用没有删除 scope、用户又没有编辑权**，那种文档两边都清不掉。
+   *
+   * 所以「建」这件事必须用用户身份 —— 产出归用户、可编辑可删。代价是没授权的人
+   * 用不了，这是**有意的**取舍（用户 2026-09-26 拍板），不退回应用身份：
+   * 退回就等于又造一篇删不掉的文档，把刚修掉的问题原样再犯一遍。
+   */
+  const callUserOnly = async (method: string, path: string, body?: unknown) => {
+    if (!tokens) throw new Error(CREATE_AUTH_HINT);
+    return await callUser(tokens, method, path, body);
   };
 
   /**
@@ -312,8 +348,13 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
    * 两处各写一遍迟早漂移，比如只在一处丢掉空行。
    *
    * 返回 `{ appended }`，或 `{ error }`（由调用方原样交给模型，不抛）。
+   *
+   * `call` 由调用方给：追加到已有文档走 `callDoc`（应用优先、用户兜底），
+   * 而新建流程里的追加必须跟创建用同一个身份走 `callUserOnly` —— 用户刚建的文档
+   * 没共享给应用，用应用身份追加注定失败，那一轮请求是白打的。
    */
   const appendDocxParagraphs = async (
+    call: DocCall,
     token: string,
     content: string,
   ): Promise<{ appended: number } | { error: string }> => {
@@ -330,7 +371,7 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
     }
 
     const doc = encodeURIComponent(token);
-    await callDoc("POST", `/docx/v1/documents/${doc}/blocks/${doc}/children`, {
+    await call("POST", `/docx/v1/documents/${doc}/blocks/${doc}/children`, {
       // index=-1 = 追加到文档末尾。这也是这个工具「只能追加」的实现根基
       index: -1,
       children: paras.map((line) => ({
@@ -799,7 +840,7 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
           const ref = s.ref;
           if (ref.kind !== "docx") return wrongKind(ref, "feishu_docx_write");
 
-          const a = await appendDocxParagraphs(ref.token, content);
+          const a = await appendDocxParagraphs(callDoc, ref.token, content);
           if ("error" in a) return a;
 
           return {
@@ -820,17 +861,29 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
   // 机器人只能往**用户先手动建好、再共享给它**的文档里贴一段。
   // 这个缺口是 agent 自己在工作区仓库里报的（`reports/bug-feishu-docx-create.md`）。
   //
-  // 身份沿用 `callDoc` 的**应用身份优先**，不特殊化。曾经担心过「应用身份建的
-  // 文档会落在应用自己的云空间、用户打不开」，于是 2026-09-25 用真实凭证建了
-  // 一篇、再用浏览器以用户身份打开：**正常打开、可编辑**（标题、正文、分享按钮
-  // 都在）。所以那个担心不成立，不必为了它把身份顺序反过来、多要求一次 /login。
+  // ── 身份：**只用用户身份**（2026-09-26 改）────────────────────────
+  // 初版沿用 `callDoc` 的应用身份优先。当时以为「用户打得开 ⇒ 用户能编辑」，
+  // 于是判定不必多要一次 /login。**那个推断是错的**：
+  //   2026-09-25 用真人身份把菜单逐项点过一遍 —— 正文读得到，但菜单是
+  //   「**申请编辑权限**」、点「删除」回「**无权限操作**」、往正文打字**打不进**。
+  //   即用户对应用建的文档**只有只读**。更糟的是应用自己也没有删除 scope，
+  //   于是那种文档**两边都清不掉**（当时建的四篇测试文档至今留着删不掉）。
+  //
+  // 换成用户身份后，文档落在**用户自己名下**：可编辑、可删、能分享。
+  // 代价是没 `/login` 的人用不了 —— 这是刻意的取舍，不设应用身份兜底
+  // （兜底就等于又造一篇删不掉的死文档）。见 `callUserOnly` 的注释。
+  //
+  // ⚠️ 创建和随后的追加**必须同一个身份**：新建的文档没共享给应用，
+  // 用应用身份去追加是注定失败的一跳，所以两处都传 `callUserOnly`。
   const docxCreate = tool({
     name: "feishu_docx_create",
     description:
       "**新建**一篇飞书云文档，返回它的链接。用户说「写一份报告 / 建个会议纪要 / 把结论整理成文档」" +
       "这类要**新容器**的请求时用这个 —— feishu_docx_write 只能往已有文档追加，建不出新的。" +
       "飞书的创建接口只收标题、**不支持带内容创建**，所以正文用 content 参数给。" +
-      `标题 1~${DOCX_TITLE_MAX_CHARS} 字。建完把链接给用户。`,
+      `标题 1~${DOCX_TITLE_MAX_CHARS} 字。建完把链接给用户。` +
+      "⚠️ 文档建在**用户自己名下**（这样他才编辑得了、删得掉），所以需要他先 /login 授权过；" +
+      "若返回需要授权，把提示原样转达让他去授权，**不要**改用别的工具硬凑一篇出来。",
     parameters: z.object({
       title: z.string().describe(`文档标题，1~${DOCX_TITLE_MAX_CHARS} 字`),
       content: z
@@ -852,8 +905,9 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
           }
 
           // ⚠️ 这个端点**只收 title**（实测：title 是唯一被校验的字段），
-          // 没有任何 content / children 参数。正文只能建完再追加
-          const r = await callDoc("POST", "/docx/v1/documents", { title: t });
+          // 没有任何 content / children 参数。正文只能建完再追加。
+          // 身份用 `callUserOnly`（不兜底）—— 理由见本工具上方那段注释
+          const r = await callUserOnly("POST", "/docx/v1/documents", { title: t });
           const id = String(r.data?.document?.document_id ?? "");
           if (!id) {
             return { error: "飞书没有返回 document_id，文档可能没建成。别把链接给用户。" };
@@ -871,7 +925,7 @@ export function makeFeishuDocTools(deps: DocToolDeps): unknown[] {
           const text = String(content ?? "").trim();
           if (text) {
             try {
-              const a = await appendDocxParagraphs(id, text);
+              const a = await appendDocxParagraphs(callUserOnly, id, text);
               if ("error" in a) out.contentError = a.error;
               else out.appended = a.appended;
             } catch (e) {

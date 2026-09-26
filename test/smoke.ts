@@ -1562,6 +1562,14 @@ await describe("J. 云文档工具族", async () => {
     return Object.fromEntries(list.map((t) => [t.name, t]));
   };
 
+  /** 一套「这个人从没授权过」的工具：用户令牌存储是空的 */
+  const toolsUnauthed = async () => {
+    const store = makeUserTokenStore(new TokenKv(), "ou_1");
+    const mgr = new UserTokenManager({ store, env: ENV, openId: "ou_1" });
+    const list = makeFeishuDocTools({ env: ENV, cache: memCache(), tokens: mgr }) as any[];
+    return Object.fromEntries(list.map((x) => [x.name, x]));
+  };
+
   await it("七个工具都注册了，名字是 feishu_ 前缀", async () => {
     const t = await tools();
     eq(Object.keys(t).sort(), [
@@ -1630,11 +1638,8 @@ await describe("J. 云文档工具族", async () => {
     const t = await tools();
     // 建成功、追加失败 —— 真会这样：文档已经存在了，把链接吞掉才是更坏的结果
     stubFetch((url) => {
-      if (url.includes("/auth/v3/tenant_access_token/internal")) {
-        return new Response(JSON.stringify({ code: 0, tenant_access_token: "tt-1", expire: 7200 }), {
-          status: 200, headers: { "content-type": "application/json" },
-        });
-      }
+      // 这里**故意不桩租户令牌端点** —— 建文档走用户身份，压根不该去取它。
+      // 桩上反而会掩盖「偷偷退回应用身份」这种回归
       if (url.includes("/children")) {
         return new Response(JSON.stringify({ code: 1770001, msg: "no permission" }), {
           status: 200, headers: { "content-type": "application/json" },
@@ -1653,6 +1658,48 @@ await describe("J. 云文档工具族", async () => {
     eq(r.docUrl, "https://feishu.cn/docx/NEW1", "文档真建出来了，链接必须给");
     ok(typeof r.contentError === "string" && r.contentError.length > 0, "失败要如实说，不能假装写进去了");
     ok(r.note.includes("feishu_docx_write"), "要给一条下一条路：链接有效，可以再追加");
+  });
+
+  // ⚠️ 下面两条是**身份**测试，2026-09-26 加。
+  // 加之前那 4 条创建测试全都是绿的，却**区分不出用的哪个身份** ——
+  // 桩函数按 URL 路由，谁发的都接。也就是说：把身份从应用改成用户，
+  // 它们一条都不会红。这种「测试与实现出自同一份误解」正是
+  // 当初那个 `paragraph` / `text` 字段名 bug 能一直全绿的原因，不能再犯。
+  await it("⚠️ 建文档走**用户身份**：全程不取租户令牌，两跳都带用户令牌", async () => {
+    const t = await tools();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_docx_create, { title: "用户身份建", content: "第一段" });
+    eq(r.created, true);
+    eq(r.appended, 1);
+
+    // ① 一次都不能去取 tenant_access_token —— 取了就说明有人在试应用身份
+    eq(
+      calls.filter((c) => c.url.includes("tenant_access_token")).length,
+      0,
+      "新建文档不许走应用身份（应用建的文档用户只有只读，改不了也删不掉）",
+    );
+
+    // ② 建 + 追加这两跳都必须带用户令牌 at-1，不是租户令牌 tt-1
+    const posts = calls.filter(
+      (c) => c.init?.method === "POST" && c.url.includes("/docx/v1/documents"),
+    );
+    eq(posts.length, 2, "建一次 + 追加一次，两次都要走用户身份");
+    for (const c of posts) eq(c.init.headers?.authorization, "Bearer at-1", c.url);
+  });
+
+  await it("⚠️ 建文档没授权时：直接说不，**不退回应用身份**造文档", async () => {
+    const t = await toolsUnauthed();
+    const calls = stubFetch(docStub);
+    const r = await callTool(t.feishu_docx_create, { title: "不该被建出来" });
+
+    ok(typeof r.error === "string", `要报错，不能假装成功：${JSON.stringify(r)}`);
+    ok(r.error.includes("/login"), `提示里要给出 /login 这条唯一的路：${r.error}`);
+    eq(r.docUrl, undefined, "没建成就绝不能给链接");
+
+    // 关键：不许偷偷退回应用身份。退回就会造出一篇用户既改不了也删不掉的文档，
+    // 把 2026-09-26 刚修掉的问题原样再犯一遍
+    eq(calls.filter((c) => c.url.includes("tenant_access_token")).length, 0);
+    eq(calls.filter((c) => c.url.endsWith("/docx/v1/documents")).length, 0);
   });
 
   await it("读 docx：返回标题、正文、字数", async () => {

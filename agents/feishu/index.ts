@@ -602,10 +602,16 @@ async function probeEnv(context: any, url: URL): Promise<Response> {
      *     误判成环境变量没生效，白排查半天（现在另有 serperFingerprint）
      *   · 漏了 OPENCODE → OPENCODE_SESSION 不显示，就分不清
      *     「会话头没配」和「配了没生效」
+     *   · 漏了 GITHUB → 加了 issue 那族工具之后，GITHUB_ISSUE_TOKEN/REPOS 在这里
+     *     同样隐身（2026-09-26 补）
      * 加新变量时记得同步这里，或者干脆按前缀白名单放宽。
+     *
+     * ⚠️ 这里只列**变量名**、不回显值，所以把密钥类变量放进来是安全的 ——
+     * 本端点另有 tokenGate 门禁。要看「值对不对」得另给指纹（如 serper 那样），
+     * 别在这里回显。
      */
     envKeys: Object.keys(env)
-      .filter((k) => /FEISHU|INTERNAL|AI_|AGENT|SANDBOX|SERPER|OPENCODE/.test(k))
+      .filter((k) => /FEISHU|INTERNAL|AI_|AGENT|SANDBOX|SERPER|OPENCODE|GITHUB/.test(k))
       .sort(),
     internalToken: v ? { len: v.length, head: v.slice(0, 4), tail: v.slice(-4) } : null,
     /**

@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:14bc4db665b1c5ca22a0b8ceb4fa4cca8590d2958d96a8f2f395023f3c113d3a",
+  "claims": [
+    {
+      "id": "claim_e580426e066e4c20961ab9bf5323601a",
+      "statement": "命令解析被切成两半：`parseCommand(raw): Command` 与 `HELP_TEXT` 在 `src/feishu/commands.ts` 里是零依赖纯函数（不发消息、不碰存储、不建模型），而把 `Command` 变成实际动作的 `runFeishuTurn(host, env, store, evt)` 在 `src/feishu/turn.ts` 里通过注入的 `FeishuTurnHost` 与 `FeishuStore` 执行副作用。这个切法使别名与大小写的判据可以纯函数断言，也使整个回合流程能脱离平台单独测。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/commands.ts#L1-L39",
+          "version": "repo-lines-v1:sha256:da683798ae83b3e48c21496616df099dd310244b21eb9ef1e5babd51f0caac26:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5NmMyYzk0YTc1M2U1NmU1YzQ0Y2UwNmIzZmNkZDUxMGM0MGMxOGYyZWIwNzY3MGJhMDUxNzk1OWE0YThmN2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjYzdmYTI1MDVhNmVmMmE5ZjE1NTM1NDJhMDRmMjhkNmRjZWZiNjEyN2MzNjRjN2E0NGI0YjAyM2NmOTNiZDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiYWUyYzljNjUwNWEyY2JiYzk4MjE5NTU2Njc5ZjRiNjg5ZTdlZjJkNWQ0YWI0OWJjMDdmYzMzNjY2YzEwZjEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L23-L94",
+          "version": "repo-lines-v1:sha256:208ccae202cc2d2983c5422fd18e28296e520df86585f56fc64661d1ffc67c1b:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3ZGY0NTdiYzUzMGU0ZWFjNGQyOTJmZWVjNDhjNTAxN2ZmNzNlMTA3OWVjMWQ4OWRlOGUzNWE2YWVkYjlkODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4ZjZhMGVkNDk4ODMxMTg5OTcwZmNiMDJhYWY4OGMyYzQzMjJlNzg4NDNjYjYyNjg2MDIyZGU4YTRkY2U2ZWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4NDhhY2ZmNGU2MGU5ODFlOWY4MThkZjUwZGJhNzk3YWE5ODYyODIwMWRmOTIyMTJhYWVhNjA3YjI3MWNjMWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3MTY0YzcyMmI4ZTRmYThjZGJmNjRkYmI3ZmNmMTBkY2Q5MTA2OWY1OGYzYTk4YWRiYmM2OTNmYTVkNjVlYjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_984a46a1a84448a49cda95c49d4b2dc1",
+      "statement": "`Command` 是一个判别联合，成员为 ask（携带 text，唯一带业务载荷的分支）、status、compact、clear、memory、forget（携带 key）、login、logout、help、error（携带 message）。「不认识的命令」是一种正常结局而非异常：它作为 `error` 成员携带给用户看的文案，由分派层当普通回复发出。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/commands.ts#L76-L81",
+          "version": "repo-lines-v1:sha256:c006eef80b6359e39fd62375d7e9e7c8ea88fddcd1f88924e21f9715edb9ac5e:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI4ZmRlYjAzNjQ4Y2QyNGIyYzNhMzcyMjI0YTMzOTBiN2MxZGEzOWI0NjQ2NGUwZWVmMzYyYmY1NWQxYWE4MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzhmMmY4NzllNjE5ZGEwMjgzNjY1YjJhMzI0NWM3OWZlOGVhZGRjZTFiZDU4MDE0NmM0YzM2YzkxYjI2M2E3MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/commands.ts#L8-L18",
+          "version": "repo-lines-v1:sha256:c87f014102f6971b62d9d023b5dae214c58cd9eb4bf24197a27686a63622eed4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0Mzk5MzM2MzRkZGZjNGI5ZWJiYTgzZmYxZWRmMGU5ZGYwMDA0Njg4YjkyMWQ3MzhjMzM1MjcxMzU1NDIzM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwZDBlZjgzYjcyNDY2NmVmY2ZmYjI5Yjk5YTFkOTZjODIwYzg5NWEyNTFiODgyZjA5MmI2Mjk5YWZmN2IzYjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJhZGMyMGY4NmY4NzkxZWU2OWM3MzExOGYyOWFmZmJlZjNmNTJlOTU1NzQxNmEyZDY0ODMyM2RjZTZiZmYwNjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5ZDdiZjJhZmUzMWU0YmYxOGFjNDhjYzUwOTAyYzZiMjI3ZDA4NzM2NzcxYjAyNWM0NTJlZDk3NGFjMGUzZDkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_debe6cdcb8e44b33adddc922c3b6b89d",
+      "statement": "解析规则是：trim 后不以 `/` 开头一律判为 `ask`；否则从第一个空白切开，head 经 `toLowerCase()` 后进 switch（命令名大小写不敏感，参数原样保留）。因此 `/REPO`、`/CLEAR` 等大写形式同样匹配，而多余参数被静默忽略（`/compact 现在` 仍是 compact）。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/commands.ts#L39-L48",
+          "version": "repo-lines-v1:sha256:290f0024a0067cfdcf38cfa38fff3528df0585a358db2aee7164caabdb4d1def:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjYzdmYTI1MDVhNmVmMmE5ZjE1NTM1NDJhMDRmMjhkNmRjZWZiNjEyN2MzNjRjN2E0NGI0YjAyM2NmOTNiZDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExN2NjMjY3NGI4MTIwZjU5YTYxNGM0NTg4M2VkOWQ0NzFmMzdlZTk1ZTQwZTM4MWVlYWY0YWRhMjZjZmI0YzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxZDVmOGE5NjJkYzc1ZmM5YWRkZGM3M2UyMmI3MTBjOTMxNmQ1NTg1YWYzNTBmMWQyN2UyOWEwMWZkOTBlMTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2YjYwYmRmMDU0NTkyNWY3ODMyNjRlODhmOWZiNGE1NWYzMGE5YWQwM2VhZTQyOGMwMTEzOTllZGVlNzVhYTIifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L306-L315",
+          "version": "repo-lines-v1:sha256:563583244b05a26fcd29298cfb59168964d791db2b12b7f81a4ff2aba93ce5fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1MDcxMzNiODlkYjAwZGZlYjI2MzBmYzBhMzY0OTZmMTAyZjcyMTk0YzcyZTQwNGI2MjViYmM3MWNjN2EyYzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNmMWYxNzk0YWMxNjQyOWU5MjFkNjJiMjAzMzBlZjU1ODJjNTI2ZTE1NzNjZTg3NDQ4NDUzOTcyODgyMjA3MmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhMWQ2ODJlMTU0MzEwM2Y1ZGU3YjE4M2JkZjY4MmY1MWI1YzUyMDliYzQ4ZmY5MzU4NDQ2MTAwY2Q5NjEyNmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6702f04184d54ac9aa73b5ed69260f0d",
+      "statement": "命令匹配是精确的、不做前缀或模糊补全：`default` 分支直接产出 `error`，`/log`、`/for`、`/memories` 等近邻输入必须落 `error` 而不是被识别成对应的命令。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/commands.ts#L76-L81",
+          "version": "repo-lines-v1:sha256:c006eef80b6359e39fd62375d7e9e7c8ea88fddcd1f88924e21f9715edb9ac5e:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI4ZmRlYjAzNjQ4Y2QyNGIyYzNhMzcyMjI0YTMzOTBiN2MxZGEzOWI0NjQ2NGUwZWVmMzYyYmY1NWQxYWE4MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzhmMmY4NzllNjE5ZGEwMjgzNjY1YjJhMzI0NWM3OWZlOGVhZGRjZTFiZDU4MDE0NmM0YzM2YzkxYjI2M2E3MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L317-L349",
+          "version": "repo-lines-v1:sha256:2b430d27eff461a3dc07933bb75ecd06ee21c6e03c224afaa61b242e8e94f8f3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0ZDI4ZmFmNzY2MWM1NTkyN2U1Njk0MjkyMzcwYThmNTRmNDZjYzNlNzRjYTE4YTUwODk0N2ViYjcyMjc3YWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyOTM2MGU3MWE5YjE4MmZjOGM3ZGUyNjA3YWMzZjU5OTg2NGJjMzJmZWY1YWU3NjIyZDBiMzIyODRiNDFhMTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjZDlkZWQ5YjA1MGIxM2MwODU5Y2UwMmQwZDI3MmM5ZWIyNjcyOTJlNjkzNGE4MmJkNTNlODM4OGEwNmQzZTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b3143f1c631c4414bb68483daee8eb90",
+      "statement": "`/forget` 的参数被故意允许为空：`parseCommand(\"/forget\")` 返回 `{ kind: \"forget\", key: \"\" }` 是合法结果，因为用户打光秃秃的命令时想看的是用法说明，而只有宿主知道有哪些键、以及清空需要什么确认词。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/commands.ts#L61-L65",
+          "version": "repo-lines-v1:sha256:73b3b66e8ae7350cc9db7c8f66c9810e5099d5131d2cec17ee9aa87c3768b824:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDdmNzk1ODY0ZGNjMmJjNGQyNjMxY2ViMTk0M2Q5ODRhYjQzY2RiNWQxMzc4ZDgzOTAyMzJiZjIzMTg4MDBiOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTZiYjg3MjUzMDgwNGUxYjE1OGIyZDVjYjdlYWVmMDY5YjkwNjkyZTFmYjlhNWRhY2JhYTlhODczNDdjM2FkNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTQzYjJhNTY1YWQyYTVkN2VhZWM3YjMyOWU5NzYzODA1ZjYyYzhmNjc1NDgxN2NiMDVkNzU1NzcyZjQzMjkwMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGY5MGJhYTM5MzIxMzJiNTdkMWY3MTJlZGFjZTU0ZjA2YzhiMmNlYTRhMzMxZmIyMmUxMWUxN2ZjZGI1Njc2NCJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L331-L338",
+          "version": "repo-lines-v1:sha256:5fe47a3da8c95c99f3addd882d54590980e4edddda10a9b08d7dcc110024d590:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDA2YjVkNDgwNTA1Nzg3M2IxNzk1ZmIzMzJjZDM3MGY5ZDliZmUyNTcwZjI0NTYzNTgwOTVlNTA5YzZlYzExOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTRmNjZjNjBlODc5Yjg0NTIwYjRiNWVmZDYxOGY4YjdjMGI0NGU5ZWI3YWE1MzYwOTE2MWU1OWMxYjU5MDI1MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjU1MjJhMWQzNjEwMDM2MGVhZDA3M2ZkNjFmMTdkYmMxMzgwNzI2NjY1YTg0Nzc0ZDk5NDhhNWJjMWI5OTI1YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzRiNjU0Y2RiNjEyMjIwMjAzYTYzNTJjMjM3ZTVhOWRhNjJjYTg3M2ViZmRlNGVkMzhkNDdmZTlhNjFkYjgyMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d3ccccf685e842ca93babde66cda2511",
+      "statement": "`runFeishuTurn` 用 `switch (cmd.kind)` 分派：compact / clear / memory / forget / login / logout 通过 `safeReply(() => host.<method>())` 调用宿主并用兜底文案接住异常；help 直接发 `HELP_TEXT` 常量、error 直接发 `cmd.message`；status 走 `host.statusText()` 但不包 `safeReply`，是唯一没有兜底的宿主调用分支。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/turn.ts#L111-L146",
+          "version": "repo-lines-v1:sha256:1bfabd90a339f42c8ec91c94fe25aad7526eae21cd901dd407ca2c65202760c4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhNWE1Mzg5YTQzNzJkZGIzNzE2ZTBjZTI1ZjE0ZTVmOWJkZTRjOWJmMzcyZjQ0YmI3YWUzZjU1N2IyMTQxODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4Mjc4ZTc5YTk3MGQ4ZWQwNjRjZGMxMjhiMWVjNDA4MTY3MTg5MDJkNzFhZTdhNTRiZDU3NmU5NWVjYjhlYjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxZGZjMWFlYzIwYmJmYmQ0N2M5MTNkM2I4YTViNjJkMGM3NWFhZDJjMTY3ODZjNjU3N2Q0YTBiYzZmNjg1MDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllOTA5ZWQxMGFmNmQ5ZjhkNjE2MTQzMjVkNWM1NjM2MDg4NzY1Yzk0YzM0MDBkZmEwNzJlNWNiNGE5M2I1MmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9e3c071019bf4aebbfd94e63c2f74085",
+      "statement": "`safeReply` 的存在理由是「必须有东西发回去」：它把宿主方法抛出的异常转成 `处理失败：<message 前 200 字>`，不兜的话异常会冒到 `agents/feishu/index.ts`，默认 async 模式下进程只记一条日志就结束，用户一条消息都收不到、看起来像 bot 死了。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/turn.ts#L71-L84",
+          "version": "repo-lines-v1:sha256:66e7f7fd1c1fdce3c153b5e3b3da3623e3af45f32a5fa8f4c633c57b6fcb39b0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5MzQxM2E2Mjk0NjZiOTRjZjkzMGEyMTI5YWE3YzYzMDI5N2YyZjEwNzdjNDQ3Yjg1NDhlMDZiNjk4NmFiNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2NDJjOWMxY2FhMzhhZGUzNGIwNWRhN2YzNTQ2ODE3ZjZhZDZjYTdjODNlM2RlYTU0Mzc4OWU5ZjJiYTJmOTUifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L838-L865",
+          "version": "repo-lines-v1:sha256:af9c2f26c1103624c6cd6ab6e9a8e0b8126fa49d7131659de581bbc7586c2bce:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwZTI0MWRmYzI3NWI0MzYwNWRiN2I1NjFlYTg3MDliYTMwODk4MDA2ZjI3MjkxMWJlMTM4MTI4ZmQwMGM3Y2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2NzMzOTg4NzllMWZjNzZjYWJhZjAyMTAxNThhMTliNzg5ODJlOGQxZDQyNzY1Yjk5MWQzZWQwODBlMDY0M2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVmZjcxZWMxZWI1OTJmNzJmOTEwMDU1MmZkN2RiMTA1NDllNzlhMDE5ZDBmMDQ2NGRhMzJmMjRiNmMxYWVmZTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cc48c68017c949c5be09522702660027",
+      "statement": "`case \"ask\"` 的异常策略与发送失败刻意相反：`host.ask` 抛错时异常被**吞掉**并回复「没答上来：<message 前 300 字>」，因为让异常冒出去会让调用方重试三次后放弃、用户毫无提示，而模型失败通常是配置问题、立刻说清比自动重试有用；但 `sendText` 的失败**不兜、任其抛出**，因为那属于传输层网络抖动，是重试真正擅长的场景，且此时 state 停在 pending、飞书重推会再进来一次。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/turn.ts#L155-L181",
+          "version": "repo-lines-v1:sha256:da5672e2387271ab9b233c86be5af5bcad6bda6da9c436aa9b84f86529490dac:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1ZmRiMTIyNzNmY2E3N2FiMDNhNzA1NDFhNzY5N2U0YTYzMzgwNTcwNTBmNTdjY2Y5MzI0YmI5ZTdlMDUwYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyMzViYjE0ZTMzZTc0MzNkOGUyMWI5YTNmZGE3N2IwOTU4ZmNiMmZjNDgwZTE3OWRlNjUyNzFhODNlZGY3ZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1YzI0MGY0ZjllYmI4ODFiYzM4ZWVjMTE4NDAxZTRiM2M4MWNmZjQwMGZkNGViYTJjMTkxYTcyZDg4ZGFiMTcifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L889-L901",
+          "version": "repo-lines-v1:sha256:0282d9f8073092c8cf069ed88765713eb588624ab6fddf2a359abb51c0843fae:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwNDFkODc3NjgwMTY2NzZlMTFiMjVmZmJkZWU1Njk2MGZhODAzZGE1Njk0NGJmN2QyZmUxYTcxYTM4ZDViZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU5NGNmNmI1MzNhNDc3NWJlNDU1YThiNDQ2OWQyZWQzYmU5MzA0MGRhOGNlMmI0MjA4YTFmZDU5MDM4ZWNkNWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2ZDI1NjI5MTQzZDk4OTg0Nzk5YjdiYzVmNGEwNmM4ZWJmMzg2YTIyZTY5OTAxZmM1YzY0MzFiZDViNjczMDUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7858e607e1ff4c819139e83def8715ec",
+      "statement": "`host.ask` 返回 `streamed: true` 时表示答案已经通过流式卡片发到会话里，调用方不能再发一条（那会是同一段回答的两份），但要把该文本 `sent.push(reply)` 记录下来，然后 `break` 跳过发送。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/turn.ts#L155-L181",
+          "version": "repo-lines-v1:sha256:da5672e2387271ab9b233c86be5af5bcad6bda6da9c436aa9b84f86529490dac:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1ZmRiMTIyNzNmY2E3N2FiMDNhNzA1NDFhNzY5N2U0YTYzMzgwNTcwNTBmNTdjY2Y5MzI0YmI5ZTdlMDUwYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyMzViYjE0ZTMzZTc0MzNkOGUyMWI5YTNmZGE3N2IwOTU4ZmNiMmZjNDgwZTE3OWRlNjUyNzFhODNlZGY3ZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1YzI0MGY0ZjllYmI4ODFiYzM4ZWVjMTE4NDAxZTRiM2M4MWNmZjQwMGZkNGViYTJjMTkxYTcyZDg4ZGFiMTcifQ"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L23-L34",
+          "version": "repo-lines-v1:sha256:286fcf2ffd670f869396e9c2a685e843fb71578a2bf445e174fdb13b8cf1148d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3ZGY0NTdiYzUzMGU0ZWFjNGQyOTJmZWVjNDhjNTAxN2ZmNzNlMTA3OWVjMWQ4OWRlOGUzNWE2YWVkYjlkODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1YzBhMGVjMDFjMjkxM2JhN2I5OWFmY2YwYTBkMzkzODE5MWMzMWFiZGE4OWM1ZWIyOGRhOTQ4YzE3MTdkMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4NDhhY2ZmNGU2MGU5ODFlOWY4MThkZjUwZGJhNzk3YWE5ODYyODIwMWRmOTIyMTJhYWVhNjA3YjI3MWNjMWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyZDRiMjhjZDZkOWJiM2Y1MTRlZGZjNTcwNzE5NWYwYmQ1NmI1ZjQ3ZTY1ZmQ3NDg1MGYyMjkxMjcyY2NmMmMifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L903-L908",
+          "version": "repo-lines-v1:sha256:dcec8086c6d42907935bd377727896f562ce784115aca1e1cd1ee78d83b47f23:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDMxNjdiMGRiNjYyMzIzMzVhMTU3YmRiNjNlZGNhMWY4NDJkNTE1MmU3NTc1NGQxMTAwZDBmOTU2OTk3MjUwMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDQ3MTJhMGFmYTE1ZDZlNDhkNGEwOWVlMWM5YzkyNjlmMTM3Mjk3NjZiMGY3OWM4MDEwMDNmZDNjZDQ3YjQ5ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDcwYmVkNTNkMjEzZDUxMTQ4NDQ5ZWViOTgxMTQ0YTQzMDQyOTIxOGM0ZmIwMDJmMmIwZDFkZTY1MDUxYzJlZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ddd3a098a87d46c49e407e2d13669c0f",
+      "statement": "`runFeishuTurn` 维护一个按发送顺序累积的 `sent: string[]` 数组：所有回复经 `say()` 记一条再由 `sendText` 发一条，唯一的例外是 `streamed: true` 那条「只记不发」。函数返回该数组，`index.ts` 只在 `dispatch === \"sync\"` 时把返回值塞进 HTTP 响应 `{ ok, mode: \"sync\", replies }` —— 这是唯一能把答案取进 HTTP 响应的地方，因为流式卡片的正文通过 `im/v1/messages` 读不到（只回「请升级至最新版本客户端」的占位），自动化核对否则退化成人工开浏览器。async 分支返回的 202 不承载业务内容。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L173-L189",
+          "version": "repo-lines-v1:sha256:0d472848777dc47c1ba0809d169cb4c7df80f9ba753773e49e194bb1cb174da8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmYmI4NmU0OTEwZjViN2JiNWU3ZTlkZGUyOTFiM2U5Yjg5NjUzN2ZkYTcyN2I4ZmEyNjhkNDBhM2JkNGJkYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4NzliODUyZTVlNWZhMzlhZWRiY2QzZTc0Y2ZkM2E5ZDEzMGMzYzRmZmE1ZmE1NjFjYWE0OGUwYzdlYzI1ZTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZTM3MjVkYTAwMmI0NmVkOGI0ZGU4ODAwM2FkOTcxMGRjYWYxOGQ1N2M0NzAxZGMzYmVmZjBiMmM1Y2IxM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJmZjEzMjcyMDJmYjYwOGRiYTc1ZmM5Y2U2ZjZlNTIwNDc4NzNiODFhYjY0NmRmYWFmODQ2ZTIxZjQ0MTA1NWYifQ"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L184-L191",
+          "version": "repo-lines-v1:sha256:e0d187d4091ca9f427e60fb575d27bde9ce3563a35c30c89d5399a030ec31e0f:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDgxYjE4ZmVhNjM2ZDJkOTczZDNhM2E4OTc4Nzg5NDU3NzY2OTE3ZjU1MTI5YWNmYTcyNDI3M2U2YjE3MWE1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGE0MmNhNGU0ZDc4YjRjNDc5ODJlNjQ0MWYwMWM0ODFlN2U4NzgyNDI4OGRiMmMwMTQ0YmYxZDExYTk4YzhjZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTdkODYzMmU1NGU5Mjk4YWJiOTU4NzI3ZTJkNTE0MDhhYmFmMTM2NjAzNTM3OTEwMTQwYWJmNjViMzBhYjYxMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L98-L109",
+          "version": "repo-lines-v1:sha256:ea28aa8d8b790d051dcd652cb3c613a73e759155db2596365b3c535f28566dd2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1M2UwOTQ1ZDhjMTM3ZTZiYmM2YWYxMDUyZmM0OTI4MzYwZjEzMjJjMDdjY2VjNTk2ZTY3YzE3MmRiZTZiYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3MTY0YzcyMmI4ZTRmYThjZGJmNjRkYmI3ZmNmMTBkY2Q5MTA2OWY1OGYzYTk4YWRiYmM2OTNmYTVkNjVlYjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyYmE3ZmE2ZDNkOTg4ZTYyMWM0OTlhYmM1MGZiN2MyNTAwZDJkZWNiMjU3NzNmODZmMmU4MWE0MGY2ODk0MWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e48c0bb31ad34d7c981ea0fed68c2d6c",
+      "statement": "`runFeishuTurn` 只有在全部回复发完之后才 `await store.markDone(evt.messageId)`。中途抛错会让 state 停在 pending，飞书的重推会再进来；此时 `host.ask` 靠确定性的消息 id 认出这一轮已经跑过并返回已有答案，因此不会重复烧模型。`markDone` 必须 await，因为存储已从同步 SQLite 换成异步 KV。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/turn.ts#L184-L191",
+          "version": "repo-lines-v1:sha256:e0d187d4091ca9f427e60fb575d27bde9ce3563a35c30c89d5399a030ec31e0f:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDgxYjE4ZmVhNjM2ZDJkOTczZDNhM2E4OTc4Nzg5NDU3NzY2OTE3ZjU1MTI5YWNmYTcyNDI3M2U2YjE3MWE1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGE0MmNhNGU0ZDc4YjRjNDc5ODJlNjQ0MWYwMWM0ODFlN2U4NzgyNDI4OGRiMmMwMTQ0YmYxZDExYTk4YzhjZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTdkODYzMmU1NGU5Mjk4YWJiOTU4NzI3ZTJkNTE0MDhhYmFmMTM2NjAzNTM3OTEwMTQwYWJmNjViMzBhYjYxMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3027b80ab0c44dcea52fcf0ecc093d7c",
+      "statement": "从 `Command` 联合里删除一个成员是编译器可守护的改动：`switch` 的 case 标签必须是联合成员，留着旧 case 会直接编译不过；`FeishuTurnHost` 上删掉一个方法时，宿主实现对象多出未知属性也会报错。历史上移除 `/repo` 与 `ingest()` 时两处都由编译器强制同步。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L691-L693",
+          "version": "repo-lines-v1:sha256:976605b4399d10f68b2ba8af6993228ef048609b760c306cf3a772ddab5bfd05:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjgyODIxMzk2NmNlYjg1NDhjZmEyMjc5N2Q3MWMyOTRhMTVjZDhkMWFiMjhmNWJmYmJhMTEzMGNmNzEwOWYzNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWY5YzVkM2JkNzAxMTE2MmFjNTk1YzA1NmYxYjliYWQ0OGNjMGNhYjkwZWY2NTFmNzIxYmVkNWUyZmNkZTdjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTJkZGIxNzU1MjAwNTYyYTI4MWQ2OTlkNmMzZGQzNjhlOGQ5NDg5OWQxYzllZDFlYWY2YTVmODBjNjFhZmZjOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTY4MGIyZDRhOGUwODkyY2I0ZDgwZDZhYWQ4ZmQ2NGRlZWYwNzIxZDBkNTBkNjc5Zjk2MjUxNWQzNTU3ODE1NSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L148-L153",
+          "version": "repo-lines-v1:sha256:9a467d206cc939baed0b335f7dfc7d0ae0179bd53d4ab915ea205b131a0d9dff:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTAwZWI0ZjJlODkxOGJkOGUzNDgwODAzODgxN2MwYjM4OThkY2NjNDJhYjFhZWYzNTQwMmQ2MzQ3OWQ3NjY1MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODUyNzg0OGQzNjg0Yzk0NzAzYjdlMWU2YTcxNzM2N2Q0MmEzNjY3YTgzNmVjYjNkM2M3MjEyMjRkNGY0YzY2NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTg0ZjA4MGI5MGJjZDg4NWIwYjZiNmFiNmE0YmRmYjczYjRlNDdmM2VlMDAzZDdkYzQ0MDE0MTBiOWM1ZDNjMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjNiZTk1YzdjMzkwNjk3YWI1NDU3M2ZkNDJhMTdiNDliOTYzYzg4NWViNTVkYzI3MDI2NTcyMDJiMGNjMjBhZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7bcbfa33ae53466e9da8351d0b38c23b",
+      "statement": "反方向的风险编译器完全看不见：把 `parseCommand` 的 `default` 从 `{ kind: \"error\", message }` 改成 `{ kind: \"ask\", text }` 类型上完全合法、`turn.ts` 一行不用改就能编译通过，后果是打错的命令（如 `/repo a/b`）被当成普通提问送给模型、得到一段即兴发挥的答复。这条风险由端到端测试钉住：C 节断言若干输入落 `error`，F 节断言 `runFeishuTurn` 处理 `/repo a/b` 时只发一条含「不认识的命令」的消息，且用 `asked = true` 桩断言 `host.ask` 一次都没被调到 —— 后者是唯一能区分「识别成 error」与「静默当提问」的判据。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/commands.ts#L76-L81",
+          "version": "repo-lines-v1:sha256:c006eef80b6359e39fd62375d7e9e7c8ea88fddcd1f88924e21f9715edb9ac5e:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI4ZmRlYjAzNjQ4Y2QyNGIyYzNhMzcyMjI0YTMzOTBiN2MxZGEzOWI0NjQ2NGUwZWVmMzYyYmY1NWQxYWE4MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzhmMmY4NzllNjE5ZGEwMjgzNjY1YjJhMzI0NWM3OWZlOGVhZGRjZTFiZDU4MDE0NmM0YzM2YzkxYjI2M2E3MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L283-L296",
+          "version": "repo-lines-v1:sha256:00055ceb6aca0be9b8b2bc9f0faf2a7b6a980bacbbc07c1bbb053ed3db86a1b5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0ZDJhOWNiZjVmMzZmOTE3NmE2MzI1NDRjMTQ2NjdmYjYxMjYyN2I0MjJkZjhhZjhiMDhhNjhlYjM3ZGYzZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxNzBkYzM0NDU2YWEwMTYxMjM2ZWZkZmEwMzcyMzFkOGRkMTBkODY2MDQ4NWM3ZDc1YmY2NDQwNjM3OGM3ZjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3ZTY3N2IxZDI0ODdkNjM5MGU4MjRiMTgwMWZjMWRmNjNhZmQxNmVjNzBmZWJiMjMzNDBkYTJkNTJjMzNjZjAifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L867-L887",
+          "version": "repo-lines-v1:sha256:cd6bd9b999eac638b459d3035a2055ef2c032b990fbcc6797839c2aee94fa059:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ODI3YzczMmY2N2ZiNjQ3NWVkM2I2NDZiOTQxZTY3Y2UwMjVjNDQ4ZjBmYmIwNzUwZGEwNjE1ZjlmMDI1OTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0ZWVlNmI2Y2I0MWM2NDFlYTUyM2MzZDIwYjY4MGVkM2JhNGYwZDQyZGEwMTdkNjlkZjcyMThhN2UyOTIzYjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2MjliMmYxNzkwMWI4ZDExOGNmYzY4MGFlMjNmMjRjNjAyMmYyMzllMGJlZmRjOGE3NzJmYWU1ODNmODYxMWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3bd83f0ec0384680a916d610deb6844a",
+      "statement": "命令回执走 `sendText` 发飞书纯文本消息，不渲染 Markdown（加粗与反引号会原样显示）；Markdown 只在流式卡片那条路上有得渲染，所以宿主给命令用的文案不能用 Markdown 排版。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L734-L745",
+          "version": "repo-lines-v1:sha256:d064595642e6bb5dd15e3e4ca23d41422f39a6abbfb1797c26b0ada3abd86cce:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MDFhMDI5MjRlY2M0OWQ4MWE0ZjEwNDdiNTMwZTBjYTNjOWNmZjQxODA4YjliZDRjYWYxZjVmMzk3NDU1ZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxNzU4MTY2YTczNGMzMDIyNzk4YTY5M2Q5N2RjZTY5YzYzNjg0M2UxOGJjMjIwZmU1MWRjMDUxZWM5YzA4NjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJjZTdiZjM3MGZiNWQwNGZiZDkwMTA1ZmE2NDY3MjZkODE3NDRlZWM0YjQ1MThlNmIzMDhhMGNmMDdkNjMwNjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4MTBkZDk4ZjczMWFlZDAyNGE1ZDY3YjBlMDYzMDVkY2ZhNDA5ZTc3YTM1ZTFlNWZlZTQ2ZjlhZjZhNzg4NjMifQ"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L55-L61",
+          "version": "repo-lines-v1:sha256:8a2d0646c9177d63644aff9fbf584969cec879ea210da72fa99e890220e68d9c:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYyYTJmOTk2ZjA4ZTY4MGJkMjkyMTM1YTZmYTQ5NzhiZGEyNmU2MDJkODRmMzNjYjFkNTk0Nzc1ZDQzMDRiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2ZiMTJjNWU5ZTNlY2Y1YmQ5MmFkOGNlN2FkOGNiYzhmODE5MDViMWJiM2QxNTY4YTM5YTY4NDFjMTMxNzJlOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTc1ZjlkNjY1NGUxNWE5MWM5ZjkyNTgyY2UwZGRiNTFmY2Y4M2NmZDIyNTU2NzY0NDQxYzRmMTg4YTg3OTRjMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDRlNTEwNmEwOGVlYjQxYTI0NmFiODJlZDA1YzMxOTY5NDk2YTZlMWM1MmM3NDYzOTFlZTRiNzQ3YTdhMWI0YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_622bcff456d14c1fa2f63b574ffaba3c",
+      "statement": "`/login` 的授权链接由宿主生成、由回合流程原样发出，绝不经过模型转述 —— 模型复述 URL 会出错（截断、加空格、把 `/` 写成全角），而授权链接错一个字符就是死路一条。宿主方法自己不做兜底默认值：`buildAuthorizeUrl` 在没配 `FEISHU_OAUTH_REDIRECT_URI` 时抛错，由 `safeReply` 接住并发出一条可读消息，而不是静默用一个错误的回调地址。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L712-L746",
+          "version": "repo-lines-v1:sha256:e7499f5075d2a46ceb3fdf26e82a3e6e99678ed558fa9fbe8e8526f8c7b5ba7f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyM2EyMjdjYWViMzZjZmMyZTMyNjBjOGYxYTQwMWUxMjdjOTRiN2VlZDE3M2U3ZjZmZTkzYmJmYmE3MTVmNjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmMGNkYjk3MmE3YmZiN2VkMjQ2ZjlmZjY3MjM4NWU1NWY0OTY4ZmMxMTA0M2RjNWI2ODRkNTFkZmEzMWRiY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhN2ZlZGFiZmQ4NmVmMmE1ZDBjZDk2Yjk5YTUwYWNkOTZmOWY3Y2M3MTQ0YWY4YTBlOWRmNjNmNzIxNTMxNDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3ZDY0YWJhYmM4MjI5ZDEwNDgzZjViM2UxZWFiMzE4ODU3Njc0MGQzYmYyYTU1NmU0N2NmNThhODI1NDViYzYifQ"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L45-L54",
+          "version": "repo-lines-v1:sha256:3aae41090c84651fb08f5ac4040b04d1df740748c2befb9e7f835717d8401998:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkMjNjNWZhY2ZjYjJkOTg0OTMyMzYxMGMxNTRiMTM4YjJjMTFiZTU4MzM3ZjA5Njc4NjMyYzFjMWZjZjE1NmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzYTZlYWI0MjQzNzg1MDkxNWIwZmU3OTI3ZDg3YjdiNzU2ZDNlNTZiZDM0ZDA0MTE2ZTA2MTUxMWM2NzUyMzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlZWIzYmRkMDQyNmZkMzQxOTY4MjRlM2ZhZDIwYjU3YzliYmE1MWJlOGQzNWMzYTZhMGFhNmY4ZGI5ZWRiZjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ0MjJiYjkwYzU1YWQ1MTY1YTUyNmE3MmI2ZTBkMzEwYjE1NWQ5NDRkYWQ1NTJlOWEwODU1YWJlYTZmNzc0MmYifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L793-L801",
+          "version": "repo-lines-v1:sha256:ac3af40d47b3fb7a44c784f1344f481dde904f0f5a28fba3729e9a31e2aa7587:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTZmM2IyN2M4OGUzYWY4NzgxYjNmOWZkNzFkMmIyMmQ5MWExMDE3NGY3ODAxMWQyNzY4ZDlhNWE0MzYxNDZjNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTRmNjY3ZmRiN2EyZjczNTExYmRmMGI1ZjYzZTQ5YjgzY2M5NWI3ZWYwNDUxYjAyZTZlOGFjMDNlY2IyNmVlOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGI2Y2M1M2ExNmE5ZjQyYmY3MGE0NDVkMzhlYmM0MWZiMDlkMjE4ZGFkMzZhMjczOTdmZTNkMTZhZDI4Mjg2YSJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L854-L865",
+          "version": "repo-lines-v1:sha256:b4158e894ed71122bd4a974c9cf38cca3aee9ef4dac260fd4d97ae7a0b5bd3ba:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2MjcyNjRmY2VkNmM1ZTY4MjMwNjY5MzdjZGIzYzU1ZTQwMjBlMWNhODg4ZjZiMTFlZWUxODUyMzViN2RjMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhlMmMzMGFhMDIzOTkzMWQ1Yzc2YzYyNjQ2Y2U3MDdjMzhmNTAxNDkzYmE1NTEyNTg2Njg2ZWQ0ZjFhZjA1ZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVmZjcxZWMxZWI1OTJmNzJmOTEwMDU1MmZkN2RiMTA1NDllNzlhMDE5ZDBmMDQ2NGRhMzJmMjRiNmMxYWVmZTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5a568ab23a2f4334a1ee461ba67b9c29",
+      "statement": "`/forget` 的键名参数由 turn 层原样透传给宿主（含空串），用法说明与 `all confirm` 这类二次确认格式都在宿主层解释，turn 层不自己编文案；`/memory` 走 `sendText` 纯文本，宿主实现因此不能用 Markdown。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L779-L812",
+          "version": "repo-lines-v1:sha256:cc5692510247ef23e8f68612b618ae626eab2f787fce8d73c026a5941acb5185:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImViM2ViZjU3Y2M5MmY0Yjc3NTk0ZmZmMTE2YTVlNmJkNzA5ZTlhNjM4M2E1OGRiZDkyZTU1YWExOGRhYzAzZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmMGNkYjk3MmE3YmZiN2VkMjQ2ZjlmZjY3MjM4NWU1NWY0OTY4ZmMxMTA0M2RjNWI2ODRkNTFkZmEzMWRiY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkM2E5YzhiOTAzYTQxNjhhNTE5MzYzZDM2MjUyZjA0NjBmYWViYjg4OGEyZWUyYTUxNjEyOWNlMGQ3ZDc2NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAifQ"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L62-L68",
+          "version": "repo-lines-v1:sha256:b3266609b6cdcc6058c2d5a52112172d7c175dfb75c9c1e01924f9a273e92f17:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYyYTJmOTk2ZjA4ZTY4MGJkMjkyMTM1YTZmYTQ5NzhiZGEyNmU2MDJkODRmMzNjYjFkNTk0Nzc1ZDQzMDRiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWViODZjMzY3ZWM3YWM4YmMyYWNkZmUxNTQ2NGYzNzc2ZWNhZWI0NzI3NDA2MzcyMzcyY2VhOTQzYmRmM2JkNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDYxYTVjYTRhZmFjODU3MTk3M2M1NzAwMjE2NTQ2Y2ZmZWUzYjExYWIxMzY5NDMzZTM3MjQ5ZjMxMjU3ZTNhZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzc5MjllOTFlMGY5OWMzZTgyNWRlNjliNDM1ZmI2NDg0ZDFiMGExZGYyZjQ2NTYxYWJmMWEyOWYwNDE4OGI4OCJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L820-L836",
+          "version": "repo-lines-v1:sha256:994d5cb9f3f7c8c73e420602dee43300c17b998445ad9b0976b167fa1b698ae0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyNjM0ZTQwYjQyYWZlNDJhODYyZmFjMTM5YzRlMmQxZTdjNWU5OWNlZWUyYjVhNDhmZmE5ZTNiOGJiNTY4MDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2ZmRhMWNmYzVjNjM0MDgxZTJiMjU4ODhmNWVhMTYxNjg5Mjk3Y2ZjMGQzMmNjNzk4ODViZjhlMWVjODA4OTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2N2JmOTIxNDU4MWM3N2MyM2Y1NTAxNDQ4ZGE3MjlhOTVkYjhkNjkwM2IwMDZiNzFmZGRkYmEwYzY3NDAzYjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7d5f2b2cf921434087dff85fb5478a50",
+      "statement": "F 节的元命令测试钉住「命令不留痕」：`/compact` 与 `/clear` 走 `host.compact` / `host.clear` 而不是 `host.ask`，宿主 stub 的 ask 调用计数必须为 0。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L948-L960",
+          "version": "repo-lines-v1:sha256:a5f397a3abc42b8c5da39331077129810546d59940ec570224d9156f2befd14a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhODhiYzZmNTdhYTlmMTBiM2FlYjdhMDNmZjQ5OGJiNzg4NDRhNjBhMWZhNjdhNzU4ZTkzYmFkNDdmNmU5YzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIzMzZmNzQ4ODQ2MGIzMjZmN2ZkZDJjZGQzZTQxOGY2OTgwNzA2MTk2NjFlOTIyYzgzMzMxMzFhYWVkZWZmZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjZDlkZWQ5YjA1MGIxM2MwODU5Y2UwMmQwZDI3MmM5ZWIyNjcyOTJlNjkzNGE4MmJkNTNlODM4OGEwNmQzZTMifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

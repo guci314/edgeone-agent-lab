@@ -1,0 +1,246 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:0bbfde5c0893df52253b299255ec25a2eee9ad5c816781267fe822c5dcf6326c",
+  "claims": [
+    {
+      "id": "claim_a8e2ffe45d21487495e8fabd9dc1b8ba",
+      "statement": "飞书事件进入 agent 的入站层必须落在 EdgeOne 平台之外：agents/* 路由强制要求 Makers-Conversation-Id 而飞书服务器发起的推送加不了自定义头，且 cloud-functions/ 内部 fetch 同项目 agents/ 路由被平台拒绝（实测 404 domain endpoints match fail），因此形成了「平台外收事件 → 平台内跑模型」的两段结构。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/index.mjs#L3-L21",
+          "version": "repo-lines-v1:sha256:20f0f02254c0943b13fe5e5f8c964c98f521f6cde6bf42abe28d699a8dcdf128:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ4NzI1ZTkxMTY5MmMxYmNhMGRjOGI3OTAwMzE4YTg5Mzc4NmQ1OTY3YzBlMjgyMWUwN2MxNGNmYzlmYWQ1YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiNDE2NTMwNjUwNGFhNWQ2YjllZjBkNmM3Yzc4NzdhOTg5YmIwMjE5NWEzMzhkMWU5ODdhMDRmZDgwZTg3NjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkYTdlODNmZDFiODg1OTA0OGVlMWMxNGIyZGM2ZTRlNzY0NzgxZmM0NTBmNWQwYjE1MGE3OTZhZWU2NTdhNmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyZWJlZDc1Y2VkNmE2ZWExZjA0ZTI0NzBiYTVlMzE0NTk0YTYwMDhlODhmMWI3Mjk5OTQ2ZThjMjAzZTc4MjkifQ"
+        },
+        {
+          "resource": "repo://docs/02-%E9%A3%9E%E4%B9%A6%E9%85%8D%E7%BD%AE.md#L13-L17",
+          "version": "repo-lines-v1:sha256:af7389ac78fd3001629742d1b00cd5e3beb9dd9f44b8c14aebb0b113dc5c5d4e:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTcyMTIxYjI3NzIxMmFlYzViMDNjMmMxNmE5MWRiYTg3MTY5ZThlYThmZmEwMmI4YTQzOGYzYzlmNjEyMjAyMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDQwNmM2MjhkYjgyNGQzZjQxYWZkODA0NzZiMTExODlmNDZlNTM1NDRlMDBmNjgwMzQ0ZTliNmE5YWY3ZjE0MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGQ2NjQ0MjJhODNjZDdkY2IxYTg4NzkxOTkwOGIzZGM4MTgyNTU1ZmM0ODRmZmY3MGU3ZjRjOThkMjlkNGQ5YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjI4NjJiNjcxOTdhMmY5MTZhYjgzNmMyZWQwODFlM2QxNzgzY2Y4ZjM3ZjFkMGQyMjgwY2VmYmM3NTIwYzZlZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c162405b042f4bf9920cd23689a1047e",
+      "statement": "飞书入站链路换过两次，v1（同项目 cloud-functions 转发）因平台拒绝自环而失败，v2（本机 bridge 长连接）可用但依赖本机开机、已弃用，当前生效的是 v3：飞书 webhook → CF Worker 中继 agent.yujizi.org → EdgeOne agent。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L3-L8",
+          "version": "repo-lines-v1:sha256:cbd664aae0ffdc6e791f4ed223d23898433ec1e12f74d721c19e327ad287f394:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjlhNWZlY2QwNDVmYWQyMzQyMGIyOGNjYTRiZGNiODU2ZmNjYTkyZmYzMzczNGEyN2Y3OGVkNGNlYmNkZjhiYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWVlMDc3MzE1OGRhMWRjYjIzYTdjYmI3NWI2NWE2OWRhM2Q4OGM0Y2Q4OWMxNWE4ZDE4MzlhYzVmYzQ1ZDI4YyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGRjYTNjNjQ1ZmIzYTliNWI1NDg3ZDMyZjllNWEzYjVhYWQwMjAwN2MzYTY5YTQxMWQ1MGMwZGE2ZjdlODlmZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTFkMjlhMDM1YjAzNTA5ZDc1ZWEzZDFiMDgyYzk4OTMxMzljMTMzZTIyYmMxNzg1ZDZmYTRkYWZlYTcxYzRjZiJ9"
+        },
+        {
+          "resource": "repo://docs/02-%E9%A3%9E%E4%B9%A6%E9%85%8D%E7%BD%AE.md#L9-L31",
+          "version": "repo-lines-v1:sha256:aae0ed0ebb1b17f6d7041f7041fe81d80a0b8cc828b3e610ddeff357ee156ded:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyZDhkMjQ1NjM0MjFjZWE0NTUwMzNmMDRiYzc0ODhmMTA1YjM3NGUyZTZlN2U1MWEyMWFlN2YzYzIxYjk5MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllY2U5MTA2MTFmYmU4YTY1ODM5ODVlN2Q1OTFiMmVmNGUxZjFkNDYwYjVhNmQ1ODU3NmE2Y2RkMGM4NDRlOTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2ZGQ1MzE0ZjhiY2NmYTNhODMwYWI5OWQ3MTcyNDhkNWE1MGY1YzI4NWM0Mzg3OTBhMDg3NzhhNzAzNDk1MjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8ccedd66972544249841c03d49fc6542",
+      "statement": "当前生效的 CF Worker 中继代码不在本仓库（在 cf-agent-lab 的 src/feishu/edgeone-relay.ts），本仓库只能看到它的接口契约：验签/解密 → 立即 ACK → ctx.waitUntil 后台转发（带重试），密钥走 wrangler secret 的 EO_BOT_VERIFICATION_TOKEN / EO_BOT_ENCRYPT_KEY / EO_INTERNAL_TOKEN，目标地址在 wrangler vars 的 EO_AGENT_URL，飞书侧请求地址为 https://agent.yujizi.org/api/feishu/edgeone。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L3-L8",
+          "version": "repo-lines-v1:sha256:cbd664aae0ffdc6e791f4ed223d23898433ec1e12f74d721c19e327ad287f394:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjlhNWZlY2QwNDVmYWQyMzQyMGIyOGNjYTRiZGNiODU2ZmNjYTkyZmYzMzczNGEyN2Y3OGVkNGNlYmNkZjhiYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWVlMDc3MzE1OGRhMWRjYjIzYTdjYmI3NWI2NWE2OWRhM2Q4OGM0Y2Q4OWMxNWE4ZDE4MzlhYzVmYzQ1ZDI4YyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGRjYTNjNjQ1ZmIzYTliNWI1NDg3ZDMyZjllNWEzYjVhYWQwMjAwN2MzYTY5YTQxMWQ1MGMwZGE2ZjdlODlmZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTFkMjlhMDM1YjAzNTA5ZDc1ZWEzZDFiMDgyYzk4OTMxMzljMTMzZTIyYmMxNzg1ZDZmYTRkYWZlYTcxYzRjZiJ9"
+        },
+        {
+          "resource": "repo://docs/02-%E9%A3%9E%E4%B9%A6%E9%85%8D%E7%BD%AE.md#L19-L39",
+          "version": "repo-lines-v1:sha256:88d089fc2a89711f5ff85c0cf0bbc4d75162d31502eaa978a58f3e5c4cc3949c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NzY1MDUxZTllNzExZmVjYThiNmZkNTI4MmRlMGViMGExMTBmY2YwOWM5NzQzMjRlZmI5OTAwOTBkMzRmNjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2NmZjMDdiNGY4ZWYzODE5NGJmYmM1OTUyOGIxNjI0OGYwN2MyY2I0ZDIyMTIzZDZmYTVkYmE0ZmYwMjllZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAyZjZlNmViYWViN2ZhYmUwOWM3ODllNzM2YjJiZDU3NjRlNTc3ZDk0ZjRkMDhlM2Q4OTU5MTlhNDcyMWFiZmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2deb5431d3c6483298308a231dfd3d79",
+      "statement": "CF Worker 中继的密钥改动需要跨仓库手工同步且分两步：wrangler secret 更新并重新部署 CF，再把 EO_INTERNAL_TOKEN 的同一个值同步到 EdgeOne 侧项目环境变量的 INTERNAL_TOKEN 并重新部署（两侧必须同值，否则 agent 返 401）；其 conversation_id 算法只有注释与文档保证与本仓库实现一致，本仓库没有任何可执行断言钉住这处副本。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L710-L730",
+          "version": "repo-lines-v1:sha256:d6afbd11d8c88e5d9bafe88280b22a71d522a884d6e0173276ab35a8d62ae6ee:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmMGNkYjk3MmE3YmZiN2VkMjQ2ZjlmZjY3MjM4NWU1NWY0OTY4ZmMxMTA0M2RjNWI2ODRkNTFkZmEzMWRiY2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmNzIxOWI4YjkyZTA1NmQwNTdhNWFlM2I1M2RjYjEzZjFmNjA1NzdhZWJiZDFjOWExNTJjNzhjZTNjMTEwYjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzMGZhMmZhN2E1YWQxODFjYjRlMDFhZjlhZjIwNzg1YTA1NzJiNDM5MTAxODA1ZDhmY2Y2ZmQxNjI4NzdjYTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjZTdiZjM3MGZiNWQwNGZiZDkwMTA1ZmE2NDY3MjZkODE3NDRlZWM0YjQ1MThlNmIzMDhhMGNmMDdkNjMwNjYifQ"
+        },
+        {
+          "resource": "repo://docs/02-%E9%A3%9E%E4%B9%A6%E9%85%8D%E7%BD%AE.md#L26-L31",
+          "version": "repo-lines-v1:sha256:53e2ef56030acbe769c27bc9769360f494f503404b76885ac97cac58a883af87:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjgwNGQwOWM2YWE1ZGQ0YzdlNWM5MDZjYjkxOGNiMDI1N2ViMmIzMzU0YWY5OTYyMWZiMDExNmVlZjBjZDAzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWVjZTkxMDYxMWZiZThhNjU4Mzk4NWU3ZDU5MWIyZWY0ZTFmMWQ0NjBiNWE2ZDU4NTc2YTZjZGQwYzg0NGU5MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzRiMzM3NmFhOTJhM2U2ZDQ3MjQ3YmU3MzJhOGVmMzUxMmRhODMyNmI5MGM1ZGIyMzM3MjRiNGRhYWYzNzQ2OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTZkZDUzMTRmOGJjY2ZhM2E4MzBhYjk5ZDcxNzI0OGQ1YTUwZjVjMjg1YzQzODc5MGEwODc3OGE3MDM0OTUyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_535e6a3d8ddc47b29c90df2025eb894d",
+      "statement": "本机 bridge（bridge/index.mjs）是已停用的 v2 备选链路：它用飞书长连接（WS）收事件，只做「收事件 → 转发」、不碰模型也不回复（回复由 agent 自己调飞书 API 完成），长连接方式还使其不需要公网回调地址；重新启用只需在飞书后台把订阅方式改回「长连接」并在本机把进程跑起来。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L3-L8",
+          "version": "repo-lines-v1:sha256:cbd664aae0ffdc6e791f4ed223d23898433ec1e12f74d721c19e327ad287f394:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjlhNWZlY2QwNDVmYWQyMzQyMGIyOGNjYTRiZGNiODU2ZmNjYTkyZmYzMzczNGEyN2Y3OGVkNGNlYmNkZjhiYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWVlMDc3MzE1OGRhMWRjYjIzYTdjYmI3NWI2NWE2OWRhM2Q4OGM0Y2Q4OWMxNWE4ZDE4MzlhYzVmYzQ1ZDI4YyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGRjYTNjNjQ1ZmIzYTliNWI1NDg3ZDMyZjllNWEzYjVhYWQwMjAwN2MzYTY5YTQxMWQ1MGMwZGE2ZjdlODlmZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTFkMjlhMDM1YjAzNTA5ZDc1ZWEzZDFiMDgyYzk4OTMxMzljMTMzZTIyYmMxNzg1ZDZmYTRkYWZlYTcxYzRjZiJ9"
+        },
+        {
+          "resource": "repo://bridge/index.mjs#L18-L21",
+          "version": "repo-lines-v1:sha256:3f51ed23f9c0daa8deead2335a01cf77b48cd6fdced5aa1b7bd6a5b5cc5d98a7:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmEwMjgwOGE4NjY5Y2U0MTJlOWYyMmU0MzQ2MGUwNjdlMTZlMDJhMWEyNTM5NGM2NTgzMGRkODRlOGYyOWM4YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGI0MTY1MzA2NTA0YWE1ZDZiOWVmMGQ2YzdjNzg3N2E5ODliYjAyMTk1YTMzOGQxZTk4N2EwNGZkODBlODc2MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjU5Njg4NjdkYjFhZDk1ODFhZDhlMzNkY2UxZTI2MmU3MzA4Y2EyMWIzNGE1OTVhMGExODJmYjRlZmE0MDkxNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzJlYmVkNzVjZWQ2YTZlYTFmMDRlMjQ3MGJhNWUzMTQ1OTRhNjAwOGU4OGYxYjcyOTk5NDZlOGMyMDNlNzgyOSJ9"
+        },
+        {
+          "resource": "repo://docs/02-%E9%A3%9E%E4%B9%A6%E9%85%8D%E7%BD%AE.md#L29-L29",
+          "version": "repo-lines-v1:sha256:0568449cc015551f0030b9385b00759b5a7424fe01f6f72f4911240cf84f9eaf:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDU2ODQ0OWNjMDE1NTUxZjAwMzBiOTM4NWIwMDc1OWI1YTc0MjRmZTAxZjZmNzJmNDkxMTI0MGNmODRmOWVhZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDU2ODQ0OWNjMDE1NTUxZjAwMzBiOTM4NWIwMDc1OWI1YTc0MjRmZTAxZjZmNzJmNDkxMTI0MGNmODRmOWVhZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTUzZTU0MjkwM2EyMTk1MzU3OTdjZjk5MzlmOTFiMTJkNTMxMTdiMTkyMzgyNzQ5YzUzZDA1Njk1ZDI3Y2M4NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTQxNjhjZjVhODhjOTFhOTE0M2ZhNzAxMGQ4NzI3ZTRlMDUzODYxMDk0MjA4YTU4YjVjNDYzOTY2ZTAzNGQ1MCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_19b20f11cd024dfc86320aa442a34013",
+      "statement": "bridge 的 handler 必须在收到事件后立即 ACK（return { code: 0 }）并把转发放到后台（void forward(...).then().catch()，不 await）：实测在 handler 里同步等转发约 4 秒会超过飞书的 ACK 时限，飞书会把同一条消息再推一次，日志表现为同一个 messageId 先 202 后 200 成对出现，第二次只靠 agent 侧去重挡住但白白多跑一次。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L127-L133",
+          "version": "repo-lines-v1:sha256:4707d134c80a03bd01b495202f33d32acffa35bc5f80804c1bf9f9637de91984:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTlkNDgwZWFjM2Y1ZTU1N2M4MDQ1MGMxZmIxYTM0YWE3N2E5NjljZWJjYmFiYmM3NzU0ZTZjYWVjNDc2OWViMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTMwOGRkMDQ0MDc0ZGI5OTU2Y2Q4YWFiNGNkYmMxYzM4NDJhYTliYjA5MWU5NjMyYTUwMDU4MDNhZDhjNjMyNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDczY2NmNjhlOTk0YTQwYjk0MjljNDJiNjMxMzdjMzgwNzEwZGVmMDY5N2Y5ZjFhMWQ4OWFhODE5NWRhY2E1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWEzODIzNWQwYWVhYTMzMWRiZjk1NzY1ZDY0MGJkYTBmODY4N2M3ZDFhYWI4NzBlYWQyNjY3ZTA1MDU2ZjdiYiJ9"
+        },
+        {
+          "resource": "repo://bridge/index.mjs#L107-L134",
+          "version": "repo-lines-v1:sha256:9ecf649af9d8ab979e1de393c180433e1d44ac0d0ce1ea5ff23b1ba6904ec042:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzNTc2NGQxOTRiYmUzZGNhNTkwNDRjMGFmMmMzNjg2Nzg1NmM5Njg2MTVjMmNjMWU4ZmE4MzFhMTFlNzFjMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlMGI2NjFmOTFiYTQ5OGUwZTZmODEyMjY0Y2UwM2ZjYTQ5MWViODc3ZjA4ZjI1ODk5YzE0YTg3MGE3MTZkZDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjNzgwZmJiMjc1OWUwOWIwMDJhMjM4NGYwMGEwZTJjNDA0OWEwODU0OGJjYzViMmIzM2VhY2ZmOGQ3NDVjY2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzODNhYzE5OThhZDg4Mjg4NDVjNzBlZGZmOWQyNWZjYzc4OTU3ZjU1MzBhNzk4MzhkNTE4NGExZTE3MGZlNDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_456fbae51d8c4f2c9752061f26105328",
+      "statement": "bridge 的异步转发没有重试：长连接本身不重推，转发失败这条消息就丢失、agent 侧去重也无从生效；这与 CF Worker 中继用 ctx.waitUntil 带重试的后台转发形成最实质的差别。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/index.mjs#L129-L132",
+          "version": "repo-lines-v1:sha256:050f521734fbce65fd5345609e9c75a7536ce39eb6126f7a90417cb82fb700db:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGJkOTkxOGIzZGM5MzlmMjQ0YzI0MGI0MzJlNzAxNTdhY2I0ZjhmMjFmNmI3Yjk0MDk3MWE3M2E2NGQ4NjIwYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzE3YWYxMTAxYzk3YjdjMmY1MjU0MDc4MmU2MzRjYzQ0NDBmMGU5NzAzNDFlNTJmOTc1MjMxMWQ3OGI3ZDdkMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2U2NTY1YzdjNThjOTY5YjJhZjUwNDEyN2VmYjQ0NGI1NTc1N2MyYTI4YjJkMDdiOGEyMzYxNzhhZmNjZDU4NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjQ3ZWRhOGE0NWY5MmFiOTg1YzJmM2ExMzY0YjJhZjIyM2I5MzBjYTY5NDZiMTViNDY5MTM0NWE1MTcwY2I4YyJ9"
+        },
+        {
+          "resource": "repo://docs/02-%E9%A3%9E%E4%B9%A6%E9%85%8D%E7%BD%AE.md#L21-L23",
+          "version": "repo-lines-v1:sha256:4a743a9fd4598742fc93e61801276710b1766e1dd233e7a6c234f6af09288cb5:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYyMjZmMDI2ODM4MmQwNmE4MzEyMWNlY2M2ZWI2NTc3MGYyYmI2ZjQyZGFjZDFmZjU2NTkzYTMxM2I2Mzk2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmFhZGYyOGUzNzM1ODAzZjUwMjkzZjBkY2IwYzRkMzdkNGUyMWU4ZTU4OTdlYmQ4MTJlNTQyMzE3NWQyMzUwYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjI4NjJiNjcxOTdhMmY5MTZhYjgzNmMyZWQwODFlM2QxNzgzY2Y4ZjM3ZjFkMGQyMjgwY2VmYmM3NTIwYzZlZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmJiNWQ0YjYzNTM4YTljZDI0MGU5MTljZDdkMDMzMjg2OWU2OWM3NDk5YTUzMDI0NmE2MmMwZGM1YjkxYjAwMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_805e8f6398ba48eaa44400a60f969966",
+      "statement": "bridge 在转发前只做最粗的两层过滤并对其余情形静默 ACK（return { code: 0 }）：sender_type === \"app\" 的自环事件必须丢弃（否则 bot 会跟自己的回执聊起来），message_type 非 text、content 解析不出文本、或缺少 chat_id / message_id 的事件也一律丢弃。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/index.mjs#L61-L68",
+          "version": "repo-lines-v1:sha256:5c36856c9b36596ea302d831a98b87078d15752a46c3d666ece2f1dc36fd28f0:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTRkNDU4NmVhZDEyMmViYjlhNThlN2Q2OTVmOGVhM2E0Mjk4OWVlMWRmNjJkMDdjNTFhMmViMmNiZGNkMDNkYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmE0MzhkOTE4M2YzMjMxZDU5YzM2NDM2YTVjNDIzYzBjM2ZmM2RlNjU3NDVkNzJmNDUzZjAzZDVjYjYyZDIwZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTY1NmM1MzJjMmU0MzE4ODQwZjNlZTUwODFiZTljMzdkM2UzMjM1NTQwN2UxNDY0OGVlYTk5ZGYzOGFjM2M0MCJ9"
+        },
+        {
+          "resource": "repo://bridge/index.mjs#L95-L105",
+          "version": "repo-lines-v1:sha256:b3a90125039a40298552b9a15d4022ad103c01a44a6e1938549d7e327b37395c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0ZmFlMDY5ODVlZjJiZDgxNzNjYzc1MTRmOGRjODc3NWU4ZWRiNzcxNjZkZmE1ZjBjYjkxNTFlZWFhZDUwMWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhMTk5ZGY1ZjA5ZmU2M2YzMTE1MmM0ZTIyMDlmYTM0OGVmYmJjMDRlNTY0NDI3MWI1NTBmZGUyN2ViNDY3NTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2NTlhNjY3MGRkZmMxMzljNzkzYTc0ZTIwMGU0YmRmZTZjNjBhYzFkNWZlYThlYjFiYmFhZjg5ODljMjM5NWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhiZmI3MzFjNDM5MWRlNWQ1OTRjOTdlNDBiYTY4M2ZjY2IzMjE0ZDFiNjQ5MzkyMTA4ZGYxMzI2OTE3ZjliYTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ea4ca71b04e94e4bac3da804e5646042",
+      "statement": "bridge 的 forward() 组装与当前转发层同形的 body（messageId / chatId / chatType / openId / text，外加 body 的 token 字段），带 conversationIdFor(chatId) 算出的 Makers-Conversation-Id 头（fs- + sha256(chatId) 前 32 位十六进制，恒 35 字符、确定性）与 x-internal-token 头；INTERNAL_TOKEN 在 header 和 body 两处都发，因为该 runtime 的 request.headers 不是标准 Headers 实例而 agent 侧会读多种形态。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L106-L114",
+          "version": "repo-lines-v1:sha256:450654c8c3cbf8c59f4855f6f5b9411e67f394f20d9f34c7a193b1ef20017132:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY1ODY3MTQ4OGE2YzQzNTQyYmRlNjNjYmQ2OGI4NWFjMjQ4YmY1ZDJjYzJiMTdmYTUyMTUxODNhZGI1NTg3ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQ4OTM5YzJmOTk0MDdhY2ViNzNiMzJkZGQ5NzJmYmEzNjBkNmQxZDg5ZDMzM2FhZjBjYWNhZWVjYzZkODc4OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDNmZmNjNDk4OGQyYTEyZjliMWM2M2EwNmNiZjA0NGY2YzRlZmJlZmU1ZmY0OTczNzA1MDFkNzE1MzQzZWNkMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODgyOTM2MmJhYTRhMmJmYzJlMzI2YzkyZTI5MmRkNWM0Mjg3ZDVlMjJhODkxNDQwODU3MmM4ZjI5MjJjNDEwZCJ9"
+        },
+        {
+          "resource": "repo://bridge/index.mjs#L51-L89",
+          "version": "repo-lines-v1:sha256:1d1c54f25a8603dbb60a798a003ac868e8523fcf0560143c170effe314a2aad1:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MTA4Y2Q3NTg3M2YwM2Q0ZGU5NDk3Y2QzMTc1NjE2MDlhODExZmMyNTM2YjY4NGI5ZWIwZTA5OGU4MDFmMDAifQ"
+        },
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L191-L216",
+          "version": "repo-lines-v1:sha256:9044ea6c422ee0d314a83c3b07d6f3a3d50136c81c5befd7c2c0b1ad699e9c6d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2NDA5NDNjMzY2NWU1NzI0M2RmYjI3ZDVmNzIyZjAxNDRkMDM0YWU0YWZjOGMyYzZiOGFlZDAzNTRiZTU0MmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZDExY2FmNDNlOTdlZjM2OWU2YmVlZDFhMjY4YmQwNTgzOGYyOWI5ZGQyNTRiZjY5YmE2NDg4NDE0NzIzNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyNTY3OTk4MDIyODIxZWFhN2I3ODlmNjU5YzVmMDZhNTA1MTczYzhlZmYwZjgwYmQ2ZWZlYTUwNjZkN2VmNjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5OTU5NWU0YThjZDQ1MGE0NjhmMzRjMDA5NmMxYzcxN2QxMzJkMDU4ZGJlYTE2NzY5NDM2ZmVmY2I3NTNmNWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1df2ba98e74645ed9ba6f7ede67aafcf",
+      "statement": "bridge 的转发带 AbortSignal.timeout(110_000) 上限且超时不重试（长连接不重推，重推会造成重复回答）；这个上限只是兜底，因为 agent 在 async 模式下约 200ms 就返回 202。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/index.mjs#L83-L86",
+          "version": "repo-lines-v1:sha256:df06a13ab26270ab2c22163201da7a98be7815ae959e27505f55ee9c080ce29f:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2JiMTk2ZjhhNDM0MDUxMDk0N2YwMDcxNTE3N2I3Mjk1MzVlNGU0OTNiNjc3YTQ2ZDI4YzZmMzZiNjM3MTZjOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjM3YzhiN2VhMWQ1YTZiZDE2YzAxY2E0YWMzMWQ3MjRmOGYzMDkwMTQyZTdiMzdiZjBmYTlhODdiYTNmOTlhOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWM0ZjdmMzI1NGJmYjYwZmI3M2IyMjE4NDA1NDgwODY3YzQ0MmNjNzI1M2U2OThiMDQ4ZmUxNmI3N2ZhNDFmYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_97c586da76da4c93a03395355a5b4dd6",
+      "statement": "bridge 进程从 process.env 读取 FEISHU_APP_ID / FEISHU_APP_SECRET / FEISHU_VERIFICATION_TOKEN / INTERNAL_TOKEN（缺任意一个即打印错误并 exit(1)）以及可选的 FEISHU_ENCRYPT_KEY 与默认值为 https://eolab.yujizi.org/feishu 的 AGENT_URL，并用 @larksuiteoapi/node-sdk 的 EventDispatcher（消费 verificationToken 与 encryptKey）注册 im.message.receive_v1、由 WSClient 启动长连接。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/index.mjs#L30-L49",
+          "version": "repo-lines-v1:sha256:28b77ddd7669c8a89db27a1ffd9f8bd47f04862c6cd23fe254a8ec1271dbd436:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRlNTNhZTcwOWRiNTcyOTA5ZWQ4YjRjNjdhNzViYjE2ODkwMWFkNzk2ZDllYjQ2MzVmYTEyZjU5ZWIxNzI1MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE4ZTA1Nzg1MGUxNTU2YjcxNTc4NDY5Nzg3OWE4YTFjN2FlNDIwMGQzNjFjZTlhYzY4MGExMmE0MTNjYzE0MjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmMmU1OGE3NjEzOTBmMjdhZDg3NWM1NGNkOTg0NjI0YTU4NzQ0NDI1OTg2MzFhMWVhNDFiOGM0ODYxZTI1ZDIifQ"
+        },
+        {
+          "resource": "repo://bridge/index.mjs#L91-L147",
+          "version": "repo-lines-v1:sha256:97bda41a3f776081f11ddd802fcdd225a541782dc111c9b7ea4d2c31a48ede4c:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImViOTkwMGQ2OTFjM2U4YmRjYWU1MTA4N2VkODBiNDEwYTk1OGMzYWEwMTY4Yzc4NzVjMGQwMDg5NDc0YmUyNDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyZjFlODUxZTljOTE4MzMwOWY2MzBjYzcwM2Y3ZjQyM2VjMjRiOTM2ODBlNzJjYmRhZWE5OTNmYzU4ZTgxZTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlNjBlYTdlYzNiNGRjZmVlNzU5NmU2ZjcwODJhYTdmMWU0ZjRjYjAxNjY3MWMyNjNiOWNjNWJkNGU1YzdiODAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_41d8011e9adf4dd0876c5255e74213e6",
+      "statement": "bridge 的环境变量由 bridge/tools/sync-env.mjs 从 EdgeOne 项目的 listEnvs 同步生成到项目目录之外的 ~/.config/edgeone-bridge/.env，五个键任一为空中断执行，AGENT_URL 不在云端 env 里而由脚本写死；文件以 0o600、目录以 0o700 创建，只回显每个值的前 6 位与长度。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L86-L95",
+          "version": "repo-lines-v1:sha256:d28d584a655d78e9b2c56059f0e05ca9b57d66078eb45ba7bb104df7c3eb9215:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0OGQ3ODExOWY2MGQ5MGJlZTE4NzEyMzc4MThhNGU4M2RkZjUzZGVhNDdlZDZiYjNjM2RlZWQ2NWYwOGY2NjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0NTVkOWFlMTcxYjQ5MGU1MjM3ODk5MjQwYTMzZGM3MTdjZDJhYjA0YzE2ZDE5NjdhZDgxNDdmNzI1MWUxNzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3ODAzNjYyMmM4ZGExNmFmYjBmZDk2NGMyMDBlMjY2YjU0YThjMzNmZDM3MDg1OGFlOWZhMWNiZDcwZTliNmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhhNDkwZjE1MDYzMDY2Zjg0OTc5MjQ2NzBlZjAyYmExN2E3ZmIwNmJkMzFjZjE2ZmYwZTQ3MTQ0NGQzZTA2MDgifQ"
+        },
+        {
+          "resource": "repo://bridge/tools/sync-env.mjs#L24-L76",
+          "version": "repo-lines-v1:sha256:dbe3644e2a6047eaa2db01ac36121b72ce59e808b7f84ec51c531eafc95518b5:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwNmQ4OWRmMTdlNjU3N2U5NDk1YzExMmVmZmZkNmZiZGJmYjZlMzhkYjYxMTg2N2E3MzNhMjUwNjkxOWIzOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZiNmY3OTRkZmVmNTdhZGM5NWI2OTJlMjk1Zjg0MGI4M2Y2YmJlM2E3MzgyMmRhMTdhZjg2MjUyOTRhMjRlN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_311ce314539c40eba0ef024446f0e955",
+      "statement": "含密钥的 bridge env 文件与依赖必须放在项目目录之外（~/.config/edgeone-bridge/）：EdgeOne 没有部署忽略清单（edgeone.json 的 schema 里没有 exclude / ignore 字段）会把整个项目目录当公网静态资源上传，https://eolab.yujizi.org/bridge/.env 曾返回 200 导致飞书 APP_SECRET / ENCRYPT_KEY / INTERNAL_TOKEN 明文公开两天，bridge/node_modules 与 .npm-cache 也曾被打包上传把 assets 撑到 50M 并导致部署失败。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L10-L38",
+          "version": "repo-lines-v1:sha256:9b67db9554c0b0152feb9d1cb929b61c08706c01edebd4663977696bfd242692:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2OTc1OTM3NTc1ZjVlNTU2ODFmZjIyY2RmNThjYWVmYjEwYzI1NWJhYWM4MDdhMjYyODJkNTdlOTcwMWMyMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGY1OWUxZWU0MzRhOGFlZDI1ZTliOGVkNmRmNGQ4OThlYWU2YmRjMjhkYzZiMTM1YjNkYzg2ZDQ2MDMxMzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiNjcxYzIyZjYzYzlhNzQ5NjIyNzUxODVmYTI1YTU3NWE5N2JhNmYyMGEyYjgxZjIzYmM1ZWQzYjViMjdjMTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhY2Y0NGEwMDdlNmIzZjk4NTIwOGUyMTIwNGIxOWFlMWQ0NjcxNmZlZGFhM2IwYzliODcyMmY0MTc4OTAxMjUifQ"
+        },
+        {
+          "resource": "repo://bridge/tools/sync-env.mjs#L13-L22",
+          "version": "repo-lines-v1:sha256:e65bef59155b35c89996617746e2511b98fc735122b4826dbee57d4822de0123:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlOGE3NTUxMzUyNGNmNGE2NjNhMjAyMzdkMDJhN2ZiZWNiMzA1NTA5NmIyODg1YzRhZTJmOWEyMGNmNmJjMDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2YzdkZjE3ZTBkYzBkNjcwMWIzM2UzYjlkNjM0MDA3MWRjOTEyZDFmOWI0MTFkNjY4MzVhYjUwNDE4NDE5NWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwZThhMDU0NDY3ZjY5YWRjYzQ2NTE4MzRjMGJlZGY5ZDY1ZDczNjFjOGEyMTQyMDM3NTVlYzAxOGI2N2ZmMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRiNmEzMzdlY2I5YjU3YzhiNjQxYzQyZGZiMzVkNjgzNjQ2N2VlZDVlMmJjZGE5MThjZWE4ZGM5Yzc5ZDU0YWIifQ"
+        },
+        {
+          "resource": "repo://edgeone.json#L1-L12",
+          "version": "repo-lines-v1:sha256:0e2182dee23c66671c6768f83b4317ed80a55dfbcd78a6e8342a29ef47a1be44:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_85199229b8ac40b19537f02e71bfd76b",
+      "statement": "bridge 用 launchd 常驻（bridge/launchd/com.guci.feishu-bridge.plist）：RunAtLoad 开机自启、KeepAlive 进程退出就拉起、stdout/stderr 写 /tmp/feishu-bridge.log，plist 里有两个需按机器修改的绝对路径（node 二进制与 bridge/ 目录，node 需 ≥18 以支持 --env-file），环境变量刻意不写进 plist 而走 .env。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/launchd/com.guci.feishu-bridge.plist#L1-L50",
+          "version": "repo-lines-v1:sha256:e25b8c1c46e6cafad8bb34750cc2d3350c863ef1fa5a6957aef0b1d8c5025c17:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlYjY0MWRjY2YxMDYwY2Y4MjgzMTc3OGFiMDRiMjcwYjk3YjI0NzgwZDA4OTVkNWIwMGQ0ZWIyMTdmYzhhMWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBiYzEwMDJkZWRiNTE4NDI2Y2IwZjU0ZDBjMWI0ODZlZDJkMTU3NTQ1MTY4MDI4NGMzNzA0MWU0MDIzOTg1OGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyMDJiZGQ3YWZiZjkxNWM0Y2YwZTliNTBlZGU5NTcxZDdkYzJkY2JlZGY4ZjU0NjdiMmVmZDg3OTNiYmNkYjQifQ"
+        },
+        {
+          "resource": "repo://bridge/package.json#L1-L17",
+          "version": "repo-lines-v1:sha256:007ed77fa35a293464bc0a8d4daf35dbba8850b9a3b92eee6885108353b358d5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6af46e06366a43abad80504246d1beff",
+      "statement": "改云端项目环境变量不会实时生效——跑着的 agent 用的是部署时打包的快照，所以密钥变更的顺序是改云端 env、重新部署（npm run deploy）、等边缘节点切换、再 npm run sync-env 并重启 bridge，401 时用 ?probe=env 的 match 字段区分「值不对」和「还没切完」。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L318-L330",
+          "version": "repo-lines-v1:sha256:9ae9dc6d2bf65389c11401ba97349821ac83a57387076b33260bbee1caa88fb3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyM2NiNGMxM2Q2Nzc1OWQ1NGY3NjcxZDQ0MDM0OTcyZDA5MDNhMzlkMDhhZmFlNzNiYjk4MWViOWFiMGRjZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0NmI3ZWMzYTAwYWNkNjNkNDE2MGJjYzRmZDQxOTI1NjFiNTgwYWJmYjAyY2JkNWFjNGVkYzFiNGNhM2UyZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzOWY2N2YwYzJiY2RjNmFiYzcxYmIwMmIyODViZjJhZjA3ZWYyOTQyZDgyMjIzNjI5NDVjMjI0NzQ0M2IwZDUifQ"
+        },
+        {
+          "resource": "repo://bridge/README.md#L135-L145",
+          "version": "repo-lines-v1:sha256:fd833101ae46fa868359741ffffa4d7aa697fdea6d0b6a65dd501152356a91f8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MzY5ZGI3YWRhNWVmODI2ZWRiNjBiNmRkNmJmODhkMDJmZmRkYTY5ZjQyZWEwNjc5OGY3MjExYTBmMzQ0YzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3ZGI2ZDdjZjhhZTRiYjE2ZjQ4MGM1NzRiZDY5MTg3MmI3YWVjZDQxNGNlOGI0NWZiNGZlNjVjYWY4MTMyNWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2MGMwNDE3ZTVkZDFhNTcxOGQ2ZDIzZDYyMzUxMWQwMzkyOGYxMWVlZTFmNmYzN2NhMTk3MzZmODU4ODVhNzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjZWE3YzQzODJlNWM2NzVkODcwYmE4YjZjODcyMzE0NWRjN2MwNjk5Y2Q1NWY2NTJiYTk5ZTZjMWMyZjFlMGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4fc3c275ec4744ef991ba7e180491a90",
+      "statement": "bridge 与 CF Worker 中继都跑在部署运行时之外：EdgeOne 部署只认 agents/ 与 cloud-functions/，test/smoke.ts 只 import cloud-functions/feishu-webhook 而不涉及 bridge/，因此「部署成功」不证明这两条链路正常；仓库里 conversation_id 哈希不变量的未受保护副本共有三处（webhook、bridge、外部中继），只有 webhook 那一路有自动化断言。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L147-L149",
+          "version": "repo-lines-v1:sha256:6d5b831620d6b30c1847f8b2059a9bd4026bc718c44c82286aedd74d93e392da:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTNmNjI1MDQ2OGI1Yzk1NjAzZmJhZmFmYWQ2ZjE1MGNkMzBkNzYyZWVlNGE0MDUyMzlhZTY5OTFhYzZiYTA5NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjY3YzllMzRmMWRmNmI5MGQ1MWNiZjU5YjU3YzJmNGQ1YTI5OWFiNmIzY2IyMjFhZGQ3ODVjMjRkNDE1Y2QyNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGUxODNlOWFhY2EwYTZkNjA4ZWY1NmE4MWY5ZjA0MzllNzE4MzM5MDVjNjRhNDQ5Yzk1NGFlYTU1ZGU5ODg0MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://bridge/index.mjs#L26-L28",
+          "version": "repo-lines-v1:sha256:321f5f2cdf971e745c54a9f497a7f9ff89ab491df31dea3d8cdf5ad77909aba4:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTAxZWFkOTM2YTIyODFkNTNkY2MwNjRiN2UyYTJhYjBkNTNiOTJlZjNlZjdiMzRiNjY4NjczMDA3ODk1Yzg2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGEyMGIwNjUzNDcwMzFhZmU4OTM3YTZkOWRmMmVmN2JjNjljOTdlNDA5ZDRjMDNjZTcxY2ExNTIzNTk0MGQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGZiNWUwZjY4ZDY1OTRiYWY2YjIwYjc2NWU4Y2ZlMTRmZjNjNmFjNTA0ZGZiZTc0MjA3NzhkYWZkYjhjYmU5ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDhhMjFiYTE4OTY4ZjZlZmEwNThlYWVjNzEyYTVhMmE4ZTIxMDdkMjcxMTk3M2MwNmM2YTM0NDE0YzA3ODQ1MSJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L75-L90",
+          "version": "repo-lines-v1:sha256:d9ac4175716e4a75628de6f0fa957032941abbdc2a8de85bee86bd82aee96e1d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4ZTRkZDZhZDRlM2JmYzg2ODUyMzdlMDdiM2QwYjgwMzM2NDQ3ZGZhODcyN2JmMWEyZDkxMTkwYzRjZDY5MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5MDdiMTVmN2Q1ZjE2NTJmYzU2MWFlMDkwMWQyMjg2MDMzMjU1OTRjZTA4NjczZDlmNGM0YmU3NmZiNzUzNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2NDg2MDZiZGQ4NjgwZDM4ODRmNDhhMTJkZDI2YzIwMTBhOGU5MTJmOTAwN2YwMGVkNmM4MzRkZjFhYmVhZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzYjY5NTMzMTU2ZjE5YWU4MmNmYWExOWU2MWUxZmFjOTJjMzg5ZDA3OTZiYmRkYThhYmU0MTVjNDM0NDUyMjIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

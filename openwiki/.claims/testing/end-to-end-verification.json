@@ -1,0 +1,338 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:a7e3a50ad62e78b383d49e1948f01a7bfe9e3268a7632b1a7c66156e2dda51b3",
+  "claims": [
+    {
+      "id": "claim_e375271c403b4408b3493b3c9e68c759",
+      "statement": "端到端验证工具链从开发机发起、对着已部署的 agent 打真实请求：tools/ask-bot.mjs 投递合成事件到 /feishu?mode=sync，tools/verify-memory.mjs 与 tools/verify-autocompact.mjs 复用同一手法；它们不是单元测试，需要 .env 里的 AGENT_URL / INTERNAL_TOKEN / FEISHU_APP_ID / FEISHU_APP_SECRET / FEISHU_DEBUG_OPEN_ID，缺任何一个直接 exit 1。",
+      "evidence": [
+        {
+          "resource": "repo://tools/ask-bot.mjs#L138-L176",
+          "version": "repo-lines-v1:sha256:1210e3f9f477214f2d2860c04b24b0f93144650026c238901e06e6b680ae41fc:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2ZGVmZWNmNjM3NDQ4Y2NjYjc2NWExODQ0MjZjMWI4M2ZjYjI1NWNiMTI0NjZkMGUxZDljYTFhOGM4NzhmODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlNWNjYTg5ZTE1NDUzY2JmYzRlNDgwNzIyMGI5ZmM5OGZkZDIzYmM4ZTczN2Q2NjJkNzBmYzVhZDVhYTg4NWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2MjkwYWZkZDg1YzA0MjRlZTgwYjU3MGZlOTk1MzcyODkwZWY5NzM2MTE2OWFiMGM1ZWFkNDUyMTA0ZTc2YTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlN2I1ZTliMGI4NzBhZjM0M2Q5NzVkODYzNDU1ZTc3NzAxODY3MjUxMTE4MGFmMzY2ZDE3OGI1NmQ4OThlYjgifQ"
+        },
+        {
+          "resource": "repo://tools/ask-bot.mjs#L36-L59",
+          "version": "repo-lines-v1:sha256:2ec21159c4bbff904f42fa851488b72f399538c7a81952ae081a9cbcea8e3e06:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxNDdjMjZhMzI2MjhhNGVhZTY3NGE1ZmMyYThkMjBmNTRlODQwMzk0NTFhOGQ3ODQ0NWUyNGIxNDY1NDJlMTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE1Y2U5YjYzYTkwMTk2MWNmYjllNjIwN2YxNGE1MWY0YWUxNmMyYWUwYzVjMWFmNjM0ODIxNjExOTZiMjZjNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjOWQyZDQyYTdlZWQwOTc1MGI3MzI0OGMyODk4OWZmMzdkMjU4ODc5MGQzOWEwOGE2MjU4ZGJlNmZiYzQwOGQifQ"
+        },
+        {
+          "resource": "repo://tools/verify-autocompact.mjs#L38-L50",
+          "version": "repo-lines-v1:sha256:53a2cd161e3182877256f3c172c0b8d5ed4c19e126b0c0522bd0a455a8db9dee:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwNzY1YTM0Zjg0NThjMDc2ODI1NjZjN2FjMDQ5MjE2ZThjN2U4M2QwZmMzZGRhMThiNmI1NTc3OTQ4NDViNzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmMTJiNjA0ODU5Yzc5YTRjNDA1MTUyODkxMzlkNGY4ZjUzZjcwOWVhNTMyMGEyMjY0NTA1ZTA0MmUwMmFlZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwNmU4MmE2YzY2ZGQ1MTRlNWJjMzQwMzZjZDUwMWY3N2RmNDA4YzhiMWM3NTUxNDgwOWRkNjAwOGUwZDdhMGMifQ"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L36-L56",
+          "version": "repo-lines-v1:sha256:13981f8abf8bbf0835b2d32a272ff61db7a7f9854140df6151ba2dd9b62a3173:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkZjU4ZjViM2Y0ZWFmOTA4NTc0OTU4OGI1MmI1ODI4MTU4ZTdmN2MzMDljN2E4OTk5MTU4Y2U0YzEwMzA4M2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzN2FiMzlhMmMyZWZhZGMyZjJmODJhZDgxYjc4MDFmMTQ1OGQ1YjQ4YzMzMTMxMGJhZDVkMGM2YThiMTgwZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFjYmQ3NjNlMjAzYjY1Y2Y4ZWMyZWUzMTU1ODE2ZmU4YTc2YWY0ZmJmZThhNjA4MDE3MjU1Zjg4NzVhZjY3MTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRjYjIwZGYwNTRiMDY3NjAxZjNlOTk0NDNmNWMxMmVmMTA4NzU1YzliZTFkODExYzg3ZTFhZDQ5ZGYzMTIyOGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6b9cbed7c8d542f1bb8d88b6d235bc9e",
+      "statement": "验证脚本读取机器人回复只有两条独立路径：问答/卡片正文只能从 ?mode=sync 的 HTTP 响应 replies 里拿（async 的 202 不承载业务内容，而流式卡片正文通过飞书 im/v1/messages 读不到，只回一句「请升级至最新版本客户端」占位）；命令类纯文本回执（/memory、/forget、/clear）只能通过飞书 API im/v1/messages 读。两条路互不替代。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L173-L180",
+          "version": "repo-lines-v1:sha256:55cb35382816b8898c1072895ee6fe6460460bf60e4863d5d3f0d319842f5f70:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWZiYjg2ZTQ5MTBmNWI3YmI1ZTdlOWRkZTI5MWIzZTliODk2NTM3ZmRhNzI3YjhmYTI2OGQ0MGEzYmQ0YmRhNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmJhZTFlZmNhY2IyZGE3YzY1MDQ1ZjkyMmYxMGQ3ZDE0M2JhYTlkMjc0ODU4YmFjZTU1YTIxMDU0ZmU3ZDRkZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTFlMzcyNWRhMDAyYjQ2ZWQ4YjRkZTg4MDAzYWQ5NzEwZGNhZjE4ZDU3YzQ3MDFkYzNiZWZmMGIyYzVjYjEzZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzNiYzliZTgxZDgwMjFiNzZhYTc2MmNmM2ZkOGIxNDdhZWJmNGI0ZDFhYjBjNjU3Y2U4M2VkOGY2ZjFiMDI0OSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L98-L109",
+          "version": "repo-lines-v1:sha256:ea28aa8d8b790d051dcd652cb3c613a73e759155db2596365b3c535f28566dd2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1M2UwOTQ1ZDhjMTM3ZTZiYmM2YWYxMDUyZmM0OTI4MzYwZjEzMjJjMDdjY2VjNTk2ZTY3YzE3MmRiZTZiYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3MTY0YzcyMmI4ZTRmYThjZGJmNjRkYmI3ZmNmMTBkY2Q5MTA2OWY1OGYzYTk4YWRiYmM2OTNmYTVkNjVlYjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyYmE3ZmE2ZDNkOTg4ZTYyMWM0OTlhYmM1MGZiN2MyNTAwZDJkZWNiMjU3NzNmODZmMmU4MWE0MGY2ODk0MWEifQ"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L128-L146",
+          "version": "repo-lines-v1:sha256:952584e4549af1e9327039cd38efa6440576b800b20be03173d87b3fec0a28ac:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4ODM3Njc4MzExNDk2OTg3OWI0ZWQ4OTA1YmY5ZjVhNzlhYzA0ZDljYTJkMWFhYjkwMzZlMWFkODBlY2U2ODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc1OTE3ODZhOTljYzhmOTliOWFkODRiNWMwN2E5ZTlkYzcwYjgxM2ZhM2YwYjVjMGY1ODgyYjBjM2RkNzU5MTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxYzIzNWNhMDNkM2ZiMjY2MjU2NDNlMGZjM2VjOGIzMDBkOTk1NDAwZDAxYzFkOGNmZmU3NDdlMDJkMDIzNzgifQ"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L20-L26",
+          "version": "repo-lines-v1:sha256:2d35243e8091fa8ea65a841ecbfb2add18a2fb81111e4208d7def405c076ad6d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTAxZWFkOTM2YTIyODFkNTNkY2MwNjRiN2UyYTJhYjBkNTNiOTJlZjNlZjdiMzRiNjY4NjczMDA3ODk1Yzg2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTAxZWFkOTM2YTIyODFkNTNkY2MwNjRiN2UyYTJhYjBkNTNiOTJlZjNlZjdiMzRiNjY4NjczMDA3ODk1Yzg2MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2EwY2I3NDA4MTM5MmMzZDk1NzhhZjFmYTcwZDI2Yjk2NjdmYjgwZDM2MWVkN2U5NjNiMzY2YmIzMjczNzM4MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzk3NDM4YjVhMDJmNWE3MzhiYWRiZjliODU1N2UxMDE2MzU4ZDNhNmRmYjNkYjRkMjY3M2MwMWRmYTBkMTMxZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f96019da053348efbc090a3f39ed5cbb",
+      "statement": "因为 agents 入口的 normalizeEvent 不验飞书签名（验签由中转层做得），本机可以绕过飞书网页版直接给 agent 投递合成事件；ask-bot.mjs 先给 FEISHU_DEBUG_OPEN_ID 发一条自检消息、借响应体拿回真实单聊 chat_id（省掉 im:chat:readonly scope），再用 fs-+sha256(chatId)[0:32] 算出与生产转发层同一算法的 conversation_id。",
+      "evidence": [
+        {
+          "resource": "repo://tools/ask-bot.mjs#L1-L12",
+          "version": "repo-lines-v1:sha256:aca8a3b0ecc05b82a5b7c08d969cec80b2fa19b30963d9ec511eea0059a4d76c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwN2E4ZTQ4ODdiZWViYmRiNmFlNTJhMDA3MTkwZjdlN2JhZjgwMDY1MWQ4OGY1MzFkZGE1ZGI3ZDcxYWRlODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwMWVhZDkzNmEyMjgxZDUzZGNjMDY0YjdlMmEyYWIwZDUzYjkyZWYzZWY3YjM0YjY2ODY3MzAwNzg5NWM4NjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUxZmMzZjVjNDM4NjM0NDQ0NGJkYzYyM2YxYzY5NzBkYWYzYTI1NTBmZmMwNmY2Mjk2NWZhYzJjOTU2NjUyMzMifQ"
+        },
+        {
+          "resource": "repo://tools/ask-bot.mjs#L116-L142",
+          "version": "repo-lines-v1:sha256:5ccbd4b4bc90a3d50814b9ada18436147708c5f89d916ff15509775989efc6b0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjZjBmMGRhN2U1M2UxYzAxODEzNWYyZDBhNGE3ZWJjZTVjMDUzMTA4MzAyZmExZTgzNjA0NWM2MmNkMjdjZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjZjgyOWMyODk4YWE3YTJkNDczMGRmODQyMzA2Y2FjYjRhMjhkN2UwZmQ3YjEyOTEwOGFiZmM2ZDlkOGE4MWUifQ"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L113-L126",
+          "version": "repo-lines-v1:sha256:a5c88d56f4df73071d6fae8d790a6a3771ae2d0a57bed778946c618f8c072fce:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3ZDRhMjk1Mzg1ODkxODlmNGVmZTUwYzM3YzJhZDBkMzI5ZGNhMjRlMGUzYWU5ZDNjZTkxZjJlOTM3NzFkYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjZjBmMGRhN2U1M2UxYzAxODEzNWYyZDBhNGE3ZWJjZTVjMDUzMTA4MzAyZmExZTgzNjA0NWM2MmNkMjdjZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgxYTUxNTljY2JhNTIwNjMyZjg4OTlhZjY5ZmFmY2Y4MGQxYzU0M2RjZWQ1NDcxYWJkMjdkYmFkYzdjN2VkMmUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_22804ce949624bb78f37dbaabc709221",
+      "statement": "verify-memory.mjs 的跨会话记忆验收用真实单聊 chat_id 配四个互不相同的 conversation_id（A 记录、B 基线后复问、C 首次提问、D 仅用于清理后复查）——因为会话身份是 Makers-Conversation-Id 请求头而非 chat_id，所以 chat 恒定、唯一变量是会话，B 答得出只可能来自共享记忆。",
+      "evidence": [
+        {
+          "resource": "repo://tools/verify-memory.mjs#L192-L212",
+          "version": "repo-lines-v1:sha256:080ae66bde9052ef88a4f91467a08e694a49bcefab88d7be96e03a147e25aaf3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwNjk0OTZjODg0ZjJkMzk5ZDQxZWFmYzhiNTAwY2Q0OGM0ZGQ1Y2E0N2JhNDNkZmY3NTk5NjYxYmQ2NDQ4YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxNTgxZDFkYWRkYWQ1Y2QzOTJkMGEyZThkNjMzN2EzNjI1NjFjNWRmMDAyZWNjYzlhZGY5ODM3OGI2YTY0YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0OTMzMWM1YTdhZWJhMDliZWUyNTIzYWZiNzBiMWFlZWNjOTJiMDg2ZmVlYjAyMGViNjQyYTE2OWU5MDY5NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg4MDdiYWVhOTgzZGRkOTk0NjA4ZjMxMmY0MmVhOGJkYzM3OTIxZmE0OGFjZjlkYWUzNDMzZjZkZjY3ZGNlYTYifQ"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L214-L256",
+          "version": "repo-lines-v1:sha256:8da1945e2ea9d65899b7632d8bebfe0e72cf03a1ebb56b20fedcceb4a8f57992:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3MzFkZDhkMWYzMjUxNTUwNDBkYTZlOGZjOGFlOGMyY2MzOTk0MDRmNzRlOWVlZjk3YjM4YjgxNTRlZWRlYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2YzFhZTFhMjQwNjE0NWU3OWFmYTlmNmQ3YTYyNWU4ODg1MGIwY2IxOTg1YWVkZGNjMTA3ZTNkMjRlZTA4YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkMDY3YzJmYTY0NWI3MDQ2MDgxODRkZjAxOTQxNzUxYzM0ZTI0YzBiOWE1YjE1M2VhYjI4ZTdlZTg2NTMwNDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZlY2EzYjMxZTliOWJkODc2MDA4MzM3ZmQwZTJiYjllMmU1NDU3ZmNjZjNhZThmMzAwOWFkM2JjMWVjNjI4Y2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3c2e04576e1b42ae8c6f9b2bece25992",
+      "statement": "verify-memory.mjs 的阶段顺序构成一条端到端判据链：阶段 1 基线（记忆为空时必须答不出）→ 阶段 2 在会话 A 记录 → 阶段 3 回会话 B 复问（唯一变量是共享记忆，整场最关键的一步）→ 阶段 4/4.5 第三会话 C 首问并连问两次口径一致 → 阶段 5 飞书 API 读 /memory → 阶段 6 /clear 后仍记得 → 阶段 7 /forget all confirm 后用确定性 /memory 与全新会话 D 复查，全绿才 exit 0。",
+      "evidence": [
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L354-L392",
+          "version": "repo-lines-v1:sha256:e8ceb10bc7541ba540dee3eaadc59a17e18185edf937baf6c31765d0362611c4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc4NDE2ODgzODg3NGZhZTI3OWQ0ZmJkMzFkYTY2M2ZmNDRkMDk4OGI2OTAxNzk1MjhjOGE3ODQ4ZDgxNzU3N2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjYmQxMTNhZmE1YTY4ZDk5YmM3OWVhNWJhNzU5YWJiNzdjNDMyZGM2YTYyZGI4NmM2M2ZlYjgwNWNjZjkwNWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzNTk3ZjEyMTM4ZDcyZGMwNTUxYmQ2OGVjMWY4NjI5MWJhOTA2MDYxOWEwMzFkMmRlM2JiNWE3NDU0Mzg3N2MifQ"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L214-L307",
+          "version": "repo-lines-v1:sha256:f51e75f5656e3fd3528e94304141555dc282c565fb9e382605bba7f28075d155:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3MzFkZDhkMWYzMjUxNTUwNDBkYTZlOGZjOGFlOGMyY2MzOTk0MDRmNzRlOWVlZjk3YjM4YjgxNTRlZWRlYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkMDY3YzJmYTY0NWI3MDQ2MDgxODRkZjAxOTQxNzUxYzM0ZTI0YzBiOWE1YjE1M2VhYjI4ZTdlZTg2NTMwNDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzOWM3YjM1MDU0YzU4NTcyMDMzM2NlYWZlOGY0NTZjOTFmMzFjYjViMWMwNjE2ZWRhZDFkYmJjZDA5YjcwMzUifQ"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L309-L313",
+          "version": "repo-lines-v1:sha256:9d8498d0deb75932445f015e18562f974435f6c0a7b80b4473ecf240112e3d79:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDkwOWM5YWY0NTY4ZjI4ZDgwMjlhOTAzZGZjZDExYjliYWQwYjFjMzExMTBhNTYxYzA2YTk0ODQ3NTEwNmE2NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzJjMjhkY2ZhYTJjNWI0Y2I1YjVkZWU1YTg5NjVkMzI3MmIyODhjYmM4NjIyMjAzNjAzNTFhMzdkMTI3MDFmNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzFkODVjYjcwNGU3YzE1NTUyZTNkYWRkNDUyZmE4MGM4NjVjMTFmNGUzODZmODk5ZTY0NzE5OTZkNzdjZTQyMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e43c2f7bec654d899ac179c74e072705",
+      "statement": "verify-memory.mjs 用 assertsFact() 而非 includes(keyword) 判「答出来了」：出现了事实原文且没有任何否认/纠正/不确定标志词（更正 / 答错 / 我编的 / 没有来源 / 是空的 / 不知道 / 查不到 / 没记 / 抱歉）才算断言，因为模型自我更正时会在句中带上关键词却是在否认它。",
+      "evidence": [
+        {
+          "resource": "repo://tools/verify-memory.mjs#L305-L306",
+          "version": "repo-lines-v1:sha256:7dd10323022688adce727d772544778d1f4ca6b8302fc5f87ae6daf91e515237:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjAzNDVmYzlhYmQ0ODJjMTQ3ZGI0ODE0MDRlMjVkZDI1M2JiOWIzYzE1ZDc4MTY2MzNjOGZhZTBlYzVhYzJhZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzVhZmQxMDlkYmUwNDcyNjI0NGU5YmU3OTAyOGQ1ZmI5NDBlMDkzNTVjMDgyN2ZkN2M2Y2VkMDZiZGQ5ODRiMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTk3NWViNzBlNDkxMmYzNmQyMDE2MDI1NjM1YTJmOTlmZTcwY2JhNjQxMTFmMDZjYmNjYWEwMzZiYjc4N2NiMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDQ3OGQ5NTliMDllOThjMWUwZTViMjhjMDVlOTNhZGVjNWI3MzA4MGZjYjRiMTI5M2MzZmE5NDYzMjlmYWEzYSJ9"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L71-L86",
+          "version": "repo-lines-v1:sha256:a825e707a94e2efee29e5c93dd0e7560d5eff1923558d380f6dac96fe25bf4be:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxZWM2NDU3NDc1NjVjMDkyNzdjMTdjNTM1MDgxNThlNjc2YTU3YjlhNGZjNmY5MWIyYzQ3YWVkOTg3ZmVhMTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiNTgwZjZlYzI5YmM2M2Q1OGYwMzhkMzA3ZTY2NTE4MWI1YmEyNGJiMzlkYWNhYmVhYzMxYzA1YWM5YzdiNmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b332a01c253141faa5debe2210f4ce45",
+      "statement": "verify:memory 的探针事实必须是猜不出来的编造值（「青鸟-7」「release/2026q4-migration」），否则基线那步失效、整个验证等于没做；脚本在阶段 1 的失败分支里直接给出「换一个更刁的事实」的补救方向。",
+      "evidence": [
+        {
+          "resource": "repo://tools/verify-memory.mjs#L16-L19",
+          "version": "repo-lines-v1:sha256:a0f32b1da30dd454122703aad529ba99759042ff6deb2b8b6d1ee59535b277b0:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTI3M2I5ZDkyNjg4NjRkN2M2OTIwNTg3ZDc2NTNlNWU2MzEzMGYwZGZmNzFlZGIzYjA2YTQyNGMzZjU5ZDVmMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWZjOTI4ZTZkMDg2YzQxNzBjNGIyYTE2MWRmY2QwZGE5NzllNzdiNDg2NzQ4Nzk4MWE4OTM4MzAzOWFjZTM1NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTg5NDEzYTc4ODhmMTQzMDYzYTgwYzFlMzA1ZjZkMDNiNGQ2NDgxNDgxY2UzNWU2MTZlNDEzMmE0MDYxODJmNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDc1ZmIwNTY0ZmE1ZGYzNGRiNDg1OWVjNzU2NWVhYTMxZDY4ZGE5NTY1NGNhMWU1NGE3NTgxMDg1NzBmNDU5MSJ9"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L222-L223",
+          "version": "repo-lines-v1:sha256:928fa74dd0abb848233b8772584e94f1fc847441b0e519b79cb3a2ba40ad6f3a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDY2NDgxZDMxYTE4MDYxNTY5OWY1MmEyODExMGVlMzlhZTYyODIzZTZmOGVhYWZkNzNiOTk0ZTU5ODhhNGZkYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjRlZGM5MzZkMmEwYmZjZTdkOGMwMmVlZjhjMGUwZTZhMWU3NjNhMzU3YTAwMGIxZWY1NzdlNDdhYzI4MTg4YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmJkOWZmYTY5MzM0NmM2NTY3NWU4MDU1NGUwOWQ1ZjFjZjMxYmQwODM3NDJlYjlkZjYzYTM2YjA5ZTQzM2EzMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2FlZmRhYTJkYjI2ZWVkMzJhZDIwODczZGEzODU3Y2Y1NjNmZGM1NzRjMDI3Yjg1NDg0NTQ5N2RhM2U1MTc3YSJ9"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L53-L56",
+          "version": "repo-lines-v1:sha256:6c867bee4749af279486c8a037526b636e355e6e702cc14d27d6319dbd360cb5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmQ5NDVmMGM1YmQxYTE0MTFmZjhjN2MzZTI4MmU4MGNhZGY3OTY2MjFiOGU4YTZlODc4Y2RiNDgwODdiNDE4ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTM3YWIzOWEyYzJlZmFkYzJmMmY4MmFkODFiNzgwMWYxNDU4ZDViNDhjMzMxMzEwYmFkNWQwYzZhOGIxODBmMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDQ2M2ZiODg5OGI3OTYzN2JjNWY2MjNkNzc2NmU1MmJkMzBlMGVmMTlhOTM4NDZlNTFiODY5Y2QyZGM2ODNjMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGNiMjBkZjA1NGIwNjc2MDFmM2U5OTQ0M2Y1YzEyZWYxMDg3NTVjOWJlMWQ4MTFjODdlMWFkNDlkZjMxMjI4YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b9c13bd9436e4caa84df2ec63402cf94",
+      "statement": "verify-memory.mjs 的四个会话 id 每次跑都拼一个 randomBytes(3) 的 run nonce，因为用固定 id 时上一轮遗留的会话历史会污染基线（模型复述上轮见过的事实）导致假失败；脚本还断言四个 conversation_id 互不相同。",
+      "evidence": [
+        {
+          "resource": "repo://tools/verify-memory.mjs#L194-L212",
+          "version": "repo-lines-v1:sha256:8636acaac5e2af28006f4f00266765947bcc6a2f6482d92ae5c6349ed82d5437:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZDIzMmNmNmI2MDAyMTEyZDIwNWNhMzYwN2VlOTJiN2NkOGU5ZTkzNjM5YTBiMWQwMmNhYmM1MWIwYThlYmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxNTgxZDFkYWRkYWQ1Y2QzOTJkMGEyZThkNjMzN2EzNjI1NjFjNWRmMDAyZWNjYzlhZGY5ODM3OGI2YTY0YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4MzQzNDM3NDIxYjExYjBhOWZhMzI3YmQyOTcwMGJjNmJhMzg2YWNlNGQ5ZmVlMWFkNDFjNDY3YjFmNWJlYmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg4MDdiYWVhOTgzZGRkOTk0NjA4ZjMxMmY0MmVhOGJkYzM3OTIxZmE0OGFjZjlkYWUzNDMzZjZkZjY3ZGNlYTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba4c5d6fbe0144488dbacce6886b5d8d",
+      "statement": "清理后的复查必须用从未聊过该事实的全新会话 D：会话 C 在阶段 4/4.5 已答过该事实，其会话历史仍留着，清理后 C 会从自己的对话上文中复述出来并声称「实时确认过」，看着像清理没生效。",
+      "evidence": [
+        {
+          "resource": "repo://tools/verify-memory.mjs#L201-L204",
+          "version": "repo-lines-v1:sha256:3daf735936b095bee81d22e6b2da143f6a173f87b173d634ea50bfdf1b80a6ee:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjA2NDdmOTUyZmU5OGIyNmQyODllNDA5MGQ2ZDRjNTg2M2E5Y2JlYjU1NTZkYWNjODY3MzljYzJkOGYyMzdhMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2FhMDYzOTQ1NzMxNjk4MmE1MjI2MDVlNTFkYjhmYmExYjc1Mzg4ZTU5M2YzNDQ0ODcxMWI1OTM0MmZhYTNmOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTE4ZWM5OTMzMTM4YjllZmY2YmEzZjc3Zjg3Y2QzOGY2ZTk3YTZiNDZkNGY0Y2JiYWJjYzBhMmJmOGE5ODFhMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTg5MjY0NDlmZTRlOGE4OTQyMTcwZjFjNzdhZGQzZjE5OTUwM2Y2MGI4YzY4YjY0NWJiMWIzMGFlMDI1M2U2MSJ9"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L294-L306",
+          "version": "repo-lines-v1:sha256:d39bb248012f09f0b9af26696e6d22bd19751077bae98abb94e7ac8e4951cd78:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiNTI2NWQ3NDlkYzBkZDc1ZDZhMjRhYmY0Y2RlMGUxNzliMzEzY2JkNjk2NTBiMmZmMzc0NjI0M2U2NTBhMDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1YWZkMTA5ZGJlMDQ3MjYyNDRlOWJlNzkwMjhkNWZiOTQwZTA5MzU1YzA4MjdmZDdjNmNlZDA2YmRkOTg0YjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3MjQ2OTFiMDQ2ZWE4NmQ4ODEyZDBiYWE4MmNlZDFjYTZkMWNmNjgxYmMxN2I1MDk5ZDQ5NmZiNzc5YTNkYjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NzhkOTU5YjA5ZTk4YzFlMGU1YjI4YzA1ZTkzYWRlYzViNzMwODBmY2I0YjEyOTNjM2ZhOTQ2MzI5ZmFhM2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ea5feff0824e4473b04337f33cdfb745",
+      "statement": "verify:autocompact 用假 chat_id 加独立 conversation id 验证自动压缩在生产上真的触发：消息只尝试发到不存在的 chat（一条都不打到真人聊天里，整轮回 500），代价是读不到回复，于是判据改读 ?probe=last 的 counters.compactWanted 与 counters.autoCompactions（压缩代码在 ask() 内已跑完，发送失败发生在它返回之后）。",
+      "evidence": [
+        {
+          "resource": "repo://tools/verify-autocompact.mjs#L1-L24",
+          "version": "repo-lines-v1:sha256:a52b62462e1f61eac0689ae221bb0377dee504f7aa089b2a4698e9bd72ac04ec:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwZTkxOTkzYzYxMTVjZTQyMDVkZWFiNjkzZGYxZjcxNjE2Nzc5YzU1ZDQyYmNlMWQ3ZjRlZDJlODU2NzVmZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2ZGM4MjQyN2M5NTFhODc3ZGEyNTFkYzg3NDhlMzAxZDNlYmY3MzhkNzI5NjczZWYwOTczNjJjMGUwYzcwZWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlZDQ1MTI5OWQ0MTVmNTBmNmIxOWU0MzAzMTE1ODM5YTgzNGIxY2RkYjEwMTU0NmZmZmRiOTFhZjg0YmNjMDgifQ"
+        },
+        {
+          "resource": "repo://tools/verify-autocompact.mjs#L74-L131",
+          "version": "repo-lines-v1:sha256:a17cec65b8b92c33cffb1bb74cb75cb9ce22a7a76c569907835c74c40846ab6f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyZjk2NDg2N2Q4NTJiZTVhZDk3ZDMwZDVjNjYxYzQ1MTFjNTIyOWI1ZDA4NWFjYmMxNmNmYjJiOTYzNjM5NWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4NWM5OWNiNDA1OWU1OTdiOGM2MjAzNWQxYTkzOWNiYjVkMzVkYTk0MzI0ZDRjNDliYjJjMzVhOGZiMzRjZTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZjMzg0MDE0ZDU0NmQxZWY5NjlkZWE4MzdmNjQyM2Q3ODU4ZjA0NmZjZTI4ZDhiNDRkZDg0MzliZTkyYTdiN2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8a51f00414664548b3aa035aa4172ece",
+      "statement": "verify:autocompact 运行前必须先打 ?probe=last&op=clear 清零：diagCounters 是按实例的内存计数，实例由 conversation id 粘性路由，不清零会读到上一轮攒下的值构成假阳性；op=clear 同时清空内存环形缓冲、重置计数器并删掉会话 KV 里的 DIAG_KEY。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_diag.ts#L76-L112",
+          "version": "repo-lines-v1:sha256:eba6de2ff2561dc0c2347b1818b6138a2e56082c34a98fb3696661c69d1f7bc5:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0YTliZGJkYTE1MmI0NjhlMmVhY2U5N2UwOTlmZjliMmFiMzcxMGRiNGQ1ZTU4OGNmNjhhZmJiZjU4YjA5MDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImExZGZlZDUyY2ZlMjgwOTIwYzc3OWEwZTc3MzA1OWE4YWQ3YTc5ZjY1M2U5NDMxMmNmY2M2ZTk4OTMwOTU0ZjAifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/index.ts#L367-L378",
+          "version": "repo-lines-v1:sha256:fc7127f96e1bfc1558db4dae653320874ad56e947adf02c52dadbce0c70e626c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2YjVjMjk4YWQ2MzUyM2Q2MTIzYzEyNmQwZjkyNzZiNWY0ODg5ZGY3YTlhNTlhZjExMjZiOWFmODI5NGQwNjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU1MmM3NWFiNTYwOTI2MmUxOTE2ZDgxNWJkNzIyODc5NmM2MDBkM2M1YjdmOGE0MjgxZWYzNWI5N2NkYmQ1MzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1MzNlYWQzNzU5MGU1ZjdhMzQyYWNkYTUzZThmOTQ3YWJmZmMyZmMzZWI4OTMxMzE3Y2EyNzkwMGMzZjI4MTQifQ"
+        },
+        {
+          "resource": "repo://tools/verify-autocompact.mjs#L93-L97",
+          "version": "repo-lines-v1:sha256:83f49edf7e85c5870fc8e3d1d8a8b1ed1ee7d54fe178dc4111e898900ee6d505:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmFmODY3YTA4MTgzMTZhNDE4MjQ5NzdiMTczOWU1YjBiMWIzNWZjNGI2YzE0YzBiZTE2NzFiYmI1ZmNmZDQwZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTkxZjE4ZmJjM2UzMTBjZWJmMjZmNGEyYjhhN2FmODIxY2I2ZTZkZjgzMzg0MDBhMzMxYTFiNmVlYWZhNTA4ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWQ4MDUzZTY0MjU2ZGIzZmE1ZGI3OWQ4ODA2MzdjZTE1NGFlYjYzYmQ2MzMxOWM4ZTMwZGY0NjhmOTY5MDI2ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzBlNGE2OTlkNDFmNjgyYzUxMWIxYjA4YTRiNGEyZWQ1NDVkYjdlNzhhYmRkZDU0NjUxZDc3MGRmYTM2OWJmYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2458a40eadf049cda95e1eb693bd27f9",
+      "statement": "自动压缩链路上 compactWanted 与 autoCompactions 都涨才等于判据和压缩都工作；只有 compactWanted 涨说明判据说该压但没压成（多半摘要返回空），诊断里会有 auto-compact-skipped，auto-compact-failed 则记下摘要请求抛出的原始消息。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_diag.ts#L94-L104",
+          "version": "repo-lines-v1:sha256:acbea3c062c400efd0f4933343af8322e0df8db995456b4863e07e803b0be214:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA3MWM0N2VjODFlNThiOWY0ZjM2ODVlOTM2MjA0YjI5YjViMjY1MWNjYmIzZjE2MDBjYWI4YmE5ZDUyYjIzMzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzNDVkNDZkOTViNmRjZmVhZjdiMzQ0ZGIzYjI5NDNlMDdkZjYxNWNmMjE1OGE0NjE3ZGJjZDlkOWZkNmU3YzUifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L434-L459",
+          "version": "repo-lines-v1:sha256:c03e2e4309e87eea8eb45246016ed1bcf4d58feee0aeeafd5bb9e05cb9e47ca4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmZDQwMjVkZjkyMzBiMDA4OWM5YjU2ZmUwYzBlZWFkMzUxMTY4YTVkOTUyZDlmZDczODQ2ODE1M2E5OTc5MzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE0ZjQxYjFhMzk3OGFlNDFjMDU2OWZmMzQ3M2I3MTAyOTc0NjE4N2JhM2VmNmVkOTI2MWNjOWZjNzE2OTY4NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1NDg1NDZiNWI0YTE2MTk3MzQzYjM1NDExYWZiNTE2NjlmYTA0NmQzNmExMDMwYjEyY2QxOWEzYTgzNjM3NTcifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L261-L278",
+          "version": "repo-lines-v1:sha256:c6dc1994b89aa7262ffea7ae64c20b671b8f6ce6b137596dfcb204a8811fbaf0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2ZjUwNzM5MjM2MDVkOWY2MTdjZTdmYTJiNmZiYWM1Njk2MDY5YTQ1YWE1NTg2OTViYThiZGM3MjcyMWNiOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlZDQxOGJlNDYyY2E4NTdjYjU5ZjI2NmNiNGQ0MDQyYzcxMzIyMGQ1N2M0ZmU4YzNmMGJjY2RiYWQ3MTY3YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwZDQwNGE2OWNlZTM5MWViYjJkNzMwNDM1MmMyY2Q5MDg1YTg3MGFjOTFhMzIyNWYxOTgwOTc1MjExYWZhZjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNjMmE0N2I1ZWJkNjk2M2VlYWU4NjZiNzg4ZWYyMjEwZGMwMGZlMzU2YmI3MTExNjM5MDg4ZTgzMmQzOWZkNzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_488c48c9a7ff409aad63bdd396f42853",
+      "statement": "verify:autocompact 每轮投一段撑上下文的 filler 并要求原样复述（每轮贡献约 8000 渲染字，判据线 12 万字故约 15 轮越过），跑满 MAX_ROUNDS（默认 30）仍未触发时脚本自己给出排查方向：先确认计数器真的清成 0，再确认这轮确实跑到 ask() 里（看 sessionInputCalls 有没有涨）。",
+      "evidence": [
+        {
+          "resource": "repo://tools/verify-autocompact.mjs#L133-L136",
+          "version": "repo-lines-v1:sha256:296f2a16b22821dd4fcfca1bed38619c043cf2d61a8cd015b752620cdcfb19b9:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGZlNmMwMzY3MTFlYTFlMDIxODQzMmJmNTdhMjNiY2IxZDA5NDNiZmJjYmU0YzJkODcxOTEwZWFiMWNjMGU0ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDk2NTA0ODNlZDIxYTZhOTI3OWVlYTU0MGQ2NTdmM2VjYjI1N2JlYzlhOWJjMTZhZDlmYzcwNDhiMGQ0ZjdlMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI1ODBlOTY0ZjgzYTQ3M2Y0M2Q0NDM4NDYyOTQ5ZDY4YjU2MDBmZGE3ODdmMTYzNzQ1ZDAwZGU4OWNiZjM2YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://tools/verify-autocompact.mjs#L79-L83",
+          "version": "repo-lines-v1:sha256:c9f47cde2ebfa2968e7ac16e827c47817d6dea7db17b32b0f1fd8daf46ec828d:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RmMTIxZDIwYzE3MDcxNmYyOThhYmI4MWIwZDZjZmNmMjlmYTYwOTQ4MGQyYTc5Zjk0NWJjZWNhNGZjMWQzNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI0MDhiNjNmYjU3NDM5MGYzYjc5ZTg5ODFhMDAyYmIwNjEyNzlhZWE0NWNmNDQzNjkwNjNjOTIzYWZhNTc1YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWFlN2M1OWIyYzg2NzA5NThlNmE4YWIwMTFhYTVhMWI3MTA1YzFmM2ZjNjE5NGZlNDNiYmE5MTM1MGM0YTM0MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f86442c86a17468eadeab8e01ad6d340",
+      "statement": "后台执行能力（?probe=start / ?probe=check 或状态页自测按钮）必须分两次请求、隔 16 秒、带同一个 Makers-Conversation-Id，且部署后必须重跑——线上的实例回收策略可能和本地不一样；phase: finished 则 FEISHU_DISPATCH_MODE 保持 async，phase: started 则改成 sync 重新部署。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L669-L713",
+          "version": "repo-lines-v1:sha256:5131f4b34b377dfcf170e2c00ff97a42d6e02a96f68d3621f2338674cc4a4cf5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNDc4NWJmZmIyZjBiYjA3Mzc2YTgwNTc5YTA2Y2U4MDhiNDg1OWNjYjExMmM4NzViMjM5YTgzMGM2MWY0NzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjNzMzNWYzM2JiMGNjNjRiYzE2MzJkODM2ZDA2MWRkMWMzMzI4NmQzYzdlMzA4ODc1MGMyM2RhODhlMzBkN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYzAwYTRjZmY1OTFkN2M2N2RiMmZjMzYxMDE4NzQyYzQzZmVkM2NlYmYwNzllOWY4ZjVmMWNlYWQwMDY1ZTIifQ"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L510-L542",
+          "version": "repo-lines-v1:sha256:19974d39b10f9af1cb1e2bd782511d921a9442eba19f07017db211f6e0cb3a56:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzYTMwYWE5NTZiOTIxNDhiZDJlYTY4MDg2ODAxMjc0MmY4Yzk2NmZhYmYzODZiOGRkYjA4ZTkyOTk1ODIxMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0NDYxZGRmNWRjNzVlNjFhODY2Njc0NmY5Nzg0NGE1MjI2ZTI1NGNmMWFlZGY2ZmRiZDQ3YmZjZjhhYjAyYmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5YmM5MDI4Y2ZlMTBlNTQ4OGRhMzE3NjNlOTM5OGFmMDNkNGIzNmQ5MTY0NTBlYTJiMzdmMjk3OWU2MTQ1NTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNhY2U3MGU1OGRhYzg0YzJjNDg5N2VmNTM2NGMzZmNiYmRjODlhMjEwNTI3ZTBiYTVhZDQyNWZjNmRkMjAwNTMifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L103-L167",
+          "version": "repo-lines-v1:sha256:4c645a6960a984f09ea5cf8fcefe25ebd65b397088511652170653bc4af598f0:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmMWQ5ZTA5MThkNmFkNTlkNTZiMzZiYjEwNGU3NzRiYTkxMWEzNDcyZWI2OWE1NWFiZjQwZDcwMmNiZjBlYzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4ODZkMzg0MDQwZjkzOTdkNTNjMjUwN2ZmZmRjNjg4NGZmNGE4ZDI3MTlkMDU4MTAzM2VmMTg4NWExNmI0ZTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_53c937f19c1041d4bfc5762a76c87f32",
+      "statement": "端到端验证仍有三块未被覆盖：真实飞书入站 webhook（事件订阅那一跳没跑过，验收全走直调 ?mode=sync 或合成事件）、流事件的实际名字（applyEvent 的四个事件里工具结果与思考增量是按规律推的，仅在 ?agent-metrics 可见真实 data.type，猜错后果只是卡片少一行不影响答案）、以及生产上的会话窗口配置（平台侧静默施加 100 条窗口）。",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L15-L45",
+          "version": "repo-lines-v1:sha256:565978f29714b1de5fd3233cb431bca543cbb8a8b814812acf9089f8279bfadb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiMTg0M2JlNzY2ZTQ4YjlhZjIyNmE5Mjg5OGJiYjY4NjYyYjRmODRiOWZlNDgyN2M3YzUzNWI3ZDA4NDg4ZTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyMmRlNzBjZmE5NDg3ODFhODE5ODJiYWMwMmFmNTRjZWE2YmRmZDQxZTgzMjAwNDc0NTQzNjIwNGY0ODk0NDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0NjlhZDYyNzBlMzEyOGIyYjljOTRhM2M1NDg3ZGZiODBiZjE4OGRkMzk0ODkzYTc1ZTUxNjVkN2FiZDI1ZjYifQ"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L544-L564",
+          "version": "repo-lines-v1:sha256:6bcd2f0c74ab535aa7a767d813261149f8981a38e38c775616880b2522ab3fbb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMDNjMTFhODYyMDRlMGFiZGU0NWM3NWM2NTMxOWE5MTczZjM3NjNmMDgyMDlhOGVhMzRmNGU2OTM3NjA2ZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjODRkMjhmZTQ4NTAyZjNhNDcxMjliNGEyNGVkMjA2ZWU3MjcxZjU4NDg0ZDBiZTBmNjBiMjA0YzVmNjU2NTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjczZjEwZGQ4NjFiNTllZDYxMTI3YWMzMmMzZDdjYTRkYzA0YTI2YTlhZjVjNjY2YzdkZGYzNDIzYWY3ZmE4YTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L797-L818",
+          "version": "repo-lines-v1:sha256:7114dff4f03105940fa91a5e60cbada80f57c52360d87afb0de7290092f98d91:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwNTIyM2JjMDEzYzg0OGU2MzJjZTlhY2Q0MWQ1MGZiMjc4NzA3NWViNTExYWY5ZTVlNDE1ZjFmMzUxYTZiMDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImExYmFmYTkxNGIwYTk2ZGVlMjFmNzIyZWZiMDAyNzUwYjllZGFlY2I2NWFmYjdjZjFiMDYwMDdiMTY2MzgzZGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_541ea48b471b4cc9bc9ad2b37667365e",
+      "statement": "验证脚本通过 curl（显式 -x 指定代理并清空所有代理类环境变量）而非 fetch 发请求，因为本机 HTTPS_PROXY 会压过 all_proxy 导致静默走错代理、稳定 401；那个 401 是边缘挡板（响应含 Tencent Edgeone 或 x-eop-msg: eo_time missing）而非业务鉴权失败，且 .edgeone.dev 域名必须经代理而自定义域名可直连。",
+      "evidence": [
+        {
+          "resource": "repo://tools/ask-bot.mjs#L13-L34",
+          "version": "repo-lines-v1:sha256:549b544d21d494c959dc6907411efade263a382cd01d832d6c11ab77522a69c9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiZGU0MzI2NjRiN2IyMTAxZTI1ZWQ2ZjIwY2NjOGM1OGJlYjYyNGM2ZTZmMWZiZGJlNDIzMTc1MjU2ZDY1ZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwMzU0YjQ1OGY5MjNlZjYyYmYzZWZjMTYxOWVlMjk5MGMzMGE0ZmQ3ZGFmMjExNTEzYTZkZDllYTJhODYzOTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzNWQzNmRkYjJlZTE3YmY2ZDcwNzI3MmEyY2MzNWZjZjQ0YWNmYjAyOTE5YTQ1ZDAzNTk0ODU1MDYzZjYwZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiNDhiZDhiODEwYWJiZTM2NDYzMWFiYTE5ZWJhZmEzZjQ3Yjk1NzY1N2I2OTVmMjFkNTIwODg4M2ZlZmViMWQifQ"
+        },
+        {
+          "resource": "repo://tools/ask-bot.mjs#L161-L175",
+          "version": "repo-lines-v1:sha256:60d1df9ac74347e3e2c80430aa310d1effa961d9640826fe35b299b739b11914:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2ZDAwYzZkNmU2NTI0ZmY3NWMzMGMwNmM0MWJlNWNlNDgwZWY0YjJmODhlZTRjMmYwNThhYzljMjhiNGI0Y2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5NDhkNzdjZDhlNTgwMjRhMDUxOTQxNGJkMzY0MzZkMWFlMTU2NjljMWFjZTBhOWVjMWRhYWM4NTMxYzNjYmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiNDE1OTZmMGFkZDIwZDRlM2JjOTY4ZTI0Nzc5NmQ2YTM1MmY5Nzk2ZjVlMTRiYTEyYjk2MjJmMWYwODU2OTcifQ"
+        },
+        {
+          "resource": "repo://tools/ask-bot.mjs#L61-L91",
+          "version": "repo-lines-v1:sha256:9caf33cf80359b60aa8a8858566be83d72981dc35c09efabc5b2bdfff47a9507:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwMGYyOTg2ZWY4NjRlMmI1MTUxY2QzYzg2NTdmN2MzMGZmYTdlZGEzNThjMjYxYzdjMjkyZDc2ZTIxOGY4MjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4Njc1ZTE5ODJkMThmMjM2N2NkNDdhNjg0ZWZhZWRmN2IwOTk2NmRlNzU5Y2UyMjM3YTI3MmEyNzJmNDA1MTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_38ea49a4631a459990151e194bbed914",
+      "statement": "conversation_id 的 fs-+sha256(chatId)[0:32] 算法在 cloud-functions/feishu-webhook、bridge/index.mjs、外部 CF Worker 与 tools/ask-bot.mjs、tools/verify-memory.mjs、test/smoke.ts 里各有一份独立副本；任何一处改动未同步其余各处，症状是「两个会话的记忆串了」或「同一群落到不同实例」这类最难查的现象。",
+      "evidence": [
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts",
+          "version": "repo-file-v1:sha256:b4f56456ed238d0c7ac64555cbe00f3c4d566e24f0ce7aa53f22f92288d14ee3"
+        },
+        {
+          "resource": "repo://tools/ask-bot.mjs#L138-L141",
+          "version": "repo-lines-v1:sha256:c015b030bc3ffbbf374362abb377256f1d3e35662b17408601d776f4374c62d7:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzZkZWZlY2Y2Mzc0NDhjY2NiNzY1YTE4NDQyNmMxYjgzZmNiMjU1Y2IxMjQ2NmQwZTFkOWNhMWE4Yzg3OGY4NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDcyYmJjYjJjMjA5ZGY2MzA0YTIzNWQ0MDMxZTZlYTFlMDE2YTMzNWYyYmE1YjgxYWI3MGY4NTVkYTRjOTZiNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjYyOTBhZmRkODVjMDQyNGVlODBiNTcwZmU5OTUzNzI4OTBlZjk3MzYxMTY5YWIwYzVlYWQ0NTIxMDRlNzZhOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzhkZjJhNWVkN2FlMmFhMTVhYzFiMzFiMDhkZDJhYjRmZjMwMmYxYWU5N2JiMDM0YzgzYjhjYWEyMmU0MGExZSJ9"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L160-L161",
+          "version": "repo-lines-v1:sha256:bfa978938c460cf3801786dd1870974239b9b520e16254375546b33fe7be652d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWE1YzUyMTJmODdlODlhMDRmMjQ3NjJhODBhOTE1ZThjNWVjZmZlYmU5OGVhNWZlZjYwYjc2NzQyMTgwNjUyMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODkyNGI2OTNhZmY1ZjMxODNjZGIzYTQyYjg5MWM5NTJhYTcyZDU4NDQ5NmFmNDM2ZjYzYWRlNDAyY2NkNTA2OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTlmMWJmY2JkZTIzN2ExMjE0MTIwNTI0NGE5Y2E0MDMzYjg4ZWRjMDA1OWY2ZDVjMDMzZTQxNzEyZGFhMTIxYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTUyMjA5YjgwYTlkZGNkNTBmZjgyYTZiZWQ1OGFmNmU1NTZmNzJlM2Q1YmZhZjEzNGYyYWFlMzQ2ZTc4ZjYyNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_23c06b6b5634409aaf547524632c2b51",
+      "statement": "探针是 GET 且边缘会缓存：凡是「改完代码 → 打探针复验」的流程都必须带 cache-buster（如 &_=$(date +%s)）让 URL 本身变化；-H \"Cache-Control: no-cache\" 是请求头、边缘不认，否则会把缓存误诊成部署失败。",
+      "evidence": [
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L447-L475",
+          "version": "repo-lines-v1:sha256:a52aefd525091ca4e10583784d05cbff48ce79966ad0ae6f8f1c92da24648ceb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyZjVkMTUyZjBhZTliNzc5YzViNjNjY2IyMjdjY2NmNDExNTU0ZDRmYWU3ZmEyNjNjMDUxZTgxOGZlY2IzYTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3NDBmN2IyYTE5NzdjMmNhNzE1YWUxYjlhMDEzMGE0Y2VlMjViYTVmNjQwZTVhZjFiY2E2MGI0ZGJhOWVjYWUifQ"
+        },
+        {
+          "resource": "repo://tools/verify-autocompact.mjs#L84-L86",
+          "version": "repo-lines-v1:sha256:5ae7c59b2c8670958e6a8ab011aa5a1b7105c1f3fc6194fe43bba91350c4a342:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzVkMGJhNzdkMDAzODllMWZkYjIyOWI4ZTA0ODI4ZDAxNTUzNmMxNGI0MjE5MmI5MmI5NmU1YTRjYTE0OTRlYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzg2NzM3NGEwM2NjZDM2ODFlNmVkMTE1ZTQ4MDhlYzI1NzM0YjVkNzlmYjIwMmQ2ZTAyZTQxMDAzOTJlYjY5NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjBiOWJhN2FmNjg0OTc4NzM0YTcxMTJmZGUzYzc3MTIyNWFhY2VkNWNmZDA5MmRkZjk4NTEyZTdkZTg3NjNmYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2NlMWRhN2RhMmJkZGJkMDVhMzYwZjJlMmRmZjBkZDY1ZGMyNjBmNGZhN2I1MWM2YWYxMzRiZDdlYzk2OGFjNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2cf6d40251464370a9261fa2d69437a1",
+      "statement": "verify-memory.mjs 的阶段 5 / 阶段 7 用轮询等待一条新出现的、含关键字的纯文本消息来读 /memory 回执，这依赖「命令回执走 sendText」这一实现事实——哪天真把命令回执改成卡片，这两条判据会失败，是设计变更该触发的信号。",
+      "evidence": [
+        {
+          "resource": "repo://tools/verify-memory.mjs#L148-L158",
+          "version": "repo-lines-v1:sha256:675f5a0e7a9753014409f765f2bb271a261c0b4a42ecc35a6dd6561d36490ad5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmODViZjk3Y2U3YmM2Y2VlMmJiYzZmMjAzODQ0YzlmYjNiYmQwOWVhZGE2NmYwYTM5MTcxOGQwOGRjMTk5MmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRmYWI3MTBkZGY3ODU5ZTU3NTc2NGE5MTNhMDAyYzc0NTg1ZmZhNzAwMTUxMGNiODgxMWRhODNkMmNmNzRiMzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzNGZjMjRjOTZjZWI4NWMxMzE1MDNlMjNhZDRjZDI4ZTdmMTZlM2FmZmM0YjRhNmY0YTNiNzY0NzgyZDU2NzUifQ"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L258-L292",
+          "version": "repo-lines-v1:sha256:35faee9d40f36dd6310773ab70d5b2e5ff978e06d8c85aa2e55141f90f82772b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzNTVmMTJkNTQyMGQ0ZDNiZDQ3NGJiOWMyMjBmZWJhYTQ2ZWI2MjNiNGJjOGU4NTlkZGNmMTViYWNlNjBhODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExMzI0NzY4NjRmODYxNzlkZDU0YjBhNDRmNmI5NTk4OTZhNzNlZjNiMWUxNDdmYTg2YmNhZmJkYmY2YmM1ZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxYjQzMDY3NzI3MGZlZDk0YmE1MjZlMDk1YzgyYzU1ZTA5NDdhYWM5MTJjOTU4M2E0Yjk2ODA3NTM1YjBkMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7c65d5071dc6436590f7fd44d3cc93e4",
+      "statement": "docs/03-验证清单.md 记录按顺序执行的完整验证清单（第 0 步冒烟测试已实测通过 → 本地起服务 → 后台执行 → 模拟飞书事件 → 流事件名 → 真实飞书链路 → 部署），核心原则是每一步都过了再进下一步，跳步时出了问题不知道是哪一层。",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L56-L107",
+          "version": "repo-lines-v1:sha256:b9fa6a03ca86b773c4e4ba606ed23686ab9b96b9382e75e54d0777e0d1ea7d79:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyYzUxMDcwMTQyZjJlMDE1NTNmYzQyZWUyOGFhNGVjNDcxYTUzZWI2YzlkMTQ4YjkyM2E2ZWJmMWRkZjBlM2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MmQ3MTExMDNkNTBhNDM3ODMwYzZmYmNkMDRmYjRiYWI0OWEwZjgyZjZkMjZkMWM3OTFjNmU4NDg4ZGQwOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwNjcxMjBjNzA4N2ZiMTdmYjY3ZWE4ODljZjY0NTlkNWMzMDlkMmEwMTNkMjY0MTE4YzkyZGQxMzYzODY5ZDUifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L1-L8",
+          "version": "repo-lines-v1:sha256:743a9fc6dc083333b714015bc85a6dfa3ff369375f8b3f83e9f93deb50e124ca:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI1OGI0MmNmNGI4ZGIwYWYyM2QyMTgzY2I0Nzc3MTAzNTBlM2YzZjVjODAzZmUxYTUzNjI1NDdiZDlhNTFiMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjUyZDcxMTEwM2Q1MGE0Mzc4MzBjNmZiY2QwNGZiNGJhYjQ5YTBmODJmNmQyNmQxYzc5MWM2ZTg0ODhkZDA5MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmQ4ODcwMGQ5MTM1OGViNzEyZjQ5M2ZlZGE1NWRiZjI0ZDhkOWMwYTU3YWI5YzI0M2I5NmJmOTJiZjIyMzY2OCJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

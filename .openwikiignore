@@ -1,0 +1,37 @@
+# .openwikiignore —— 给 OpenWiki 的排除清单
+#
+# ⚠️ 最重要的一条：.env
+# 根目录的 .env 里是**活的密钥**（FEISHU_APP_SECRET / FEISHU_ENCRYPT_KEY /
+# INTERNAL_TOKEN / AI_GATEWAY_API_KEY / SERPER_API_KEY / GITHUB_WORKSPACE_TOKEN /
+# GITHUB_ISSUE_TOKEN / OPENCODE_API_KEY）。
+#
+# 为什么必须写在这里：OpenWiki **不读** .gitignore，只读本文件；而且它读取的是
+# **工作区**，不是 git 索引。所以即使 .gitignore 已经把 .env 挡住不让提交，
+# OpenWiki 照样会把它当语料读进去，把密钥写进 openwiki/ 下的页面 ——
+# 而 openwiki/ 是要提交进 git 的。那等于二次泄露。
+#（这个仓库已经有过一次 .env 经 EdgeOne 部署被公开的事故。）
+#
+# .env.example 是脱敏模板，可以留 —— 它对理解配置结构有用。
+#
+# 语法 gitignore 风格：last-match-wins、`!` 取反、前导 `/` 锚定仓库根、
+# 尾随 `/` 仅匹配目录。匹配大小写不敏感。
+
+# ── 密钥：绝对不能进 wiki ────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── 依赖与构建缓存（体积大头：node_modules 174M、.edgeone 149M、.npm-cache 113M）──
+node_modules/
+.edgeone/
+.npm-cache/
+dist/
+.tef_dist/
+.vercel/
+
+# ── 日志 ─────────────────────────────────────────────────────────────────
+*.log
+.dev.log
+
+# ── 编辑器 / 系统 ─────────────────────────────────────────────────────────
+.DS_Store

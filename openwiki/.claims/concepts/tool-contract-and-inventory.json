@@ -1,0 +1,526 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:f870d90021d0660181f732184a13c2afe6c5c69de29c53e24711b6612efa63fc",
+  "claims": [
+    {
+      "id": "claim_db3fae74aace471ca5e4ab731c11a0e5",
+      "statement": "The agent's visible tool set is assembled from six mount points in `buildAgent()`: platform sandbox tools via `platformTools()`, self-built web_search via `makeSearchTools(env)`, seven Feishu cloud-doc tools via `makeFeishuDocTools()`, three memory tools via `makeMemoryTools()`, five workspace tools via `makeGithubTools(cfg)`, and two issue tools via `makeGithubIssueTools(cfg)`, each spread into the `tools` array as `...(cfg ? make... : [])` so the mount criterion is visible at the assembly point.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L543-L590",
+          "version": "repo-lines-v1:sha256:13440c3fc1996ee26751ad09426603a2dde5701f1176c2814b264de580ab76a5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0MTBjOGVlNDMxZmZiZDA1MzljOTczMTVmMmU3YTdiMzk0Y2U0NDZkYmUwMDJlN2IyZjEyNTMxNmM0ZjI2MGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZDExY2FmNDNlOTdlZjM2OWU2YmVlZDFhMjY4YmQwNTgzOGYyOWI5ZGQyNTRiZjY5YmE2NDg4NDE0NzIzNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwMmIzMDFjMjc3MjZkNzE4YmIzN2M5YTRmMDA2NDhlM2RiY2MxODE4NGY1NDZiNDJmMjZjZjAxNDZkYmUzZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzZDVlZWU5NDk1YTZkM2ZmMDI3YTFjOGEwNjI2ZmI0NWQwYjc3YzU2ZTZiYjNiYzEzY2MzNTA0NDA3MThlNTQifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L1-L36",
+          "version": "repo-lines-v1:sha256:4d073396c3fe99961c122f6405f02d01bcf9ff4cdaa54339b7543921ae50536f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkOGQ5ZjNiZjBlYWVjMWUxMDRkZTg5MGU2YjRiNzA1ZDcxMWFiZjc4OGVmNjA1YzllMGIzNTE5MTA1NmUwMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhMjFhZmM1MzQ5MGJhZjk2ZGY1MmY3MjQ5MTlkOTcyYzRhNjkxMjFhOTY2ZjgzYWI0NzRkZGFmNmFhOTE5MjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0N2E5NzliOTUwYzc0MzI5ZTBkYjFmYTcxZjQxOGE5ZmY3NjEzMzAxZDVhNWE3NzQ4NmQ0Y2U4OTkxYjhmZmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_468fe895af76424a93f4c07742d25a47",
+      "statement": "Every conditional tool family enforces the same rule: an incomplete configuration yields an empty array rather than a mounted tool that can only fail, because a permanently-failing tool just makes the model repeatedly hit a wall. This holds for `makeSearchTools` without `SERPER_API_KEY`, `makeGithubTools(null)`, `makeGithubIssueTools(null)`, memory tools when no Blob backend is available, and `platformTools` when `SANDBOX_ENABLED` is `0`/`false`/`off`.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L566-L570",
+          "version": "repo-lines-v1:sha256:8407d374fda5a9e5549a5d4f38ee64ba1bdbd1cdbcbdb7ef8f23ca3590004243:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ4YjliZTM1MjU1YzhiZWQ1MDRkMjk1MmRkYjY0ODkxM2I0NzQ0MzgyN2MwMDA2MzI3M2IyZTdmYjJiZmQ5MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjlkYzYxNWMzZjNlNDk4ZjZkZTY1Mzk5NTk0ZTY3OWI1OTUxNzc4MDRhYjExNTM4ZTRhYjkzZjU5MmE3MGEwNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTY0OTliNWJjNDFiNWFjNDc3MzMyYmY1ZmY3NjcwMjFlYmNmZmRhNWI1ZTMwYzkyNmM4YmZhZDllNjJkNzkxYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjEzZjY4NjVkZGJjMzk5MzJjZWFhZTIyMDg3OWY1NTAyMTY4NjdkYWJmNGI0YjM1MzVmMjMxODE5NDEzMzRkOSJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_search.ts#L57-L66",
+          "version": "repo-lines-v1:sha256:2694b6a66ff769bd0c90dbc338d57a8b471ddaa98dbb3e7856a5cbdcd0a97e77:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0MmY3ZjAwOWE5ZTcwNjU4NWRjYzM5OGUzM2YxOWQ3ZmEyZjMzNzBhZmVlYTA1MmExMTQ1ZTQzMGJlNGE4ZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2ZTY3MmJjNTllNTY0ZTQ1ZmRiZWM1ZWViOGFlMDlhMTk4NzIzYjQ5MjU3ZGM2OTQzNWYyZDc4MzE0ZWE1ZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmMzE0YWU0OTdlNjcwMWI5NDc0Yjc3NDU0Njg2MTRjMTk1YjY2ZTg5YjA1ZDg3N2Q3NjQ0YzljZmI1OGYyY2YifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L74-L88",
+          "version": "repo-lines-v1:sha256:518967c2538321b2299bb02abfc5cea15702ad3ffab9b3c53e1d987d68a514b1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxMDNiNzc4ZTZkNWM2MWY5NjczZTYwZjk0Y2EzYzI1ZmYxN2NmZTRiMWI4MjlhMTc4Y2VhYzM1NGM0NzFlMzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyOWQ0NmI3ZjEwYTBiYTdjMWY3NzI0ODM4MDNjZWYzYzNjNGFhNmVlODZjOGU1YWExYmIyMDhkMzFiYTczZmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ1NzFmOTQ4ZmVkOTRlZDBmZThlMTkyNWU3ZWZiN2E5OWE2YjM3YzYxNWM4ZjU2ZTMwYmU5MzAwYjc4OTE2N2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2MTMzZjE5YmUyOWQ0Y2ZkY2M0MDQ0NTc5Yjg0NzMxMzFmODhkOTk4MDRiOGM5NTkzYzQ0NDY3MzdiZjQwMzQifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L52-L56",
+          "version": "repo-lines-v1:sha256:e7bb1674f3d0d476d4a66e2a04b615af7a89407931fc77d884168d432907caff:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NiYjUzMDc1YzFjNGZhZDgxM2IyM2RkOGVhYjUwNGE5YTYwYjU4NzJjY2RhNTIzYTc0ZWMyMzFmN2M2Y2JkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTdhNmMyZDVlMzRlODNmODk1Y2E0NTAyMjkxMzRjZGE5YTU5NGFjNjQ2M2EyODJlMjYzZTFiNDFmYzUyMzM5YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzRmODQ2ZTBlODA0ODMxYTkxMGJlNjI1ZjM2ZjMzNmFjZjk0M2I0ODhmNWRiODk2NThmMDg0MDdmMDRmM2MxZiJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L80-L83",
+          "version": "repo-lines-v1:sha256:7b179f9131f706cbdb64c5d4ef7e40c54ddb64ec966b83f600f5f8394fc8a91b:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTAxN2Y2YTliZGMwZDg2ZmNlYjBkNWQ0NzJkYjU5NmJlZDJmNDU4OWE0ZjlmNTBlNjJkMWZmNjI3MmZkNjhmMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjMxODBiZDA4ZGI0YzEzMWZhODU4N2M4NzNhN2RlMmM3NmVkNjdkNDY0MDE3YjAxM2ExMzQwYzRlNTZiMjM3OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjJkNGUwMTAxODc4ZTYxMTY3N2FkMDBjNDY0YzcyMDZlNDUwMGViNThhMjc3ZDYzNTQ1MzY4YWQxYzRmNTUzOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_a8b675abf0e84330846767be1d530bac",
+      "statement": "The prompt paragraphs for conditional tool families are gated by the exact same config value as the family's mount decision: `baseInstructions = INSTRUCTIONS + (ghCfg ? WORKSPACE_PROMPT : \"\") + (ghIssueCfg ? ISSUE_PROMPT : \"\")`, where `ghCfg = ghWorkspaceConfig(env)` and `ghIssueCfg = ghIssueConfig(env)`. The rule behind it is that a capability the prompt claims but the model lacks makes it call a missing tool and burn a turn.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L498-L499",
+          "version": "repo-lines-v1:sha256:b96aba18584e18556cc0cf7e1a659bd9479a379fd8f8fdb738d05e0ce68188c1:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjc4OGJjOTI2YTBjZjZiMzNkOGM1OWEwZWYzYzFiOGU0NWNkZjRhYjJjZjY3N2MxYWVkMGE2YWI5YjFjNWIwNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODQ3ZjExZWE0NTYxZmUyYzVjN2Y4MjFlYzYyNDE2MTk3NTQwOWIzZGY5ODI0ODJiZGFmMTNhMDkxMzZkZjQ0MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjQ0NGRiYWQ4NzI2N2FhZDE5MzBkZmVjMGNjN2UwNTAwNWI2MzVjNzEyODk5MWQ3YjVlMDEzNjU2NTc5NWUwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRhNmE0ZjIzNzNiYmMzMmZiODE5MTFlZmE3MzAxNzkxZWQxNGRiNzY2YmQxNjE4M2IxZmY3OTU0YzhmZTJjOCJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L536-L541",
+          "version": "repo-lines-v1:sha256:d4c93f3dfff2a4535d006da5bff311cb549d1053f3c65f69cdcef2fabc704fa7:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQ2MjAyZDVkNTJiNGY0NTdiNDQ2ODg5MzQyYzNjYTUyZGE4MTUwZjdhODQ4ZWViMmM2OTg2YzU3YWY4MDE3OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjg5MzE2Yzk5YWE3MzNmNzYzOTc4NjQ4OWJkNTlmMWM2YmM5NmJjMzlkYTZmYzk1OTFlM2I1M2FhMjMwZDZjNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjE0NDBmZGFmNTFlZDAxMzJiMDI5ZmJkZmM2NzdjMDY3NmMyM2VhNTVjOGE4Y2I2MGRkYjIzYWVjZmU2MmViNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzgzZWYzZDRlNjI0OWU3OGRmMTQwYWQxZTY4NzdmN2VkNDdiMmYwYzFhNzdkNDA4MzhhZGEzNzdlZmMzM2RkOCJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L136-L146",
+          "version": "repo-lines-v1:sha256:44304d75e48d269436e560043259e4e4aa777984284022df684d6f70fb5aa69a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFjZWE5ZTJiNzhhMWEzYTA0NWUxMTJkYjk1ZTFmNDdjZWUwMTEyNWZmNzM0MzIxMzc2NTU0ZjkzYjNmY2E1ZDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJhYjNkN2E1ZTM5NmY5NzVmZWQzNTFjYWFiMzE2ZTU3NGNkZDEyMGE3NThkYzZiNjM2NDAwYjE5ZTQ5NmYyMjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyN2UxMDZiYmVkMWI1NTJjYzE5MGFhY2EzNjJmNDliOGYxYjVkMmYxNDM1ZjdkYTA2ZGJjNjI5ZWZiZTAzYjYifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L172-L186",
+          "version": "repo-lines-v1:sha256:516058e1aeb51cc5cedacea2c94b71ba11cc681d667557fd0a2ba72f2ff9483e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2NTk3NzQ4MDBkYjM0N2Y3ZTQzOWQyY2YyNGJjMWNlNWNiNGRkMDA2Njg1ZGNjMmZiYTJhYWU0MzE2ODQzZTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2ODFiMGZmZGY4YjdhODA3NmE5YTFmM2JmMzg0MDdjMWZkZjEwYTRkMzgwZjhhNThjZWJiOGMxOGY3MmM5OWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_193edd3d878f45a0a00fd99dbd3e0f72",
+      "statement": "`platformTools()` intentionally uses `context.tools.all()` rather than enumerating a known list via `get()`, so a newly added platform tool automatically enters the model's selection space unless it is named in `EXCLUDED`; it then filters out `EXCLUDED` plus any `extraExcluded` names by comparing `String(t.name)`, and returns an empty array (never throws) if the tool bag is unavailable.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L54-L103",
+          "version": "repo-lines-v1:sha256:98063528f13ec145ce4477a4ee06134b5aa39cfb3f4e5b8273c1f22d50b724e6:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlZTEyOWY3N2U4YzQzMTcwNWY3ZGJlMWExYzkwM2Y2ZjhmMmI2NWNkNThjM2QyMmRhNzU5Nzg5NjliYTQxYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiZDM0Y2Q2NmYxN2NhMzk2MWZkNzRhMGFiNWY4OTVkZjg2ODE0NWI5ZmM4NGU0NDM2MDY3ZDQ5NTg2YTJhNDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhiYmJkY2U1NDM2YWU0ZDUyYjVjMzA4NWExZjYwMjhlYzhkMWU2Zjc3OWI0ZjNjODkzNzI0ZWMyYTIwMTU3ZDkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_14bc4dc05bc54b89b65c180f02350d67",
+      "statement": "The platform's built-in web_search is broken in this project because it depends on Tencent Cloud WSA and `WSA_API_KEY` is never configured, so a self-built serper-backed tool deliberately reuses the name web_search and `buildAgent()` passes `searchTools.length ? [\"web_search\"] : []` as `extraExcluded` to strip the platform duplicate. Two same-named, same-purpose tools in one list makes the model's choice a coin flip, and the official docs require the filtering when wiring third-party search.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L580-L588",
+          "version": "repo-lines-v1:sha256:be74f620c13f3e7ba5945db79f4a838fb829d47f6e7aed74b78a454b1f12b2a5:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzlmYjliMDI3ZGZhZGZiNjM2ZTMzNzgzNmE0NzYyMDNkZjlmOGFkOGU4OTdkMjc5M2UwY2Q2OThmMmMxMzQ2YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEwNDdhZjRhZjMyZTZlYTY4OTY2NjM0YzZkYmI2ODg1ODA3ZWIxN2VjZjIwMjRlNDdjNzZhYmJjYjg2NWJkNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDcyNzZkMzhkNjRlZGE4ZTg2NjRkZDU5Y2Q5ZGJkMDgzYWRmOTY5MDZmYzg1MTE2MzA0YjBjNDM0M2M1NmI3OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjY5NDAxNzU4YWJmMTgxYmY2ZjA4NDRiOTY4ODQyNDc0YTIwODZlN2Y3YTc4YTAzY2FhNTU3OTY1NmM3NDhiNSJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_search.ts#L1-L22",
+          "version": "repo-lines-v1:sha256:a8155f5baf306b079af48a23069491af016dff09293ce2d9517baa39b6d04e7a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlNTdiMDA2ZWQ5ZTYxYjVlYmZmNWNiYjE4MmRkMzY0NjNhNmE3NjkzYmQ1M2UwYzJlNjA2YTUzMDZlYTY2M2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk5ZDFiZDI4MzVlNDY3NTY4NWYwMjFlNjVmZTY0MjA4YjdjZDQyNGQyM2FiZDM4ZDlkYmQ2ZjlmZmNkNzA1YWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFjNTdiNzdiYzRiNWM3NThlZmRhMTcwM2VkM2IzNjFmNWYyYWYzNTJmNTliOGY0NjgxMDNjMjBmMGZkNDc2ZjcifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L26-L36",
+          "version": "repo-lines-v1:sha256:2f20881f55cc0ef7d5232578307c576e1ed728b5c529aa28410ed7ecdd92c5f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3YzRiOGNlMzhmYWYyMGMzZWY5Njg1MzMxYjdhYTUwOTE3YTBlYjQwOGFjMjEwYWNjNTZmNDY4ZDdhMzUzNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhMjFhZmM1MzQ5MGJhZjk2ZGY1MmY3MjQ5MTlkOTcyYzRhNjkxMjFhOTY2ZjgzYWI0NzRkZGFmNmFhOTE5MjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIwNzdhNTRkY2ZkNjJkODMzNGViM2Q0MTFiYjM0Yjg3YjBmZjNjOGE4ZjAyOWVmOWJkMGFiMmQzZmRiMzZlYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0N2E5NzliOTUwYzc0MzI5ZTBkYjFmYTcxZjQxOGE5ZmY3NjEzMzAxZDVhNWE3NzQ4NmQ0Y2U4OTkxYjhmZmMifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L77-L85",
+          "version": "repo-lines-v1:sha256:5629764d6774e9b69a7a53f2cc749da16a03b1689763acfadced579368c01140:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYyYTJmOTk2ZjA4ZTY4MGJkMjkyMTM1YTZmYTQ5NzhiZGEyNmU2MDJkODRmMzNjYjFkNTk0Nzc1ZDQzMDRiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTI1MTVkOWRlZjM4ZWE0OGVmMTFlMDI2NzBjMGFkNzUyZWNmZGQ4NTRhMjhkZDMyYWU5MTBiMTI4MTA4Zjk2NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2JhODEwZmY2OTVlZjBjNmZmN2E0ZTIwYTFjNWE2MWU3Y2JjMWIwNDlkZGMwMmRiZmNjMzhjMzdiZmRiOWEyMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjQzNmJjZDBmY2YyMGZiYWYwYmM2NDMzMzE4NWUyMjM0MmExZjgxODM4YjYzZWQxOWQ0NGQ4Yjc3Mjc2ODZiNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_fd64f57e05a5468ca8d4d643a873233d",
+      "statement": "The entire repository's tools share one contract, implemented once in `guarded()`: a tool must never throw, because a thrown error aborts the whole tool loop so the model sees only a broken turn instead of the cause; every exception is converted to an `{ error }` object. Returns are serialized as JSON strings, and truncation must be explicitly flagged with a way to continue (`truncated` plus `nextOffset` or `hint`) so half a result is never taken as the whole.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_search.ts#L19-L23",
+          "version": "repo-lines-v1:sha256:e717b18d793b2728034583463c8214813a3a6aaa360199d2fdffb62027dea516:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDE1MWI4MjAwYjA2NmYzNzFiZGE2N2I3MDlkYzQ3YTQ3OWY2ZmUxYjNhZDY1MDQ1NDdlYThhYjZiY2FiZTRhMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTg3NWIwMTNjMjZkOGJiNmNhMmMyNmRjNzA5NTMyNGJhMGI5ZTlkZGE5NDczMmE1MzRhZjI1NTE2NzcxZDg1OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzAyY2RjMWQ2Y2U4MTRiNjBmNmNjYjVkZGEzYWNlMzhiY2RhNTIwNzcwOTc1MGViNDMxMzUxMjhjZmFjYWQ4OSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L29-L35",
+          "version": "repo-lines-v1:sha256:7455561cc8325a9693f9de53c3564a3d2c8528b9ffad5d9003d0fdc089c08946:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTAxZWFkOTM2YTIyODFkNTNkY2MwNjRiN2UyYTJhYjBkNTNiOTJlZjNlZjdiMzRiNjY4NjczMDA3ODk1Yzg2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWMzYzFhYTdjODBhZDkwNTIzZTFhNWZhMjQxZWY3YWU2ZGFiMjg0YjM3ZmU2YzQwNThlMDZlN2Y0ZGM0ZmU4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTQwZjdjYjk2NjU3NDkwNDRhYzFmYjU1MWMyYmU0ODEzNzRjOTQ2M2RiZjFlMjcxMGExZmQ1ZjM5NzQzOTk5NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWM1N2I3N2JjNGI1Yzc1OGVmZGExNzAzZWQzYjM2MWY1ZjJhZjM1MmY1OWI4ZjQ2ODEwM2MyMGYwZmQ0NzZmNyJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L11-L16",
+          "version": "repo-lines-v1:sha256:3f52e9c42d52e591c2a7ab7c3ec49b48e20e39cdc43902d9f53c002b609018ef:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjVlNTBmYzcyYWM3ZTk2MGY5OGI5MzBhMWRjOGQ0YmZjNTMzYTg1YzM5ZDJhNjE3NTM5OTY0NjZiMWEwNjdhZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjlkNjBiYTM5ZDdjYzRlMTgzYjA3MGJjMTA1MTdiOTYyMjIxZTRjNDIyZTRiMTFiOTRjYjcyNmI3NTZhMDJkZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGNjYjU2ZWEyNzQ0NzhmZDUzMWE2ZmY1YTQyMmY0YWIxNGI2NWIwMGFjNzI0MzUyNDJjOGY2YTIxYzczYjQ2NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWM1N2I3N2JjNGI1Yzc1OGVmZGExNzAzZWQzYjM2MWY1ZjJhZjM1MmY1OWI4ZjQ2ODEwM2MyMGYwZmQ0NzZmNyJ9"
+        },
+        {
+          "resource": "repo://src/shared/util.ts#L19-L34",
+          "version": "repo-lines-v1:sha256:61e22f177da31fd87ee0f4c5235f1f367be391b25485fb8c2babf84ad664210d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1NDE4OTU0ZmNkNzQ1MDQ1ZDk5Y2VlOWQ1YjYxMWYxNWViN2Q0ZWU4YzI5Y2ZkM2UzN2U5NmVkODZjM2EyZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3OTA1YmY1N2JkZWEwZjAzYWQ5MjY5ODU1MGU5NDExOWFkZGY5OTE1MDg2NTE0YjEzYTAwMTNmNjJiOGRhODQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7f3d1b3020e8482897e7919dab7b2bb1",
+      "statement": "`guarded` originally lived in `src/workspace/tools.ts`; when that whole layer was deleted, it was first extracted to `src/shared/util.ts` because `src/feishu/docs.ts` and `agents/feishu/_search.ts` still import it. `src/shared/util.ts` also carries `UA` and `utf8Len`, the latter needed because `ws_read` truncates by a UTF-8 byte budget (using UTF-16 `.length` would under-count Chinese at 3 bytes per character).",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L199-L222",
+          "version": "repo-lines-v1:sha256:d3c835fd27384d2151b925ad9ba76c3498eb55fa0046eeafb61e4c18e3bc7787:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2ZDRhZmJhODdmNDczNTZiOTU3NDc0YTY5MjY3NmU0OWU5ZjcxOTFmOTVjZTVkMmU0MGM4M2MzMjNhOGUxZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4OGMyZTA4NzU2Y2MzMTYwYTkwMDkzYWZiZDRjYjNlMzQxNjUxYjFjNWUwYmRhMWViNDU0YTAwYTRlZGQ2YTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmOWZmZTNjZGZiOTZjMWUyYTMxOTgxZjQ4NzFjZTdkOTVlMmEwZDEzNDYxNDExYzQ4ZmJmMDhmNWRkZWVmMTgifQ"
+        },
+        {
+          "resource": "repo://src/shared/util.ts#L1-L44",
+          "version": "repo-lines-v1:sha256:7466c68906f5d89ff974c2b6ccb00f94eeb67c4603d0fa9843fa90220cd94e60:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiOTYyZjkzMTM0MDllZjZlYWRjMmYwYzNmM2Y5M2I2MzI3Mzg1MTJmZWJiZTFiMDg5YWJhMDQ0YjMxODQyODQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4c4b05dc221d487393ebd1b775409dd4",
+      "statement": "A second wrapper, `usageError()`, separates usage errors from environment failures in the `ws_*` and `gh_issue_*` families: a `UsageError` becomes a clean `{ error }` without the tool-failure prefix that `guarded` would prepend, because that prefix reads as a broken environment and would push the model to retry or apologize instead of switching tools or repos. The whitelist rejection also lists the allowed repos and is decided locally so no request is sent.",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L21-L33",
+          "version": "repo-lines-v1:sha256:73a1467c8f764d22066ab06ebf5dac76bea69c4028c84fba4f14539ba185d623:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmOGNjMDVlN2I3ZWRhZDZlNDUxODQzMGZmMzI4MmVhZWQ1Y2Q2ZDYzYjM3NzhjM2NmZWZmOTE1Yzk1ZGMzNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkxYTAwMTRjMDRiYWZhZDk4Y2MyMjZlMThhYWE4ZjBmYzFkNzZlZWFhNmUxOGJlOWJlMzljNDA3ZjU4NDU0ODkifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L70-L86",
+          "version": "repo-lines-v1:sha256:e2d6012ace4ec54991c214a6b45bd90e93e39618f06a1122a4f2936ff5c46d6b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM1ZDdjYzY2ZDFjNWQ1NjFhZjJiMDQ2Y2IyOWNkZTJkYzllNDg5ZmRjNzIwNDIzOTQzMzhmMzYwMzZhMDAyMDAifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L57-L70",
+          "version": "repo-lines-v1:sha256:87f3ff83c75e3c105ac7335d225abd2c335c6e38750a46b946a7ba6f393b6a3f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE3MWYxODNkYTI4Y2YyMzg5NDRkNWRlMzc0ZjVjM2JkZDA1ZWIxYzI5ODcxZjFhNjg5NGFiOTQzN2JlZDc5NDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU0ZTFmZGRkNjg4YTJiMTRhYWQ5MDVhZTIwNDY2MmU2ODM1NTI2Mzk0NzQ1YWNmZjFiZDQ4ZmMxMGZiNmEyYzIifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L3019-L3026",
+          "version": "repo-lines-v1:sha256:3739f2c4ed5ae2b36c64a8f77666903278d07f99382664571f0005ce289c02f9:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjBhYzRlZTRiZjI2OTE5ZGI3MTUyODdhNDk5YThlMDIwY2RkYmVjMjVjMzkzYzIyYWZlOGMxNDQ1NjUxMzNkOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDk1YWE2YzdlN2Q1ZDA3MDE4MDNkYmU2NzIzYWM0MWUxNGFjODgwNTZiY2NhZjlhZDA0MmVkODYxNGI3NTI5MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGFlYjAwMDhmNWQ3Zjc2MDQyZTMxNjAwNzA4ZTMzZTAwODUyNWYzOTFiNzM5YmUxMjU5ZTliMzRjY2JhN2U1NiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_01eb230d4c564245a31b4ca6acf597ef",
+      "statement": "The GitHub issue family uses a separate token and a separate whitelist from the workspace family because `GITHUB_WORKSPACE_TOKEN` only grants Contents read/write and the Issues API is outside that scope (a 403 otherwise); mixing one token would make changing workspace credentials silently affect issue capability and vice versa. `ghIssueConfig` returns null when either the token is missing or the whitelist is empty, since an empty whitelist means every repo the token can reach, which is the one shape the feature must never have.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L130-L144",
+          "version": "repo-lines-v1:sha256:c3559af18f3d529c8313a59c26a02eabb7a49116ca4a9d59bac3a65deefb19ed:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljZGYwODIyNzIyZmMwZGJlNTJiMTYwYjE3N2E5NDEyMWM5ZWQwN2M0NDg3NGMwNGJlZDYyNDcxZDVmNzZkNGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljMWNmODBlM2Q1ZTBhNTUxMzE3OThiODY2YjA4MDk3ZWY4NGY5Mzc4YTc5MDc4NTJjMzI4MDg5NDliOGFlMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3NTY4MGZiODFmNDA0MjU4ZDA1N2VkMTM2MTQwMGI1YmNmNmEyZDQ0YzM5ODZiNDRmMzhjMTAxNTY3YTZhYzYifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L1-L7",
+          "version": "repo-lines-v1:sha256:1739373c2d3d2bfbc7b8acddc32717d83d162d75743a9384d7da4a9f7767406d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWM5MDVlOWFiMDM1NzdkYjkyYWQxMDBlY2UzYWFkZDJkNTJlMTkwMjdjOGVjZDVkZDA3NzhjZGY4N2U1NTU0NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDFlZGUzYzM2NGZhYjI3MjhiOTJkY2U2OTQwMTU3OWJkZTVkMDM1NzE4OTk2MDMzMzQxMTNmMzMwZGFiYTFhZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDNmNjNkNzM5MmMzM2YxOGY2NDdlN2M5ZGY5OGRjYmM1OGQxNWRkNGM1YTEwOTcwNWQ0MDViZDIwOWRkZTQ0NyJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L1-L18",
+          "version": "repo-lines-v1:sha256:e824246f9b6c5e5b0b4d98cfacb258dd01b492ff3d06ada13e4c75ecbe669630:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzOTExZDFlZTFkMWUwOWMzODU0YWI2MjkwNWIwY2VhNDM3NmFkNTVmZjA0ZWU0ZDU4N2NhNTAyNmE5ZjMwZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzYWRkNjg2Mzg2NTk5ZDIyNjgxZGEzYmVjZmYzMTdlODM4NWE0OTNiMTJkMzBjNjFjZDYwMDQyMTAxMmZkOWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhY2Y4ZmYxYjNjZDAxYTlmZTMzMjRkMWY0YTk0ZWJkOWQ2MWY2NjUzNjFhNTkyYzk0YTgxN2I3ZWQ5NjgwMDkifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L44-L68",
+          "version": "repo-lines-v1:sha256:69d797236748669fb3ef8962b43eb4514369505eeffa8936c01d03fffe61c60d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyNzljZGNkOTg5YmVhNTY0ZjNiMDc2ZTc4NDMzOGYxMTU2OWE3ZjYzZWFkNTIyYmY4N2U3YTNmNDA2Zjg0Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxNWJjNzcwN2VkZTY3Nzc4Y2I3ZmU1NWI0ZTlkZGE0YzU5NDc1NWY2N2ViOTM1ZWIzMjUyMjQzYTEyOWQyMzEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2999-L3006",
+          "version": "repo-lines-v1:sha256:75a616cd7cdb051b82193d64bc5c0a5c33de982d3b5215fd3c9c5c518a29013d:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGRkYjUzM2E1ZGI4NTkxNjUxZTkyYjU5ZTBlNjZlYzg0NzY5ZDk3ZGQyZTNkN2ZhMGZmYmJiMmEzMzg3NTI1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDI2ZmFlZDVlYmRmYTAzYWExNjIxN2U2YzM0YjE5MDFhNDg5OTY1MmQxZmNhYjNjZWYyZmU4NzJjNzU1MDlhMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjMwNGZhZDFmNDBhMjE0YmU0ZmVkODIzYWFlMjQ4NzM1MzI3YmFkZjIyODFiMTA2NzRmOWYxZjFmZjhkNjEyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6b60a0950ae84cda845e111b16e85cea",
+      "statement": "The issue family only creates and comments, never closes, because opening an issue is reversible while closing someone else's is destructive and directed at others — the same convention that makes `ws_rm` delete only files (not directories) and keeps `files_remove` out of the platform tool list. It also never echoes the token in error messages since those are read by the model, rendered into Feishu cards, and copied out by users, and `test/smoke.ts` asserts this for the 403 and 401 paths.",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L47-L50",
+          "version": "repo-lines-v1:sha256:0fabff45fa460bf212f0a9b8d3583f7a791fadeef75200dc5a4fd60225f4a9d5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2QyMGFjY2EzZmRiYTkxMGNlNzQ3ZjRkYTVhNzM0ZTQwNDlhMWVmMThhNjI5MDc2YjczMzNkNmYwY2YzYWUwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjQ0ZDg1MTI1ZmU5NzA3ZDVjOTVkN2JlZDk1NTUxODgxM2I1ZDQ1ODA3ZjM3NWVjNDA5ZWU1ZWUyNGVjYjFlNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTlmMWJmY2JkZTIzN2ExMjE0MTIwNTI0NGE5Y2E0MDMzYjg4ZWRjMDA1OWY2ZDVjMDMzZTQxNzEyZGFhMTIxYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGQ3NDk4M2JiODY1NzBlZGU3OWRmYjA5YjYwYjE1MGY3NjllYTVkOTRmZjU2ODdhMDJiMTk1YmMyMjcxYWIzZSJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L9-L16",
+          "version": "repo-lines-v1:sha256:ce259d23951d73cdcfe7c1044123dbc60e2bd0ca48a3d177b6a82ebb0d121fdf:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTRhMTljN2NjOGVmYTEyNzZhNmQ5ODQ5NDQyMjAzNGJmNzM1MDFiNTM3NjE5NjExNjI0ZDc4NDhlOTY4OTlmMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWRhZDdhNTcyNWQ2MmRiMjIwYzlmOWY0NGIxYWE4NjVlNjg5NmM4ZWU4YThjODFkN2U2NWU3OWQ1Y2UxODE2MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDZiYjg2YzI5YjFlOGNkMDBmZDA3ZGVhMzdmMjYwNjM3MzRjMmQ4ZmIzOWUzMDZkNTM3MTllZWFiYzc5MWUyMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTUwZjAzMGFiZjI1NjhmZDI2ZDdjM2UxNjE0ZTU0Yjc0MWZkYzJlZWQxOTNkNWY3MWQ1MWQyNmE4YmZiMTg3NyJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L281-L290",
+          "version": "repo-lines-v1:sha256:3659c73a8447af4aa6a1489c4e5526ec5d4a6241f95b981f9b7ed7c0bf39dee8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlYTE3NDlhMTk1YWNkN2Y3NTgyMjQ0ODhjYTM0YTRiN2I3YzkxYWUzMmZkZWFmYTkzNWY1NjI4OGUwYzY1MjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTBlYjZjY2RiMGZlZmNjM2M5YTg4M2M4NzljOTg2NmJlMzM5MzFjYWFhYmYzNjYyZDdhYzRjNDEzZWM4YjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYWE0ZTlkYWI1MzhiNTM2Y2I4M2UzYzBkNzMzOWUxYzVkOTMyZDE4MDI3MTk1N2E5ZjY4ZTQzZDM2ZmEzNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhYzI3NDk1YmRiNzk4MjQ4MDM1MDNiOTkwODljYWQ0NmI3NTUzYzkwYWYyNDUwNmNlNDU2MTAwMDljYmQ4MTAifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L3066-L3094",
+          "version": "repo-lines-v1:sha256:178a7d48804ebf147686988c5aab620863c75bbdb5149042ee03c001d53474fe:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhNmViYzhiODE5MzhkODJiNGMzYzFkYjVlY2RiNjYzZTI4NjBlMmM5MjNhM2ZjZTIyMDUwNTBlNDExMGJmMmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2YmM3YzYyMDhhZTgxMzRkZmMzNDBiNmY3NmIwZmI5ZjBlOGM1M2ZmZjdhMDkzNGE5ZjEwNmM1ZjY1OGJkYmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhiOTE4ZTVlOWY1N2Y3Zjc0MDlhNGJkYmE3MzQzZWZhNDI2YzMxOGRhNTNmZDk3ZmIxMGUwZTYwMDY1YWZlOTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_015628a5dc674432ad8993ed9bf6e7e8",
+      "statement": "The Feishu cloud-doc family exposes exactly seven tools (three reads, three writes, one create: `feishu_doc_read`, `feishu_sheet_read`, `feishu_bitable_read`, `feishu_bitable_write`, `feishu_sheet_write`, `feishu_docx_write`, `feishu_docx_create`) because a wiki is a link shape rather than a document type — every tool dereferences `/wiki/` first — and writes are limited to bitable records, sheet cells, and docx append since block-level docx editing is heavy and easily corrupts layout.",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/docs.ts#L19-L35",
+          "version": "repo-lines-v1:sha256:bbfc5fcc57e6a8780994fa24d646fd21c87e9788f28b5e4462c218c4f9ca95da:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzYjQ3MTU4MjhmN2E4OGRiOTI0MzEwYzBjYTNhZDNiZWRjNTQ0NTA3NzRkNWQxZmM2YTE5OTZlNTFiY2VhMzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljM2MxYWE3YzgwYWQ5MDUyM2UxYTVmYTI0MWVmN2FlNmRhYjI4NGIzN2ZlNmM0MDU4ZTA2ZTdmNGRjNGZlOGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU5ZjkwYzdhOTgxZTEyYzI1ZjEyODM3YTM5YzNiZTFlZWM1YWYyZWZhMzUyZTJhOGVmZjdmNTlhNGViY2Q1NDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFjNTdiNzdiYzRiNWM3NThlZmRhMTcwM2VkM2IzNjFmNWYyYWYzNTJmNTliOGY0NjgxMDNjMjBmMGZkNDc2ZjcifQ"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L408-L419",
+          "version": "repo-lines-v1:sha256:c5ea0c8ecf6a5bf8152d1cf56d598571cfbc4b3f8243a25b4e1dcf5d76deec6e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxNzhlNDlmYTA3OWJmZGVjNmI0ZjI5NDk3NzdhYTlhN2JiODExYjViYjhmNmYzNDk3NDNhMjllMjM5YjZjNWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTBlYjZjY2RiMGZlZmNjM2M5YTg4M2M4NzljOTg2NmJlMzM5MzFjYWFhYmYzNjYyZDdhYzRjNDEzZWM4YjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExNTlhMThlMmNhYmViYTA2ZDY5NGIwMDcwMDkwNjI0OGI2YzljODI0M2JlM2ZmZWMxZmY3MjdjMDU0NzQzMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZlZGZiOGEyY2U2ZWI1ZDY0ZWNjYmU2YjcxNDNlNDFjOThkY2IzZDkxMmI1MTcwZTYzOTI2NmE4ZjliZmRhNGEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L896-L904",
+          "version": "repo-lines-v1:sha256:ac51661519cec652bee7865c8fc857178860839a1633990fb3af7f8267b20be5:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmFiM2Y4MDM5NWZjNWViM2Q1NGQ1MmU1YmVlNmNhYmU3NDc0ODBhNDE1MWNkYTA2NGIyZjVkNmEwNWJlZGM1MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGY2MTU2YzdiYjZkY2IwODc1Mjc1YWZkMjI0ZDZmMDI0NTEwZjVkZWFjMjNjZDU1ZDZjNDg4ODA1YzY0ZjA4ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDBhYzI0OWMzOGQwOTUyMTkzYTNlNzgzOTc0MTVjMDFhM2E2MTY4ZmNiNWU4MjA1NTQwY2I3ODQ2YTZkNzM1MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjE0OTUxY2JmNTU2ODU1YWZjZWUxZTI3NDA3OTQ4NmNmNTVmMDk4ZDAwYTJiYzU2ZTBhODFkZmIwOTRlYzU5YyJ9"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L964-L964",
+          "version": "repo-lines-v1:sha256:bd9dff6eafc2021b8ec7ac2f1a459de6138726cf730f674764b911932a002e9f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQ5ZGZmNmVhZmMyMDIxYjhlYzdhYzJmMWE0NTlkZTYxMzg3MjZjZjczMGY2NzQ3NjRiOTExOTMyYTAwMmU5ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQ5ZGZmNmVhZmMyMDIxYjhlYzdhYzJmMWE0NTlkZTYxMzg3MjZjZjczMGY2NzQ3NjRiOTExOTMyYTAwMmU5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDI3NWI0MzhiNTM5NGMzOGIwODQ4YmZlNzU1MWM4NTFkMWNkMDEwYjU2NTA3NDhlNDZlZDBmN2E5MTY1Zjc2MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjA4YjUyOWI4NGYzNTMyZDdhMmI4NmJmYzljMTFhNTAyZmNjOWVjYzVmMGQ3M2ExNTk0Y2NmZWQ0ZTNkODEyYyJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1616-L1627",
+          "version": "repo-lines-v1:sha256:bbd1b40a13a8be49bf9b33b15eb468474c60d8c6efd5e2930a660a870f770b39:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjNzkxZDQ1MTk0MzU1ZTY0MzJjNzEwNWMwYzNjZTJmMzAzYjMwZDIxZWE3MmU5MGQwODZjNzdiYzdjZGE4YmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwNDExMGNhZGIzZTEzYjI2NzNmZTZkMGU5YzcxODM0MjliMTNhZWEyNGFjZWZiNzlhYzMyNzdmMzI1OWYzYWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlNmU5YzRhNjBmNDIxM2FjNWI1YzY0YjNiNjRiYWRmYWU4NjlkMGM0NjMzYTYyNWYwNmExNjRmMjVkZmZkNGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8dd2f9898a40463d909b1d77bbfa950d",
+      "statement": "`feishu_docx_create` exists because all six earlier tools required an already-existing resource link parsed from a URL, making requests such as write me a report impossible; it is mounted under the same family condition but at call time uses user identity only (`callUserOnly`, no fallback to application identity), returns `docUrl`, and appends optional body content without rolling back if the append fails so the valid link is preserved.",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/docs.ts#L213-L224",
+          "version": "repo-lines-v1:sha256:50b55d63ed6962be7e5d6d40c0bc988193517d534077c839f64c8c45631eccf9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlNzExMjdmN2Y1ZjE3MTdiOTZlN2U5NzY5MGE3ZDE4MWE1MDcyMzdmY2FkMTg4NDBiYmIwOTM0MDIyYTkyMGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZTM3MjVkYTAwMmI0NmVkOGI0ZGU4ODAwM2FkOTcxMGRjYWYxOGQ1N2M0NzAxZGMzYmVmZjBiMmM1Y2IxM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5YjM4ZDk3M2Y0ZDU4NmI3ZjgzN2IwMTdmN2UwOWE4NmQwYTVhN2U0MDFjNDMzZGZhYWMxYjQ3Y2EyNTZlMmYifQ"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L874-L895",
+          "version": "repo-lines-v1:sha256:9267eb0b3bae210005ab05b35ceb6e2ce5e704de8515cddfe0fa720de29813fa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0MDA0NDAzM2EyMWM4ZjRlOGRkZmNhZDgwY2ZjN2M0NGRiNGJlMmJlNjRmMzAzY2Y5OWQyM2EyMWYyZjZhMGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1YTQzYzcwOTBhYmY2NDE5NDEwYWE3NGM0ZWY1NjM2NmQyNjE3MGUzNDZkNWQ4YjEwNjhlYjhjZWNlOGM3ODAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQyNzViNDM4YjUzOTRjMzhiMDg0OGJmZTc1NTFjODUxZDFjZDAxMGI1NjUwNzQ4ZTQ2ZWQwZjdhOTE2NWY3NjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwODE1ZjBiZmRmZjZmYWJjYjUyY2UzYzg4OTE0ODg3M2NhZDFlOTdjNGY4MTQ0YTY2ZGJiOWM5YzAzYzg2N2YifQ"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L925-L959",
+          "version": "repo-lines-v1:sha256:8f60ddd5f67a5015b2f5dfc9abdfe97078491169b2108c438c033c2fd9681bcd:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhNDRmOTg5NzgyYmI0NzA0NTljMGNiZGNlYjIyZDQzOTQzZWNmZDhkN2E4NDFiYjNhYTk5ZDkxMjljNWI3YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1OTZkZDg1NzM3NTY1YTdkOTEzNGJiZGU2YjUzMGM0NGEyZjlhZDA2ZDVlYjFhYWI0MmFlZmJiOTIwNzA1YTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4NzNhYzgxN2I5NmFmNzBmZmYyYmFlYjE0MTcxNTc5Yjg4MWJlODVmNmNhOTA4M2U4YjE1NWM0NzdmZGM4MzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyYTk1OTkyMmJlOTRiNGRkN2MzNzNkYWI4MWFlMzIzNWEyYjk5MmEwMTkyYjI5ZmQ2NjAwMzQxZmMzMWM0YTEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1629-L1635",
+          "version": "repo-lines-v1:sha256:a1ec5d2a3c4c4ddb1774bed7654276ae43e97b2609c6cfcdf4ad31a5b46db4b8:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTVkNjZjZTk1ZWYxOGZkM2Q3NTUxMTQyY2ZlMjI0NzVjYmExM2I1M2ViMzVkODdhMjZmMjQ1Zjc3YWQ0Yzg3ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzIyYTI2Nzk2YTBhMmI3MzNlYTY0OGFhMmEzMjI2YTUzOGFkMTM5MjdmMDYwYWNmZjU1ODgwMGVhNTc2ZTQ1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmJkYmYyYTU0NzE0MjM1YjU3ZWI2ODZiMjg0OGNhOTQyNTRiOGZmYTVmOGRkMjMyNTBlNzJjMjE5NzRmMTdmMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjMzYzQ0N2IwMjY3ZjBiYmQxMWY5Mzk0OWM1MTE1MDYxZjM0NDQ1YmI3YzBjOTAxZjlmZDMzNjk4MDcxM2FjMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c2051484341e44aa97265feee1e46ac7",
+      "statement": "The doc family is mounted whenever `FEISHU_APP_ID` and `FEISHU_APP_SECRET` are both set — application-identity credentials alone, with no requirement that the asker has ever run `/login` — because application identity can read documents shared to the bot; a missing user token manager only removes the user-identity fallback layer and the resulting error message then omits the /login guidance.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L569-L574",
+          "version": "repo-lines-v1:sha256:8a806a6c20e6eb70422e6fa9f82d33c02c7754eb16afb2161cf3984501c76ec6:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGE2YzNiN2MxNzZlZTBhMzQ2ZTcxOWNiM2FmOTc1Y2MyZDhlZDU5ZjU3MjVhNmZmYmI1MzQ5ODNlYTk0MTBjMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTg3NzU0ZTVmNjk0NTViMzk3Njg1ZTc4MTU5NGQ1MWY2NzFhMGMyZWU3Y2E5MjZjMGNkN2YzNzFjNmJiNjhjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODQ3YzY5NjQ5Y2MzNTFjMDk3MWQ2NmU4MjllMjYzNWRlNDQ2ZTc5YjUzNzFmMDUxOTNjYTllYzk3MTA0ZGUwZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmU4MzMzZTM5ZTJkZTAyYjE4OTIxNzdkOWI1MzM0ZjE0ZGQ4YjNiYjU5NDAwOGY4OGZjMGYxMDFhMDI0ZTE4MCJ9"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L96-L105",
+          "version": "repo-lines-v1:sha256:be7f5ff69e13df30b8f2787ba99caa6668c555b696ab0263dbe48a26d8853261:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlMjQ5ZGJiOGM5YzQyMTMyMWVmOTllOGIzZDc0NWQzM2MyMDRhYWQ3MzY2YmQ5ZjRhZjA0ZGQ3OGQyNzk2ZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU4ZTVkMTAxZGFjYmE5Yzc4NTViYWM0YmQ4YWYzNjE3NzE5ZTRlOWE1MTVlOTY0OTJhYWQ0N2I4YjZhYzAzYzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5YzU0MDQyM2M0MjkwYjRlZWU0MDAyYTNlYmRjOGNjZDBkOTA5NjI0NDY5Y2FhMDQyNjRkYzIyMDFlM2U0MGMifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2035-L2049",
+          "version": "repo-lines-v1:sha256:32cbb234e21eead8dadce549bcd062fb5abab4d016f306212bcdd18484faf1e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3OTI1MzY1OGNlZWM0ZmUzNGE2Mjg2ZDhmZTBiODVkOTZiODk0NGZiZThhZjAxNWRhOTU1ZGM2NjI3NGI1OWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0MTA2MzdkOWM0ODJjZWNiOTdlYTc1ZmM1MDljNGE3NWNmOTFhNjdhYjA0OTZkZjc5YTIxNGM0ZDM3ODJkMDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiZDU4MzcxMTlmZjA1ODkwN2RmOGIzYWYyMDA5M2Y4MmRiNmM3Zjk5MmQyYzFiZjg0YjI1MGNhOTlhY2Y0YjAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_18c8753389334b3eb0a63b95e647990f",
+      "statement": "`ws_commit` exists to prevent deployment churn: `ws_write` produces one commit per file, but each directory under `projects/` is a project wired to automatic deployment, so changing five or six files would mean that many commits, CI runs, and intermediate deployments. It commits a batch of files plus optional removals as a single commit, and the prompt tells the model to prefer it for `projects/` changes.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L156-L170",
+          "version": "repo-lines-v1:sha256:52267bd17fcabe0c281e00644a32e362913c15fd5d3cd87b31128d61a947d401:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkNzdiNzJiZjUwNDhlYzU5ZGJhZmQ4MjMxMjJkODZkZGMzYjgyMWU4YTNiYzUxYTg1Zjg4Njk5NDJhOWY1MTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxZGVjMGU4NzM5YWYzN2QzODAxYWE3NjE1NjVlNjI4MDY2ZThmODI3MGVhYmExY2NhYTViYTZmZTAwMzk0YjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2Y2VlMDRmZDBiZjBkMGZjMmI4ZjYyMTUxYjM0YWI0YTM3MTRhYzkzYjI1MDcyMDRkY2Y5ZGM2ZDg2MzdlNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIwZDMwYzk1YjM2ZGRkMzhhNmU0MzAzODRjYWJhNGRlYmFiZGVjZDc1MjFkYzVkYzM5ODY4MzRmNmE1NDQ3NTgifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L320-L344",
+          "version": "repo-lines-v1:sha256:8f5de5bfb8ac2b5ea1ac72379eb82e0626e808f33f18da590fddb98692b04392:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkMTUwM2FlYzI2NzNlZmI2NmY2YzkxZDUyNzY1YzY2MDlhNzVmZDhkZDMzN2QxMWY4N2FlNGNhMjNhZDc0NzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTBlYjZjY2RiMGZlZmNjM2M5YTg4M2M4NzljOTg2NmJlMzM5MzFjYWFhYmYzNjYyZDdhYzRjNDEzZWM4YjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYWE0ZTlkYWI1MzhiNTM2Y2I4M2UzYzBkNzMzOWUxYzVkOTMyZDE4MDI3MTk1N2E5ZjY4ZTQzZDM2ZmEzNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5ZTA2MDA5ZGEzYWE1NTg0MzkwNTYyODUzOWNjYmVkZWFlMzI1YWQ4ZWMwNWU0YmEwMzllNDBhNGM0N2JkOGMifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2864-L2958",
+          "version": "repo-lines-v1:sha256:6a102e438d493e7cfcb8b8ba8986f2ae8092cc4a92232e6d5071dd01fe802adb:eyJzZWxlY3RlZExpbmVDb3VudCI6OTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzMjc4Zjk3ODYxZTVlYjExZDdlMTM5YjQ4NmI0MjY0Y2ZmY2ZjMGMzMTE5YTFmOTExMjA4YzhlNmQwYmI0OTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwNmUwODRhNDJlODc2MmFlMzQyY2ZhZmQzOWVlNjE4Mzg4MmE2ZGQxYTIxZWQyNGM1NTQwMDA0MmRiYjVhYWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxN2QzYmFkMDEzY2YzMWQ1NTgxNTE0Y2EwYTRkODg1YWIwMjM3ZTYyYmVkOTAzYjQwMjI0Yzc0MzVmMjU2OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRjYzczYTI3MjdmNGJlODg1OTAxYThjNDFkZWIxM2EwODUzOWMzOGYxMWU5YTZhMzFhYjBhODBiMDZkNWNhNzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d85135b98da941309876a0c2dfdc96e2",
+      "statement": "`ws_read`'s offset/limit paging is applied locally after fetching the whole file because the GitHub Contents API does not support range reads — the parameters bound how much context is fed to the model, not network traffic — and reads are capped at 2000 lines or 50KB with no half-lines, returning `nextOffset` when truncated.",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L198-L235",
+          "version": "repo-lines-v1:sha256:3fa2fec10e8743e38292dedf1acd41c92930a0eed685f83be2b75aac7dea4ef4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhYjEwOWJjZTBhMGJiYjQ3NmNmN2JhMTQwYjRlZGU4Zjc5ZWFmNTBlYTVkOWIwNzE4YmE0NzJlOWVlZmEyMmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1Y2RlZjgwODVhZTc0YWI2MzZkNjQ1OWY1YzZkNWZiZmIwZGIyNjRmMWIwZDc1YmFjNTE5YzliM2Y2NzE3YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU1MmE3OTU3ZWMzMjljYmJmMGFjODM1MWEzN2E4ZDE3MzY3MjA4MGVhMWFkMmMzNThiN2ExOTFjZTFhZTRiZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlYWE0ZTlkYWI1MzhiNTM2Y2I4M2UzYzBkNzMzOWUxYzVkOTMyZDE4MDI3MTk1N2E5ZjY4ZTQzZDM2ZmEzNzIifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L35-L47",
+          "version": "repo-lines-v1:sha256:d0f08fe8edef8515b23f323a98336701e7ce2b20fe58e641dc9737368c867ac0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQwOGZmMWQ0Njg0NDVlNzRhOWM3YjZmNmQzZmQ2NTBmODBiNjVmMTYxOTZlYzYyOTM5NmZlOGVlZjVkMGI3NjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkOGU5NDc5ZTliMTc3ZmZhNTgzMGJiMjE2MzVhZTJmOGJjMDgxYTFlODIzYjY4NmE5ZjM5OGQwOWRhNmEzODkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzNzk1MzQxNTMyYTA2ZDM0NmZhOGU4NjJhZjkzMTVlZGU4YjU4OTNkMzlkNzNlZjQ3NzBhMjY2Yjk2NDYzMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxZTlmNWRkOWQxZjVhNGU2YWY4MzhlMTIzMjcwODI1MDBlOTM2ZmI4MWJjMzMxNjJjNzg5MTVlYjI5NTUyNTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c3826f121654308a972d7c0e1bd9d3f",
+      "statement": "`ws_read` must distinguish an unauthorized PAT from a missing file: `getFile` maps 404 to null, merging two very different situations, so the error message adds a self-check telling the model that if `ws_ls` cannot even list the root, the credential is not authorized for that repo rather than the file being absent.",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L154-L170",
+          "version": "repo-lines-v1:sha256:e3dc0b9ba10a66b67f729950dc5a504f9fc620a043e682106c74edd74a98664b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhYmZlNjU5MjM1ZDc4Zjg3ZTIyNDExZTc1YjM3YmFiMmQzNmRhYzNhZDg0M2Y2OGYwYjA1ZDBkMDRiMmVlZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzOWZhM2VlNjljYzc0M2VjZWM3OGNjNGI5ZTY2NTBiOTI4YmVlYTQ0ZDc1NmI5MzhkMDE2NWQwNWY2YTNmYjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhhZGIxMWJjZTQyYjNlZDUzMGM4NDA1ZWI0MzliYzQ1YmJmYmI3OTg5Y2EyZWM4MTZhODZmY2UyZDNhYjYxZGEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2787-L2799",
+          "version": "repo-lines-v1:sha256:1e9243adadaf1a6cb733fdf493341715926acc0619f65ebc624cb706de81f24a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzZjJkZGRiNTlmMGJkNjRkODg5ZmU3MmIyODBiNzdiOTQwYjk3YmEyM2I0Y2Y4NDk2ZTIyZjMzZjhhM2NjY2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwYzcxNGU1OWQ1MmNmZWFhYmI3OGViMjQ2ZDBiOTU4Zjk2NWZlNjRhNDIzM2M1YTVjYjJlY2UyMTIxZjk3ZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxMDRiYjJhMGFhOWMzMzdmYThiYzMxODMxYThhZDlkNGIxYzI5MWExZjYwYzNiM2Y3OTJmNmQ5ZmI3ZjAwZDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_364252d8db9a40aea9f23c5abdac2067",
+      "statement": "`summarizeToolOutput` and `toolFailed` are the two coupling functions that render tool results onto Feishu cards: `toolFailed` decides the success or failure marker and `summarizeToolOutput` decides the one-line text, using the same criteria, so both must be changed together. Failure detection must check `error` first (self-built tools) and then `ok === false` (platform sandbox tools, which return an object with ok false plus status and stderr and no error field) — missing the second branch shows a false success marker on the card.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L845-L857",
+          "version": "repo-lines-v1:sha256:dba94743dea158fae0cbe131ce736748900833619af6897f3d52182fc8eeac87:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkOThiZGM4MTI1MjJhYTlmOWRhNjg0MTFlZTYzYWE5NjExMGI2YTM1NWIwNTI0OTE4NWQ0M2M0MDE2ZjYyYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2ZTUxZTBkMDA4ZjE2YzdhMmI3MDAyZThiYzQ2NTQ4N2FlMmY1YTMzYjA4ZjczZjUzNWQwMGJmMjhiODdmZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzNTFmMDY3MTYzMTAyOGJmN2U4NzA5MDNlYjgxNjUxZmNjOGY3YTdkYzllMjAyMDZmYzQxNjA2MDM3ZGQzMjAifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L105-L131",
+          "version": "repo-lines-v1:sha256:0cf77cfe38c0128b67d12607360976fa24e859fa42fd621085ffe313d53293d4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMmY0YmFmMWUyNDljMzI3ODgxZWM3MDUyYTgzYWIxZGUzOTc4MzZjODgxNTMzNWQ5YjIyNzEyMDdjNjhlMWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3ZmFkYTY4MWJkOTcwNjc1OWRiMTcxODQ3MDMxYzYwNTA3MDY1NzcwZmMxMmYzZjA0MGNmZjM5ZjEwMWYzZGYifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L175-L180",
+          "version": "repo-lines-v1:sha256:a90538bff3012d105ecd3b648fe4d2d2fcfbe5015be90eedd4724ea18f9ac7a8:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDhkODE1MTE1NjMwMjdkNmE5NmZhMDY1NzI0NGIxZDJjZGZjOTkwNTY1YzQ2YmU0ZjE1NjVhOGQzN2I0NmJhZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2U0OWRjZDc5Yjg2M2Y3M2FjZjVjODYzZWQ1YzBiMDIzNTI3MGM2OGY1NWMxODIzNzk4NzhkNTdjMTJmMTdmMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_44714444196b4b098bd8045a2a1c72c1",
+      "statement": "`summarizeToolOutput`'s branch order is load-bearing and driven by per-family field names. The generic `count` (bitable record count, also `ws_ls`) must come after more specific fields (`totalChars`, `rowCount`, `tableList`), and the `created` plus `docUrl` branch (docx create) must precede the `appended` branch because both fields appear when a document is created with body text; the `commit` plus `path` branch for `ws_write` and `ws_rm` must name what changed since those tools mutate GitHub and a bare completion message gives the user nothing to reconcile against.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L135-L172",
+          "version": "repo-lines-v1:sha256:6b616107ba64ccef89d5ce456c4d14cc1c81130285db3ae6fddcc022a1c338a9:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkNjBjYWU0YzU5ZmUzZDQ1ZDA0YjcyZmMzNWQ0NDRkMGMzM2ViMmQyZDkzNThmNzcyM2ViY2VkZmEzYTFmZWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxZTgwMzE5MGE3ZmVjYTE4ZjExMmQ5NjU4YTQ2NTFkZjc2YTNmZjMyM2JmN2E0ZTA2YzRiZDNhYjU4NDAzZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU3ZmFkYTY4MWJkOTcwNjc1OWRiMTcxODQ3MDMxYzYwNTA3MDY1NzcwZmMxMmYzZjA0MGNmZjM5ZjEwMWYzZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjYmZiM2RjOTM3OTY0YmQ2M2VjN2VjMzZlYjYyNzY0MmY5MTNlMGRmZWY1OWVlNjI1ZmFkOTI2YTI1YmE0NWEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L934-L959",
+          "version": "repo-lines-v1:sha256:bf5335e017c8e51589941a76342abfcc131a54bb7d15072a0b88bd1ae31f7759:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmNzFhYWQzNDRjZWRmNmE0ZTY3MzIyMjY3NTU1NmQwZGViNmExNWM0ZjEwNGJjYTcwOTg3OWMzOTI1NjA4OWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1OTZkZDg1NzM3NTY1YTdkOTEzNGJiZGU2YjUzMGM0NGEyZjlhZDA2ZDVlYjFhYWI0MmFlZmJiOTIwNzA1YTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE1OWUyNjA0YWU1Y2Q2NjBjOWY3N2M1NGE5YWE2Yzg5OGQwNTAwNTA0NjFkNWQwZmViNjNkMzA3ZjYyNDM4OTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyYTk1OTkyMmJlOTRiNGRkN2MzNzNkYWI4MWFlMzIzNWEyYjk5MmEwMTkyYjI5ZmQ2NjAwMzQxZmMzMWM0YTEifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L270-L278",
+          "version": "repo-lines-v1:sha256:3a556203c974a5a449b5544e208014c9014dfcf6549fe816c2809505068b28b4:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTM5ZWIxNTE1ZTgyMTU0ZjkyN2QwOWQ3M2Q2OTNjNTIyMzkyYzM5MWVjMDAyZWFkYjdmZjRkZGY2MzVjZjJkMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTY3N2QyZjAzMWU5OGI1ZTkxMWM1YWQ0ZmI5YjIxODZhOTMyNTIyZThmNDZlZTQwYmFiZmFlM2RhMDBmYzEyMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQ2OThjOGRjYzU2ZGJjYmRiNGUxMjVjZDkwZWZlNWZhZTlmYWIzYjExYTgyM2Q1YWQ4YTFmNTQ0OGQ2ZjMyMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWExYmYzY2MxZTkxNDNhNTlhOTIyMDVjNGIyNDA5YzAyOTk2MWMyYWFjMTVjZGM5OGVkNjE2ZDkyNTk5MmM4NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3847f71648844a069cd9bd0f131f05aa",
+      "statement": "Tool results reach the card only as a single summary line, because full tool outputs run to thousands of characters and would drown the real answer, and Feishu cards are poor at long text; `FeishuStreamer.pushToolResult` emits the success or failure marker plus the summary next to `pushToolCall`'s tool-name line, and tool call arguments and full results are deliberately not shown.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L845-L857",
+          "version": "repo-lines-v1:sha256:dba94743dea158fae0cbe131ce736748900833619af6897f3d52182fc8eeac87:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkOThiZGM4MTI1MjJhYTlmOWRhNjg0MTFlZTYzYWE5NjExMGI2YTM1NWIwNTI0OTE4NWQ0M2M0MDE2ZjYyYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2ZTUxZTBkMDA4ZjE2YzdhMmI3MDAyZThiYzQ2NTQ4N2FlMmY1YTMzYjA4ZjczZjUzNWQwMGJmMjhiODdmZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzNTFmMDY3MTYzMTAyOGJmN2U4NzA5MDNlYjgxNjUxZmNjOGY3YTdkYzllMjAyMDZmYzQxNjA2MDM3ZGQzMjAifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L105-L110",
+          "version": "repo-lines-v1:sha256:7500d91846c4be3f167f8c5ce10223b45094bbf50585303cb1a00d17f8eeaf3b:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI1ODBlOTY0ZjgzYTQ3M2Y0M2Q0NDM4NDYyOTQ5ZDY4YjU2MDBmZGE3ODdmMTYzNzQ1ZDAwZGU4OWNiZjM2YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmZlNGFhODFmNjk4ZGRiNjY2MTAzMWE4ODVmMDVmZTFmNDYyYWYxNGIyMDFlYTcwZDVmODdhODI3NjFkZGM5NSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/streamer.ts#L90-L103",
+          "version": "repo-lines-v1:sha256:8a7619c95bade3f1c619fd4f2a8d1c336d28b5658d3ed85364b39cf95dbb123e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRlNGQ2YmZjZTcyZWQyZjAwOTNiZjVhM2Q3NjBkYzVjODU2YzVjNjhiYWY4ODZlNGU0Njk4NjgwNTMzNTkxYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5MWNjYzExYjYzNGUxMjc0ZDY2MmUzNGM0NzNmMmM5OWY0NGFmYmU5MGI1ZTZkMTM2MzcyMTcxOGE3YjdjZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3NmNjNzY2YTEzYTFmMmE4ZTlkOGE3ZWEzYjU1ZjViNzFlNjMyYmZiNDBkMGZiNmY4ODkzMjBiMGFkNmI0NzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bd0a3328cd7c47e3a8d0bbc412ca7944",
+      "statement": "A zero-result search is deliberately not an error: the self-built web_search returns an empty `results` array plus a hint telling the model to change keywords instead of repeating the same query, because reporting it as an error would make nothing-found read as the tool being broken and the model would retry the identical query.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L24-L26",
+          "version": "repo-lines-v1:sha256:62aaa079f4124c99de44d3f00339f14bcccf3deaaf9741e4e1e4e40e739d796e:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjNlMzU2ZmNhN2I4OGYyMTAwYjAyODhmYjExZTYyZmQzZDRkNjZmNDhmNTEyZTY0MjY3Y2U0NGMzNzE1YzBkMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODJiMWE2MmNkZGQ3YTI4OWIzMzQ4ZGFmNWE1MTc4N2JjZTNlMDJiNmVhNjA3MmM4Y2FkYmM1ZDNhODNkODA4NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODBiMWNlODgyMDYzMmU1ZjcxYTQwMzNkYTFjZmViOGNhYjNkZTA4YTVlMWFlYTBmNDBmZGRkMjQyYjNjY2IzOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDdhYzhlN2Q1ZWMzNzFmMDE5OTMyNWM2ODdiM2M1OTdiYTMyYTEyNWZlMDc3OWE2YTZmMWRjMGRkMzY2MmQ2MSJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_search.ts#L113-L121",
+          "version": "repo-lines-v1:sha256:9dcd340d985a025f20c69948fff02794423bdc2b39eb5160d44fb2b799b1ec39:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmIzMjBlYTU5N2M0ZmE1YWU0ZjhjNThlNTZhMTVkYmQxNTM3YWU1NmVlZmJiZjZjNzNkZjk4OGUzZmUxNTM3OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmU1OGUwMWE4NjI3NTY3ODMzMTM5NmVkOGJmMWUxYTI4ZmFjYjYzZTg5MThmOWMyMjcwYTMxYTMyMjg0YmVjMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmY5YjQzMmQxZWIzODZiNzYwMTQyNjVmNThjZWMyNWNmMWNhMWI3N2QxZDExOTg3MTNkNTM2Nzg5YzgxN2RhZCJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_search.ts#L136-L141",
+          "version": "repo-lines-v1:sha256:3c826f0a9fa7a11241f1cea332b7065095ec9a7a08b22b831407ed470aae4428:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjlhNTZiZDZkYWNmNjhiMTU0YjQ2ZTlkOGRmY2U0ZTVmOGY4YTgyYjhjOWI4NTg0ZTkwOWUyOWU2ODVmYjNmMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTc4NmJkMjczOWUzN2MwODhmMzA4NGY0ZjE2MmYxZDgyMjIyNWEzZTkyZWMyNTM3ZmRhNTI5OTMwY2Q1YzYxMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDNlZTQxZjM4NTFlMzQxOTYwYWEyZWIwZWM3ZGRkOWJjOTUxMWQ1ZDBlZTllOTY2OGViOGIwNDg3NjRmZDEwOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDRmM2Q4Yzc3NTk2YjZiNDBmODE2M2E4OWU1YTBlNzQ4ZmFjYmNkYmZjZmMxNDRmZmFhOGIwMTkxNTNiMTE1ZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d14feca4039f46b785048a8d900910f0",
+      "statement": "The platform sandbox tool names used by `EXCLUDED` and the prompt (`commands`, `code_interpreter`, the `files_*` group, `browser_fetch`) come from the official Using the Agent Framework document and are still unverified against the deployed environment; the repository's own open-question list says to confirm the actually-registered names against the local `/agent-metrics` panel. Because tool names are the model's only selector, a wrong name means the tool effectively does not exist, and a name mismatch in `EXCLUDED` silently fails to exclude because the filter compares `String(t.name)`.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L32-L36",
+          "version": "repo-lines-v1:sha256:e9202771a7339c92a6e209d8b1119ce149442eabde0ccb672237fa538d92aef1:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzYxYmUyYWMzYjU1ZTU3YjBmNzRkNGE0MzcyNmRiNTA2NmE0OTAwZWJlN2Q5N2Y2N2I1MGYxY2VkMGRmN2I5NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWEyMWFmYzUzNDkwYmFmOTZkZjUyZjcyNDkxOWQ5NzJjNGE2OTEyMWE5NjZmODNhYjQ3NGRkYWY2YWE5MTkyOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmM2NDYyNzM2MDhlODYxNDMxN2QwMTZiODQ1NmY0ZDgyYjRmNjMyMjFkMWM1ZTQ4Njk3YjczMmVkOWFmNjU4OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjQ3YTk3OWI5NTBjNzQzMjllMGRiMWZhNzFmNDE4YTlmZjc2MTMzMDFkNWE1YTc3NDg2ZDRjZTg5OTFiOGZmYyJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L93-L98",
+          "version": "repo-lines-v1:sha256:40c186b98f67d2d64c7d83eee598ccea9be4b421a2cf476a00652ac0a031e480:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTA3ODU4Y2Y3OTk5Y2Y2YmJjNDUwMjUxMGM3M2Y5M2U2YzJkYzFiOTIzN2M3YmU0M2VlNTM1YWU0ZmU3MTA5NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODA2YjM4ZDNhODdlYWRmYmRmYWU2MmI3MTBjOTJlMDZjODkzNzFmOTYyZmRhNTY5NDI5ZjFlMjZmNTQ3MmY0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzM3OTVhNTUzNjY1MTlhYTllNGNjMWQzYWNiMjZiOTM4OTFjNTkzNjJjNWVkNWI4NjZlMGQyNjRiOGI4ZWFiMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjExZGNmM2E0OGM5NmI4NWRlMTNlZWNhYTlhMzBiNGFkNzBkMGRiNGYxODg4MmQxM2FiMDdmYTVkZjkzZjk4OCJ9"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L806-L817",
+          "version": "repo-lines-v1:sha256:26796a51e285e5eec1da47a2c0f620971c4a48abb7e65100134bc544ea9bf30d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExM2JjYzc1Y2EzMDY3MjZmNmU1ZjI4MWQzNjU1MTA4ZWZkMWE0ZjAwYmM1NmJlNjk5NGU2Y2FiZWJlMzYzNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1ZTc5OTJkZmRjMDdlNGJhNzg5NDk1OTkzNDQwYzYwMjczM2UwNzhiODkwMzM0MWZhMDZmYTk1NzlmNGU4MDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMwNTNjZTFjOGQ5NmM3MWM0OTU3YzRmOTkyZmY1ZDc2ZjI0MjJlMjE3YzRkMmEzN2Q5N2ZkYTkwODI2OGI2YWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L235-L236",
+          "version": "repo-lines-v1:sha256:1483f94678902ca011a48c5b3c25846d882c1b5d4b672f4657d016f761d7c41a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjA0NTRmYjM0MzY2MTYxNmVjY2Y2ZTcyNzQ1M2FkZmM4MTAzZDY4NTc5N2RiYTYxZWU5ZGJmZjE1ODg0YWIxYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2ViNTZhZTVhNTNmMzU3YzljNTUwNjcyMjVjMWIzNjNkNDhlNzE0OTVjMmU4Y2FiYzk5Y2ViMGI2MWEwZGJiNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTM3MTViOGZiNDE2ZDg3NGNhM2RiZTNjYzQ4NmYxYzBmNmFhYzY4YzllZmQ5Yzg1ZTNmNjEzZWYxNDA2MDIxYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_fda450e192874602a2087fa9c0c31bb2",
+      "statement": "The stream-event names that carry tool output to the card are also unverified: `applyEvent` handles the answer-delta event and the tool-called run item event (both from the official template), while the tool-output event and reasoning deltas are inferred by the same pattern and never exercised. The failure mode is bounded to missing card lines and does not affect answer correctness, since the final answer prefers `result.finalOutput`; the verification checklist points at `/agent-metrics` as the verification surface.",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L29-L29",
+          "version": "repo-lines-v1:sha256:f25f7e566ee006d747758c23b781584dc14ec8506789bf964cee4b1652c9124b:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjI1ZjdlNTY2ZWUwMDZkNzQ3NzU4YzIzYjc4MTU4NGRjMTRlYzg1MDY3ODliZjk2NGNlZTRiMTY1MmM5MTI0YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjI1ZjdlNTY2ZWUwMDZkNzQ3NzU4YzIzYjc4MTU4NGRjMTRlYzg1MDY3ODliZjk2NGNlZTRiMTY1MmM5MTI0YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWIzZDM4ZjMyNTllYjQzNzNhYjAxYTY1YWQ4NDU5YzRkYTYzNTBlODE3ZjhlMGMyZGRiZjY5ZWVjY2Q3ZjZjNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDExOTdjZDMxM2EwMWNmMDI1OTkyNDRlZjYxN2VlMGI4ZDJhYzBhOWY4Yzg0ODhmZWEwYzAxZjllOTY4OTgwZiJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L816-L890",
+          "version": "repo-lines-v1:sha256:88ef3f1134edbaa16e1e1f80977e16f59c4c4e73c3dd7e9af416fe5a34dd211e:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxODMyODRkOWQwNTdhNjMwMzhjYWY1NmNhOWM4MmU0NDA0MzUyYmVmYWFkZGIyOWY1MjczOGIxNzYwYjFkODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzMDEzYTU3ZTI2NTUxYzQ2MDM2NDgzYjA3YjMyYjNhZmYyZDg3MmRmOWM3ZDJiMzYyM2QzMzg0Yjg1NTA5ZDYifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L214-L236",
+          "version": "repo-lines-v1:sha256:5076e2ebd46d50cd56cd3bd4c80cbd4bd6b8e5df015e0050c9841c3db3fc9879:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxNmRlNDRjNGUyMDg5OTEzYjlmMzVmYzFiMjA3YzBmMGExZTdjNjNjODZkNmZhNjRjN2Y1Yzk0NmM0YzJiOTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlYjU2YWU1YTUzZjM1N2M5YzU1MDY3MjI1YzFiMzYzZDQ4ZTcxNDk1YzJlOGNhYmM5OWNlYjBiNjFhMGRiYjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_817602e9220f4442b17a6e2a1bbb78fe",
+      "statement": "Two environment variables gate whole families in a way that must stay in sync with the prompt: setting `SANDBOX_ENABLED` to 0, false, or off removes the entire platform sandbox family (useful for first running search-only question answering), and an empty `GITHUB_ISSUE_REPOS` whitelist removes the entire issue family along with its prompt paragraph, so `/agent-metrics` should show no `gh_issue_*` tools and the prompt must not mention them.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L104-L144",
+          "version": "repo-lines-v1:sha256:24938b36320f5715b53e50bd80ae834feb8ed68f9283b6e3d109eddd80f5715c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiMzcxYjNhOTk4ZjVlNDBmOWJlOWM1ZWY3ZDU1YjljODQzYmQ1NDcxYzQ1N2E4ZDE4OTA5YmMyOTg3MTgxYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljZGYwODIyNzIyZmMwZGJlNTJiMTYwYjE3N2E5NDEyMWM5ZWQwN2M0NDg3NGMwNGJlZDYyNDcxZDVmNzZkNGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzODc2NjQxNDBlZmJhYzI2N2NkYzc2MTA3ZmM5YWI5NTNiYzIzNTJhMjdlMzM2OTJhYTNhY2MyOTU4YjE5ZjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3NTY4MGZiODFmNDA0MjU4ZDA1N2VkMTM2MTQwMGI1YmNmNmEyZDQ0YzM5ODZiNDRmMzhjMTAxNTY3YTZhYzYifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L62-L72",
+          "version": "repo-lines-v1:sha256:c3def5ead25c7e0ea139f7296a95e44a9dfb7aca72e80345c9a1b1a283f08ef8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NjkwODZhMmYyZmU4ZTE1ZDdlOTIwZWI3M2FiZTdlZjdmOWE4ZDgwZWU0ZWVmOTdlZGJjYTExZDNhOTYwNWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE0NWJkOTg0YTlhMjVhZWM5MWFkY2M1ZmM1MDgyMTIzOWQyN2RmNmNkN2I0ZmRjYmNkMWZjMjJiOGU4Y2M1YWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2MzRlMzg0NjBjZjRlMDlmMjVjNDBmOGViNmRkZjcwNTViNDA4ZGQyZjIyNjhkNzkyNDVjMjBjYTg3ODQ1ZTcifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L286-L288",
+          "version": "repo-lines-v1:sha256:ef00ae8440f8315272bae849f624092cf4d892d28d6e695abe352163200f6e7d:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTRjYjdkOGZiMGY4MDI3ZWVjODljNGFjNTAyZmY0NTViYTlmMWIwOTI0ZjUxMGYzY2RkZTZiNmJkZmQyNTZhYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2ViMmMzOThlNjc1NTdmZGY3MmE4ZGExMzdjNzJhNTAyZDgxM2RkMzkwMGQ4NWM2MGE0MDdlOTljNTMxOTMxNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzMxNGVjMGJlZWUyYWQxYWM3OWFiNDlkNjA0N2RkM2VkZGE1MTMyMTg5MzAyM2FhNzNhMmMyYTAwYTUxMjM5NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTIwMDIxZTRiZWQyOGUyNjI3OTZmNzMyNWZkNGMzMGQ2YWYyY2VmYjE1MzdjMGVkMzA2YjlmOWQ5NmQwMThhNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ea1d63e4b4be4ab59cb286b81fc12788",
+      "statement": "The `?probe=env` endpoint filters which environment variable names it reveals by a regex over FEISHU, INTERNAL, AI_, AGENT, SANDBOX, SERPER, OPENCODE and GITHUB, so adding a new variable without updating that regex makes it invisible in the probe — a mistake already made twice, with SERPER and with GITHUB. The probe lists only variable names plus a length/head/tail fingerprint for `INTERNAL_TOKEN`, never secret values, and is behind `tokenGate`.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L575-L664",
+          "version": "repo-lines-v1:sha256:bf8b7c709db9995a20920fb8e3fb84c7882416856dcaafb055c8ef7306b53d99:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkZjc2ZDFjMTE3MmIzM2U2NmUzNDIwMmU0MzlkZjdkZDE1ZmFhNWRiMmJiY2E5YmNkZDNhNzAxY2VkMjJjNzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjYjYzNWE1YjZiNDExY2RjYzk0NTEwZTU3Zjg1OGFmMjljMTgxMWNmZDMxYmZjNzFmMjYwMGJmYjc3OTZiOTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmMzk0MDA2NDZhMTQ2MWQ4Yjg5NmVmZTliYTc3YjdiNTE4NGY2ODMzMjdmNmI0NmM2YTVhNGM3Zjk0YmIwNWEifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/index.ts#L796-L798",
+          "version": "repo-lines-v1:sha256:3e3d1d7980f82a700e9f5f66e3ffeb8b3d84b94a13bd7e4bfffed65d998de599:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjAxMGVhNWI1MzAzZGI3YmQ5NGEyNWRmZWU4NGQ2NTI2M2JlZDFiMzgxOTg0NzEwMTQxZjBhNTcyNTBlYmI3NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTQyMTlmYjYwNTNiMmJhMjMzNjkzNzM1NWM0ZWE0ZjU0Njg3MjUyOTI5NmYzZWMzZjU4ZDg3ZTk0MjUwZTdiMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWFmNWI0OGQwNTI1ZmM4N2M1YTk4MjRiNWFlNzNkZDI5NmM5YWVkNDNjODYzYTU5MWEwYTNkNzQ4MDE2MjY0YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjYyZjFjZmFiYmVkN2RiYzI0YTMzMzBkOTIzZjNiZTMyYTBjZTAwZTIxMjBiMjdkODlhODk3Y2RmYWEyYWE3OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_bff84358e5b645a29b3ed6bddb76e077",
+      "statement": "The search tool is mounted once per host instance (`const searchTools = makeSearchTools(env)` in `createHost`) and the web_search duplicate exclusion is derived from that same value (`searchTools.length ? [\"web_search\"] : []`), so when `SERPER_API_KEY` is missing neither the self-built tool is mounted nor the platform duplicate is filtered — the family and its exclusion decision come from one value.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L482-L499",
+          "version": "repo-lines-v1:sha256:51298cc22c46b92a3d34c7639f42b5d26edb2691f0880462d733c51e50aa67a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0N2YxMWVhNDU2MWZlMmM1YzdmODIxZWM2MjQxNjE5NzU0MDliM2RmOTgyNDgyYmRhZjEzYTA5MTM2ZGY0NDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcwNDkyZmNjOGQwM2MzMTAxZmI0YzgzZGVlZDYzOWM4ZDk5NmYxYzg5MDBmYmY5NzM5ZGMwZmY2YWI4YjhiMTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM0YTZhNGYyMzczYmJjMzJmYjgxOTExZWZhNzMwMTc5MWVkMTRkYjc2NmJkMTYxODNiMWZmNzk1NGM4ZmUyYzgifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L580-L588",
+          "version": "repo-lines-v1:sha256:be74f620c13f3e7ba5945db79f4a838fb829d47f6e7aed74b78a454b1f12b2a5:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzlmYjliMDI3ZGZhZGZiNjM2ZTMzNzgzNmE0NzYyMDNkZjlmOGFkOGU4OTdkMjc5M2UwY2Q2OThmMmMxMzQ2YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEwNDdhZjRhZjMyZTZlYTY4OTY2NjM0YzZkYmI2ODg1ODA3ZWIxN2VjZjIwMjRlNDdjNzZhYmJjYjg2NWJkNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDcyNzZkMzhkNjRlZGE4ZTg2NjRkZDU5Y2Q5ZGJkMDgzYWRmOTY5MDZmYzg1MTE2MzA0YjBjNDM0M2M1NmI3OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjY5NDAxNzU4YWJmMTgxYmY2ZjA4NDRiOTY4ODQyNDc0YTIwODZlN2Y3YTc4YTAzY2FhNTU3OTY1NmM3NDhiNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e2afd9e31d824b54813bf0596e60d229",
+      "statement": "`platformTools` swallows exceptions from `context.tools.all()` and returns an empty array, because platform tools being unavailable should not prevent the whole Agent from starting — search and cloud docs are the main path while the sandbox is an enhancement.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L95-L103",
+          "version": "repo-lines-v1:sha256:0983f0d053ba99af7abff0d15049ed6adbfe89b0b500c7e2d6538df12fd6510e:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDY1OTVmNGVlNWZmNjNkNTA5NTA0MTlkYzM0NDE0NTEzODUxZGM5NzM2ZmQxN2E0ZjdiZmE5MzBiMjYxYjZmMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI1NTVjMDg5ODhiNTYzNWNkODNlNWM3NTFiNDJiNzEyODczMTdhYWE2MTU1OTdjMWJmZGE3NjMxZWJjNTRiMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGJiYmRjZTU0MzZhZTRkNTJiNWMzMDg1YTFmNjAyOGVjOGQxZTZmNzc5YjRmM2M4OTM3MjRlYzJhMjAxNTdkOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_252542c0dae544f99a0f9f22652d8e1e",
+      "statement": "`ws_write` and `ws_rm` each produce a real commit against the agent's private workspace repo, and `ws_rm` refuses to delete directories because the Contents API deletes one file at a time, telling the model to list and remove files individually with the note that git does not track empty directories.",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L239-L247",
+          "version": "repo-lines-v1:sha256:44f0476dc29f1a42b99fe2e4738a28ee0defae8370d67d1c790d0dfdcb67e93d:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjNjYmJjNjgwYmViNWIwZDM4OGRjNmFlZTc4ZTI5ZWY0YzljMWVkODE5NTcwNzhmNjk4Nzc5MTQzYzM5Yjk4MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2I1ODFjMGY2NmVhMTFmZTRiZGU4Y2EzMWY2MjhiYjgzYTkzMzc5YjdjMDA4ZWFlYjhjYTU4Nzk4OGJlMDBhMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2VhYTRlOWRhYjUzOGI1MzZjYjgzZTNjMGQ3MzM5ZTFjNWQ5MzJkMTgwMjcxOTU3YTlmNjhlNDNkMzZmYTM3MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmJjNjU3Mjc1MDY0YWRjNDQ4NTU2NTk5ZDZkZTc2ZDEyNDM4NWQwODI5OWMwY2E0MTM0ZWIxNDA3MTVlNmFkYyJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L299-L310",
+          "version": "repo-lines-v1:sha256:5589416bd5113e9993da0b9eaf66ed56041d436f273cd09a6bf0db75af155784:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4NzhhMDdmNWU3MGFhMjU1NTZlYTAwYWVkZmVhNGRmOWVmOTllZTg2ZDI3NDI3NWUwM2I3ZTk3YjRmY2FkNDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAzMDMyMTYxMjg4NjJhYWIyOTc5ZDI4ODIwZjBiMDJiYjU5MzYwY2E1MWQ1MTg4MWNkZjViOTFhNTA5ZGQ1MDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzYTIyMjQxYzQ0MTNkNmY4YjdiNTIzNzRmYzExM2RkZGI3OTRiMGUxNzk2ZWJkYmJhNTY1M2Y0NmIyZDJjYzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_81725cc29a0449ed980aec7e56d7508c",
+      "statement": "Each family constructor returns an array of tool objects rather than a single object, and `_host.ts` spreads each array into `Agent.tools`; `test/smoke.ts` pins the resulting name sets per family (the five `ws_*` names, the two `gh_issue_*` names, the seven `feishu_*` names), which makes a rename or a changed mount condition a test failure rather than a silent behavior change.",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/docs.ts#L964-L964",
+          "version": "repo-lines-v1:sha256:bd9dff6eafc2021b8ec7ac2f1a459de6138726cf730f674764b911932a002e9f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQ5ZGZmNmVhZmMyMDIxYjhlYzdhYzJmMWE0NTlkZTYxMzg3MjZjZjczMGY2NzQ3NjRiOTExOTMyYTAwMmU5ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQ5ZGZmNmVhZmMyMDIxYjhlYzdhYzJmMWE0NTlkZTYxMzg3MjZjZjczMGY2NzQ3NjRiOTExOTMyYTAwMmU5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDI3NWI0MzhiNTM5NGMzOGIwODQ4YmZlNzU1MWM4NTFkMWNkMDEwYjU2NTA3NDhlNDZlZDBmN2E5MTY1Zjc2MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjA4YjUyOWI4NGYzNTMyZDdhMmI4NmJmYzljMTFhNTAyZmNjOWVjYzVmMGQ3M2ExNTk0Y2NmZWQ0ZTNkODEyYyJ9"
+        },
+        {
+          "resource": "repo://src/feishu/global-memory.ts#L537-L641",
+          "version": "repo-lines-v1:sha256:e72d227828abe7e8dca92f1c98b9bcad9cda7c9fd5b67ddf788ce006cc9dbfe5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxODU1MGIxMmYxNWRkZDViNTVlMWI4OTcwZDExNWM2ODlkNzAwYzkyODI4NGQ2YzI5NjE1OGU0YzQzNzQ2OTQ0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwZWYwNTZlM2I1MTJmZTY3YWZkYTEzMjA5YTM1MjlhOTA5NDExYjZlMzA4NzBiMGQ0NDhmZDg5NjdiNDRlMjY2IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2MWZjZDFhNTUxNzRkY2M2YWVlZThjYWVkZTQyMDc4NTQ4NGQ5ZWQ1YzJmMjE2MWI2ODViZmFkMzE0NDFlZTIzIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIzNzkyOWU5MWUwZjk5YzNlODI1ZGU2OWI0MzVmYjY0ODRkMWIwYTFkZjJmNDY1NjFhYmYxYTI5ZjA0MTg4Yjg4In0"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L120-L120",
+          "version": "repo-lines-v1:sha256:1506201e2aa7ec501be0735278c55d3f98dc93c116446ce57d60eb38e4c7592e:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUwNjIwMWUyYWE3ZWM1MDFiZTA3MzUyNzhjNTVkM2Y5OGRjOTNjMTE2NDQ2Y2U1N2Q2MGViMzhlNGM3NTkyZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTUwNjIwMWUyYWE3ZWM1MDFiZTA3MzUyNzhjNTVkM2Y5OGRjOTNjMTE2NDQ2Y2U1N2Q2MGViMzhlNGM3NTkyZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2VhYTRlOWRhYjUzOGI1MzZjYjgzZTNjMGQ3MzM5ZTFjNWQ5MzJkMTgwMjcxOTU3YTlmNjhlNDNkMzZmYTM3MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L132-L133",
+          "version": "repo-lines-v1:sha256:ad9b30821b3ac455eb765e9519afd210511feed72a308cc1c7428b7b9a2b5caa:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODEyNDAwMzkyN2YyYWUyY2I4YmM5NTc4OGE3ZDIwYzNmY2U5YTEzZWNmMjlkY2EyMjI4MjFiNzE1NmRiYWMyMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGU4ZWYwNjJmNGE1NmExN2Y3MGU1OGNhYTZlYmExZmQ3NjYwODZmNjczZGYzMThiZTk4MWFhNjhjZTViYzNlMiJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

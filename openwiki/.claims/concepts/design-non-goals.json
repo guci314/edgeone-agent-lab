@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:ff51b5f0aef4e14ede60e4ebe5b435d2129f177f0f4e7aafb7a365a0035cf92b",
+  "claims": [
+    {
+      "id": "claim_1fa482cda0c9406eab659377fa5605c3",
+      "statement": "这套仓库遵循一条统一的设计规矩：破坏性 / 面向他人的能力默认不做，要做也必须先说清护栏；该规矩明确写在 docs/01-架构与移植映射.md 第十一节，并统辖 agent 自改代码、飞书文档删除、GitHub issue 关闭、平台沙箱 files_remove / browser_* 以及仓库语料层删除这几处决定。",
+      "evidence": [
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L844-L873",
+          "version": "repo-lines-v1:sha256:568819ddc5c597091b2c4fabef228e8e5752352f8d1e8d154fde139a74a560ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhODQ3YThlOWQ1YWQxNjZhYjlhOTEwMzA4OWVkZGJmNjI2Y2E4MDQ5YWNiOThmMTdkNzEzZDEwZGEyZGJhOWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZTk0MjIyOGUyNGI5ZDA5NGY3ZTNiYTUxNDliYTYxNDZmNTc1ZWRkNzcyY2IzZmIzY2VjZWJhMzI0NTg1MWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6aa55920ccab49449cbbd757751dd5f6",
+      "statement": "agent 自改本仓库代码的能力被明确决定暂不开放（2026-09-26）：技术上早已可行，部署链路由 `.github/workflows/deploy.yml` 的 `push: [main]` 触发并自带 typecheck + npm test 门禁，agent 不需要持有 EdgeOne 凭证，缺口只剩写权限；不做的理由是它等于能改自己的提示词、工具集与安全边界（INTERNAL_TOKEN 校验、GITHUB_ISSUE_REPOS 白名单、EXCLUDED 列表），且 workflow 文件本身在仓库里，改掉 npm test 那一步即可绕过门禁。",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L15-L19",
+          "version": "repo-lines-v1:sha256:56e8c43cbbd03b00dbcb32e2978308aac0e0e2bf640c907801a68ff48851f092:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTk2ZGM0ODE0OWY1YTgzZDFlZDZkYmIzOWJiYzdlMmI5MDJhYTNkMzRkNmJkNWFlNGIyOTFiNjhkZjBjYTc5YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2YyZmE3M2YwNzA0ODlkOTcyNGEwMjlkZmI1MDJhYTA4ODUwN2QwODU3OWJiYmNjOTRlZDkzNWMxYTA1MzMxNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTJjM2JkMWFlOTFmMTlmMDcyNTAyMmEwMzgzNDFiNzA5OWQ0OGVkYzQ5NDM0NGRjYTI5ZTA3N2RkYzllYTQ0ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTQzYWJkM2E1MWQ3NjAyODQ3ZTU5NDUzMDI1NTZiZjA2YWI0M2UxMWMzYzRlNGFiZDhlZmUyODg4NjliZTdlNiJ9"
+        },
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L42-L47",
+          "version": "repo-lines-v1:sha256:8540070ec6e12c7f660052dab95e3dcba996a2c623c3b5936bb96f40850c1523:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzgwMGY3MTljMjA2YjYwZWRlNGQ4YmMzNzA0NWYzMzEzYmFlMDRiZTkyMGRlNjYwMGJhMWMxZWJjZWQ2MmU2NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjYyMWI5ODMyZTkzNzVjOWNiYTkzNzAwOTcwOTc0YjQxOTRmNGIwNDVmZDg3NDUzMjJjODkyNDdhZTY3Yzc5OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTFkMTgyYWVkNTAyZmE5MmMzZGY2NDI4MmU1N2YyYjdlOTVhYTM3NzVlZmZlNGQ1ZWI0NGY3NGI4YzVlN2M3YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjZiN2VlNGViYzU3MmIzYmVjZjUyNzMyYzkzNjczOGFiNzIyMjc4NTE4ZWQ4OWQ0NzAyMDczNTFiYjVjNmM2ZCJ9"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L849-L868",
+          "version": "repo-lines-v1:sha256:44f20581a68efab1ca907812aeb70178337e4339f1163fdfac1c50e95f1f2c6b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjNTQyN2Y2ODJlM2U5ZjllOThjOGUzNzhhZmViOWZiYTNjMDM4ZTFkNjBhMDdlMGQyNDkzMDFjMTE0N2IyZjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzNTMwM2VjMjgxMDQyMjIwMzRjM2FkZjBiNTY1NmIyOTY2OWFlNDQyNDcyN2MwZTY3MzI1ZjVkZDgxMDA1ZWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIyYzc1Nzg2ZWZiMDg2MDU0MGFiZjU1ZjYyMTZiYzE2YzEyNDE5YTc1YmVhMzU4ZWQ0ZjUyZTdjMzJhNzZlMzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI0MmU2ZGZmN2I2MzFmMTM2ZDhhMDg1YmU5YTgwOTZjZTk4M2Y3NmZiNTk0ZWRjZjM2OWY4MjgwYjlmNDQ2YWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9443d76c106f4d07ab8ffc60cfce38d3",
+      "statement": "重新评估 agent 自改代码时的最小起步是两条一起上：只给开 PR 不给直推 main（复用 `push: [main]` 才部署的平台机制，等于改动必须经人合并才上线），以及明确禁改 `.github/workflows/`；`workflow_dispatch` 与 `concurrency` 组提供人工触发入口与单次部署保证。",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L15-L24",
+          "version": "repo-lines-v1:sha256:188042118d16fce73aecb6b57bb3cc9446ba0a26fe8388822f8b87aa4b9625bd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5NmRjNDgxNDlmNWE4M2QxZWQ2ZGJiMzliYmM3ZTJiOTAyYWEzZDM0ZDZiZDVhZTRiMjkxYjY4ZGYwY2E3OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0YTAxZjI4YjZiMDRkNDVjYWQwZmU2Yjg2MmQxYTgwMmQ3YzFiYzVlNzdlYjg4NTgwMGI4ZDkxY2Y3ZjQ0ODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEyYzNiZDFhZTkxZjE5ZjA3MjUwMjJhMDM4MzQxYjcwOTlkNDhlZGM0OTQzNDRkY2EyOWUwNzdkZGM5ZWE0NGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkwMDE0YmEzYjgyODg4YWEwOGM1MzYyYTA1Y2JiM2E2YTBiMDVlYmRkZDlkY2VjY2RlMGNlZmMzZWM5ODVmMWEifQ"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L866-L868",
+          "version": "repo-lines-v1:sha256:2fd91cca428fa9892ed23ce34c61e361c749ad0d7ffffe813a68c8bc6bd66413:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2I5NTNlNmU4MTEyNGE4YTg5MWQ0ZjBjYjVlNjQ2ZTlmMTI4ODExYzU3NGEwZTI2YTc1ZGUxMTdjYmNmNzI4MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjM1MzAzZWMyODEwNDIyMjAzNGMzYWRmMGI1NjU2YjI5NjY5YWU0NDI0NzI3YzBlNjczMjVmNWRkODEwMDVlZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWUyOTY3MGMyZDVjMjdhZjAyMzY2ODA2NDQyY2Y2ODkxNGUzN2I4MWVkODk3N2U4OGViODhkY2UwN2ViZGE0ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjQyZTZkZmY3YjYzMWYxMzZkOGEwODViZTlhODA5NmNlOTgzZjc2ZmI1OTRlZGNmMzY5ZjgyODBiOWY0NDZhYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_373187e5734749f28d3af04d942afb38",
+      "statement": "飞书应用刻意不开 `drive:drive` / `space:document:delete` scope，因此它建出来的文档删不掉也移不动（调 delete 回 99991672）；这是有意取舍而非漏配，回访前提是先答清「模型在什么条件下才该删、删错了谁赔」，文档明确告诫不要因此去控制台开 scope。",
+      "evidence": [
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L228-L241",
+          "version": "repo-lines-v1:sha256:252ebc28bcd577e54862afa1a5450be5d9ddc1f3d0674a10622f9d770520e38f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwNzRmODQwNmYzOTYwOTdkNzcyN2IzMzIxMTMxZGUwNTZhZWNjNzQwOTc2NzA3MGUyZDhjOWQ2Yzc1ZThkNTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2YjliYjc4NmQ3NzJlM2U1MGQzNWUxMGFmNWI1ZDBlNzUwYjFjNjA5MDMzMGM3NzcwOGNiNjZlYWM2YzRjZTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExN2I1M2JiYTBmMTZmN2QwOTUxYTU5ZDUxMWJhZWRmMzM4YzFjNzJkYWM4YjUyMTQxNDVlM2Y5YzBhMDE4NWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e3ab23ff6aec4e5799cf71dcd6dff1ff",
+      "statement": "「由人去飞书里清文档」这条善后路径只对用户身份建的文档成立：应用身份建的文档用户打开是只读，菜单点「删除」回「无权限操作」，两边都清不掉；这是 feishu_docx_create 改成只用用户身份、不兜底到应用身份的原因之一。",
+      "evidence": [
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L202-L216",
+          "version": "repo-lines-v1:sha256:0003abdaae681d38383322e656fbd6a421c4adcaaeb29981c7b04f4f2716c394:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0MTU3ODU3MmRjNjU5NjQxMmI4NjM4NzI0NDgwODU3NDFhYWIzYjgxZWUxOTlmZWNkZjA5YTQ4MjRlMDMyN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkMjg4YTMzMTkwN2FjYWNhYjMxN2E4Yjk3ZjI2OWI1OTRjODhmODhhMWRhNjk5MDY0ODQ3ZjIzODkyMTQyZGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzdlZWU5NWU3YjI2ZmYxYzdkYzY0ZmRhMTYyMzk5NzJkZmU4YjZmMTQ1MWE0ZGIyMGZjMTFkYzI5OTk3MDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUwYmUxZDg4OTY3YzIyNTdiMzgxZjBlYWYxMjZiN2E3NzEyMTc3NzkxODE5NGFlNTU4MjRlNTYyNDNmY2RhYzAifQ"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L232-L236",
+          "version": "repo-lines-v1:sha256:b1d8061ae32785933157ed4eb2c09dfad65a49b5700ffe0660c4574e1c51bef6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmYxMWNiNWY0ZGJmMGM5NmQ4MmUzYjkwZTgwMTRiODcwOGM0ZmM0Y2Y5NDMwM2ZjMDQ3ZDgzZTUwYTkxZmEyNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2I4MjBhZDk2ZTliMjI2ZDhiZWIxNDlmNTVlYjM3N2I2NDZiNGZlMDdjNWE5OTc5OThiNmEyOGRlODcxMmQzMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTJhOTliMDRjYzQ0MGQzYTRjYWUwNWQ1MTEwY2YyMmFjYTgyYjU0OTcwYTAwMWRmMjEwOTExYzkzMjJkNjIzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGVmMjg4NWY1ZjFmYjRmYjliYjUzNmExOTM5MTVlMzMxYjQ1ZWM4MzBjNmY2NjlhNjYyMTNkZGUzMmM4ZTE5NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_230e4c85c04e4f88afa914ccd1091ce5",
+      "statement": "GitHub issue 工具族只提供 gh_issue_create 与 gh_issue_comment，不做关闭，因为关闭别人提的 issue 是破坏性且面向他人的操作，agent 误操作一次就影响协作者；同族约定还有 ws_rm 只删文件不删目录、以及排除 files_remove。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L1-L7",
+          "version": "repo-lines-v1:sha256:1739373c2d3d2bfbc7b8acddc32717d83d162d75743a9384d7da4a9f7767406d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWM5MDVlOWFiMDM1NzdkYjkyYWQxMDBlY2UzYWFkZDJkNTJlMTkwMjdjOGVjZDVkZDA3NzhjZGY4N2U1NTU0NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDFlZGUzYzM2NGZhYjI3MjhiOTJkY2U2OTQwMTU3OWJkZTVkMDM1NzE4OTk2MDMzMzQxMTNmMzMwZGFiYTFhZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDNmNjNkNzM5MmMzM2YxOGY2NDdlN2M5ZGY5OGRjYmM1OGQxNWRkNGM1YTEwOTcwNWQ0MDViZDIwOWRkZTQ0NyJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L9-L12",
+          "version": "repo-lines-v1:sha256:aafd669f997c044e0e2aabd1e7780c30f9ceb4b642391e8f8cf23fe9e4868e5c:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTRhMTljN2NjOGVmYTEyNzZhNmQ5ODQ5NDQyMjAzNGJmNzM1MDFiNTM3NjE5NjExNjI0ZDc4NDhlOTY4OTlmMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTNmNGI0ODQ3ZmI5YzhlYzQzNzBkM2ZiYjE3ZTljYTMxN2M5MmMzYTFkY2YyYjAwOWY0N2ZhY2M1ODY0NmJiYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDZiYjg2YzI5YjFlOGNkMDBmZDA3ZGVhMzdmMjYwNjM3MzRjMmQ4ZmIzOWUzMDZkNTM3MTllZWFiYzc5MWUyMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGYwMmUxZGU1NjY5ZDJkMGE3YmU0ZWNkODE3Njg0MTU3ZDE5ZWU2MzY0NTg3ZjVmZTkzZTg0Nzc2MzJmYjY5NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_4cf9085e168547869ad03496ce0a2954",
+      "statement": "issue 能力使用独立的一份凭证与白名单（GITHUB_ISSUE_TOKEN / GITHUB_ISSUE_REPOS），不复用 GITHUB_WORKSPACE_TOKEN，因为该 PAT 只授了 Contents 读写而 Issues API 不属其权限范围，复用会让「改工作区凭证」意外影响 issue 能力，反之亦然。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L3-L5",
+          "version": "repo-lines-v1:sha256:9e7f21f6faa9206a5f9466ac26d6f52deb3f6dc879d80fdb7c99144846cbfee6:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDNjMDkwNTkzYjcyNjJhMDE1NzVjZmM0NjliNWQwM2RkNmM0MDczOWMxZDhkMzZmOWJlZjFmYTUzMjJmODgyNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTQzMzYwN2FhZDFjMDFlNDA5Mzc3ZGJkNzZlOWFmZGUyZTA4ZmIwYjZjMWUwNWQwNTA5ODllN2E5M2FkZjYzMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDI2NGMwZDI5Y2ZkNDE4YWFlYTRiMjllNTIyODFmNDA2ZGM2ZGVmMmNkNjkwOWU5NzhlY2FkYmYyZDkxYzhiOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGY4NmQ3ZWM3MTVlMGFmZmE5ZDQ0NTdlYWY3NGE2YzljNjgyODRkODY4NmNhYjk3MzlhMjNkZDczODE3ODFjYyJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L3-L7",
+          "version": "repo-lines-v1:sha256:f77ead69f393db206f522ce1f07fc9b599377908a973add223dac00c8061746a:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY4MTZhMjEwOTBjMjM4ODhjMjY5MGY1ZTc4YjNhYjNkNzNhMTk0YWEzNmE3MDI5NTNhZjBmZmUzNzI2YjQ2MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDkwMjIxYjgzYmIwOWY3MjYwZjJjM2Q3ZmE3NDAwMGM3ZGU3NjE4NmJkMGU1ODE5ZTFmYzFkMzJiZmJlYTI3OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2I0M2VkYzg0NzI1MjUxNjhiY2NhNzVlN2U5OTk4MThmMGNlZTBlZmZjZGU1NDhlYmRjYmRhNTEzZGVjN2ViMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGUyNzNmN2I4ZTAwYmU2ZmFkYzEwYzA0ZTE3ZmI5NThjN2U5NmUzZWY1NGJiOGQ1NzU4MmM1YWQyNWUyMTVlMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c121b8855fd44c9b8e5ae7e5cc3418ba",
+      "statement": "ghIssueConfig() 在 token 缺失、白名单缺失或白名单全为非法格式时返回 null，整族工具一个都不挂：白名单为空意味着「这把 token 能开的仓库全都能开」，正是这个功能最不该有的形态，测试 M 节对此有断言。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L44-L68",
+          "version": "repo-lines-v1:sha256:69d797236748669fb3ef8962b43eb4514369505eeffa8936c01d03fffe61c60d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyNzljZGNkOTg5YmVhNTY0ZjNiMDc2ZTc4NDMzOGYxMTU2OWE3ZjYzZWFkNTIyYmY4N2U3YTNmNDA2Zjg0Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxNWJjNzcwN2VkZTY3Nzc4Y2I3ZmU1NWI0ZTlkZGE0YzU5NDc1NWY2N2ViOTM1ZWIzMjUyMjQzYTEyOWQyMzEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2999-L3006",
+          "version": "repo-lines-v1:sha256:75a616cd7cdb051b82193d64bc5c0a5c33de982d3b5215fd3c9c5c518a29013d:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGRkYjUzM2E1ZGI4NTkxNjUxZTkyYjU5ZTBlNjZlYzg0NzY5ZDk3ZGQyZTNkN2ZhMGZmYmJiMmEzMzg3NTI1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDI2ZmFlZDVlYmRmYTAzYWExNjIxN2U2YzM0YjE5MDFhNDg5OTY1MmQxZmNhYjNjZWYyZmU4NzJjNzU1MDlhMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjMwNGZhZDFmNDBhMjE0YmU0ZmVkODIzYWFlMjQ4NzM1MzI3YmFkZjIyODFiMTA2NzRmOWYxZjFmZjhkNjEyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c56598e3c9d4f20b71a8e73a82f1ba3",
+      "statement": "平台沙箱工具通过 agents/feishu/_tools.ts 的 EXCLUDED 排除名单摘掉五类：browser_screenshot / browser_click / browser_type / browser_evaluate 是点页面元素的交互类工具（飞书链路没有人工确认点击目标的机会，挂了只会让它乱点，要读网页用 browser_fetch），files_remove 是删文件（沙箱本会过期，留着只多一个误删自己刚写的数据的机会）。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L46-L60",
+          "version": "repo-lines-v1:sha256:5d598d8b56fe5fd846f6bba925e0edb917564aaa054fd8990d13e3f45c33b355:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1ZTI2Y2Q5MjM2NmY2MGQ4ZWQ5MmQwMjM5ZjA3ZmVmNzRjYWMxNGFhNjlhZGRmOWMyY2MwZDExZWIwMGE0NjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1NjQxMzEzYTA0ODQzYjVmOTY2OGU3NTljYjMwOWUzYTE4YTY2OTQ0ZjdmMDBhMDY0YjI4MWRiNDI1NjZjNjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI0NzM0NjI0NTBjMzdiNjEyZWYxMzY2N2NiNDRmNDU3ZTdlZWFhZGM0NjAxMjkxYjMyMjUxNWU0Mjk2NTJiMzEifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L86-L103",
+          "version": "repo-lines-v1:sha256:5978a59ffaef8240a6791d1c35fc5d5cc08f7a07ccb35395fa22b75ebeb8abc0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzYTk3N2M4NzhkMzJmZWJhZWJmNDEyYTJmMWFmYzgzNTgyNWI3NjhlYjQ1NjEyMTFlOGZlZjI0YzUzZmY2MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNmNzVlNjdmMzBmYTk4MWQyY2UwOGFkNjQ5MmZmYWVjZTkyYzFlMGMxMTk3M2YzNWQxOGIzMjdmYTNmZjk1NjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhiYmJkY2U1NDM2YWU0ZDUyYjVjMzA4NWExZjYwMjhlYzhkMWU2Zjc3OWI0ZjNjODkzNzI0ZWMyYTIwMTU3ZDkifQ"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L778-L783",
+          "version": "repo-lines-v1:sha256:3c101cd21a4748289be85a6ab5b552e5ea8298023329b51d21707384095aafc4:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGM2MTRhMmE1M2QxZTc4YmU2NTAwZDFjYjBmNzQzYTRiMTRhODYwZGIwMjU3MWFjNzQ4OWYzZThlNDFmYzNkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGJiMjRiZDJlMDg5ZWRmMjhmZGU4NDJhYWQ4NDZmNDgzYjQ4MzYzZDQ5YTNkMjRiN2NkODU1ZDYyOGM0MGIyOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzhmNjJmNmVkMjI1ZGUwYTA4YTJjZDU4ZjlkNjI0NjJlODBiZmJiN2Q2YTcwM2JmNmRhOTI1ZTIxNzdlYTIyMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2IwYjdiYjk4MWE1MWFkZThhNzNiYTcxOGRhMGMxZDlkNDcxNmE5MzMwYTJhN2YzYzI3MzlkNGRiYmUzZjBlZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_476eaaf05f274cc7abd84fc90c5489cf",
+      "statement": "自建 web_search（serper）挂上时必须通过 platformTools() 的 extraExcluded 参数摘掉平台内置的同名工具，否则两个同名同用途的工具同时在列表里，模型选哪个全看运气，而内置那个因缺 WSA_API_KEY 是坏的；调用点是 _host.ts 里的 searchTools.length ? [\"web_search\"] : []。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L580-L588",
+          "version": "repo-lines-v1:sha256:be74f620c13f3e7ba5945db79f4a838fb829d47f6e7aed74b78a454b1f12b2a5:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzlmYjliMDI3ZGZhZGZiNjM2ZTMzNzgzNmE0NzYyMDNkZjlmOGFkOGU4OTdkMjc5M2UwY2Q2OThmMmMxMzQ2YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEwNDdhZjRhZjMyZTZlYTY4OTY2NjM0YzZkYmI2ODg1ODA3ZWIxN2VjZjIwMjRlNDdjNzZhYmJjYjg2NWJkNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDcyNzZkMzhkNjRlZGE4ZTg2NjRkZDU5Y2Q5ZGJkMDgzYWRmOTY5MDZmYzg1MTE2MzA0YjBjNDM0M2M1NmI3OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjY5NDAxNzU4YWJmMTgxYmY2ZjA4NDRiOTY4ODQyNDc0YTIwODZlN2Y3YTc4YTAzY2FhNTU3OTY1NmM3NDhiNSJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L26-L36",
+          "version": "repo-lines-v1:sha256:2f20881f55cc0ef7d5232578307c576e1ed728b5c529aa28410ed7ecdd92c5f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3YzRiOGNlMzhmYWYyMGMzZWY5Njg1MzMxYjdhYTUwOTE3YTBlYjQwOGFjMjEwYWNjNTZmNDY4ZDdhMzUzNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhMjFhZmM1MzQ5MGJhZjk2ZGY1MmY3MjQ5MTlkOTcyYzRhNjkxMjFhOTY2ZjgzYWI0NzRkZGFmNmFhOTE5MjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIwNzdhNTRkY2ZkNjJkODMzNGViM2Q0MTFiYjM0Yjg3YjBmZjNjOGE4ZjAyOWVmOWJkMGFiMmQzZmRiMzZlYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0N2E5NzliOTUwYzc0MzI5ZTBkYjFmYTcxZjQxOGE5ZmY3NjEzMzAxZDVhNWE3NzQ4NmQ0Y2U4OTkxYjhmZmMifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L74-L88",
+          "version": "repo-lines-v1:sha256:518967c2538321b2299bb02abfc5cea15702ad3ffab9b3c53e1d987d68a514b1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxMDNiNzc4ZTZkNWM2MWY5NjczZTYwZjk0Y2EzYzI1ZmYxN2NmZTRiMWI4MjlhMTc4Y2VhYzM1NGM0NzFlMzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyOWQ0NmI3ZjEwYTBiYTdjMWY3NzI0ODM4MDNjZWYzYzNjNGFhNmVlODZjOGU1YWExYmIyMDhkMzFiYTczZmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ1NzFmOTQ4ZmVkOTRlZDBmZThlMTkyNWU3ZWZiN2E5OWE2YjM3YzYxNWM4ZjU2ZTMwYmU5MzAwYjc4OTE2N2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2MTMzZjE5YmUyOWQ0Y2ZkY2M0MDQ0NTc5Yjg0NzMxMzFmODhkOTk4MDRiOGM5NTkzYzQ0NDY3MzdiZjQwMzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_630bb0faf9114ee587ca80855b0ed107",
+      "statement": "SANDBOX_ENABLED 设为 0/false/off 时 platformTools() 返回空数组，整条平台沙箱工具不挂，用于「先把纯搜索问答跑通」的部署阶段；这是与 EXCLUDED 不同粒度的开关。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L68-L70",
+          "version": "repo-lines-v1:sha256:c4de42fac9a9c833362152109fdc38c8c68bad7127286cb3007ded18d46e1d29:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjdlNGRhODU1M2VhNDhmMTcwYmVmMDhjYmI3OWIyYmEzOTZlY2Q0NWFhM2Q0ZTA0N2UwZmY1MDU4ZDM3MTdkNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjY2OGE5NWVkMDUyOTFmODAwNGY1MjAzOGVkMWVjZDlkYTNjMjliMGFjMTVlM2YzNTNkMjJkNWVjMDI2ZmFiYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDU3MWY5NDhmZWQ5NGVkMGZlOGUxOTI1ZTdlZmI3YTk5YTZiMzdjNjE1YzhmNTZlMzBiZTkzMDBiNzg5MTY3ZCJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L86-L92",
+          "version": "repo-lines-v1:sha256:884a0ec94460db18154adb7085d2c264bc2c540d50cab92138825e0fbc9895c0:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDNhOTc3Yzg3OGQzMmZlYmFlYmY0MTJhMmYxYWZjODM1ODI1Yjc2OGViNDU2MTIxMWU4ZmVmMjRjNTNmZjYxNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2Y3NWU2N2YzMGZhOTgxZDJjZTA4YWQ2NDkyZmZhZWNlOTJjMWUwYzExOTczZjM1ZDE4YjMyN2ZhM2ZmOTU2MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWRjZWU2YTIzMmI3ZWNjYTdjYjc1NzM0NjlkZDFlZjZjNGYzMTJiNTQyOTE2MzI2MmYyNmFlYjYzZjEwZjZiMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_a8cb094ef3d046ce8fa5d58d09266f94",
+      "statement": "仓库语料层（/repo 命令与整个 src/workspace/）是移植跑通之后于 2026-09-25 主动删除的，原因不是技术问题而是定位变化：助手从「GitHub 仓库代码问答」改成通用助手，留着会让提示词同时照顾两种互相冲突的人格，且 read / ls / grep / find 四个工具名与沙箱那族语义重叠导致模型选错；删掉后「手上没有的语料」这件事不存在，提示词能只说一件事，同时 repo.snapshot 6MB 上限、generation 制原子切换、fileCursor 惰性游标整块复杂度归零。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L1-L9",
+          "version": "repo-lines-v1:sha256:7a78349346ac577cff57df638caddb2a6b70180b13e5783398ddf4c65e78b9d6:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmZkYmI0MzRlNjY1OGY1NmZmOTE3ZDNiNTkzZGQyMjVmZmZiOWMxMDU5YWJkYTZhMjAwMTBhYTZlODE1ZmVmNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2I2NDVhYzlmOTA4MjY4Y2ZjZDA1ZDgxNjIxZGNlY2QzN2U0MDJlYWZmZDJhMmJjOWQwMmI4YzdlYjM2YWMwNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWY5YzkxMmE2NjMzZWNjODViMzBhYTRhYmNiNzk2NmNiMjk3MTY3NTUyYjAxZDhjNDE2YjA5YTA5ZWMwOTljYyJ9"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L721-L735",
+          "version": "repo-lines-v1:sha256:8b89c8b25a59d699b4f8a230a25aff0df8e4049fa97ef416306dbb5d4057c739:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2MWQ4NzYxYzgxM2Q3NzNkYjEyNDc4YjQ4OWI0ODJhODVlOWVlZmFhNDZkMWM0Yzg3MzE5NThjMDU5OGY2MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiYjE5NTEwMzBiZDcxZDMwZGE0NTdhMzZjYWM5NjdlNTBjYWY5NTI4ODUxMDQzZjM1MTY5M2FjZGEwNjNkMDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZTRlOTEzYjA0OWViOTNlMzNhMjMxYjQyODUzYjBlMzU2ZDhmYmFlNDc1NDBjOTJmOWRkNjRiOWNhMTAxMmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYmI0YWNiNzlkYTMyM2IzOGQ3MGE2MTJiOTkxZTM4NWRjODYzYjcyNWExZjZkNDYzMTBlNzdkMjlmOWRmMzIifQ"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L837-L840",
+          "version": "repo-lines-v1:sha256:c59a2a89782d261ec9bb1f29ee8177691772e9612720a448220c8c49140ac05f:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDFjOTE4YjRkNDkyNGU4MWQ0NDRiZDNmNTU5N2RjMGQ1M2QwMWIyMmFlMGVkNmQ4YzFhYzRlM2RjNTNhYzhiZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTc0NGFjNThlNmI4NjdkMzU1MDY1M2IzN2UxZmM0ODUyODM0NWY1MTcyY2Y0YjBkOTFjM2U2MDNiYmQwMzY0NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTA4ZWI1YWY1YzY3NTllNDQ4ZmRhZGMwMGM4NGE0MWZkZWY3MzlmYTc1ZmYzNmYyMjY3ZGY2NWIyZWUxYWViZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_31e23638216947e7bb1f854daec655c1",
+      "statement": "仓库语料层的删除是「一次改完、两边仓库都改」的一整批：src/workspace/ 9 个文件、Command 的 repo 成员及其 OWNER_RE / REF_RE / parseRepoArg / REPO_USAGE、turn.ts 的 case \"repo\"、FeishuTurnHost.ingest()、HostDeps.repo 与 makeSnapshotStore()、提示词里的那四个工具段落、compact.ts 的「导入过哪些仓库」、以及 test/smoke.ts 的 E/F 两节与 seed()；长期记忆、云文档工具族、会话压缩、沙箱工具、webhook 转发不在删除范围内。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L691-L693",
+          "version": "repo-lines-v1:sha256:976605b4399d10f68b2ba8af6993228ef048609b760c306cf3a772ddab5bfd05:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjgyODIxMzk2NmNlYjg1NDhjZmEyMjc5N2Q3MWMyOTRhMTVjZDhkMWFiMjhmNWJmYmJhMTEzMGNmNzEwOWYzNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWY5YzVkM2JkNzAxMTE2MmFjNTk1YzA1NmYxYjliYWQ0OGNjMGNhYjkwZWY2NTFmNzIxYmVkNWUyZmNkZTdjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTJkZGIxNzU1MjAwNTYyYTI4MWQ2OTlkNmMzZGQzNjhlOGQ5NDg5OWQxYzllZDFlYWY2YTVmODBjNjFhZmZjOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTY4MGIyZDRhOGUwODkyY2I0ZDgwZDZhYWQ4ZmQ2NGRlZWYwNzIxZDBkNTBkNjc5Zjk2MjUxNWQzNTU3ODE1NSJ9"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L737-L757",
+          "version": "repo-lines-v1:sha256:8428b440933113610b08b03083b0deb92931120f65e7e8496041de63d8fc0510:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzOTkyOWYzYzY5Zjk5YWI0MDhjMDljODkwMTA1NjYwY2JmMmU0NmI1ZGNhNGY3ZWFhZjY1NzVjMDJkOWYzOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1ZTM4YzI4MjIyNDBhMzRkMzUwYWFhNDQ4OGVlNDE2YTI5YWQ2NzFlY2IyZDE3ODg1YzA5M2U3YWEyZTgwMWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliYjYxN2RkMTE1NzJmOTZlODA2OGI1NTNkYTdkY2FhYjM0YTkyMDM5ZTJlN2VmNDM0Y2ZmMzZmZDNhZmEyMTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/commands.ts#L1-L18",
+          "version": "repo-lines-v1:sha256:96389555109560a1f5cd686f3428037509acb137de7759db155fb4971b774238:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5NmMyYzk0YTc1M2U1NmU1YzQ0Y2UwNmIzZmNkZDUxMGM0MGMxOGYyZWIwNzY3MGJhMDUxNzk1OWE0YThmN2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwZDBlZjgzYjcyNDY2NmVmY2ZmYjI5Yjk5YTFkOTZjODIwYzg5NWEyNTFiODgyZjA5MmI2Mjk5YWZmN2IzYjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5ZDdiZjJhZmUzMWU0YmYxOGFjNDhjYzUwOTAyYzZiMjI3ZDA4NzM2NzcxYjAyNWM0NTJlZDk3NGFjMGUzZDkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_613f1871320b448a96c654697b1366db",
+      "statement": "删除共享层之前必须先检查有无其他模块 import 其中的通用零件：src/workspace/tools.ts 里的 guarded() 仍被 src/feishu/docs.ts 与 agents/feishu/_search.ts 使用，直接 git rm 会连带搞崩两个不相干的模块，正确顺序是先把它抽到 src/shared/util.ts、改完 import，再删目录；这条教训作为注释保留在 src/shared/util.ts 文件头。",
+      "evidence": [
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L750-L754",
+          "version": "repo-lines-v1:sha256:c13a7016acd3e0286a7d0cb442d00107def96d9866c1c5e37608cf528c7737a3:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmJmYjJmMzI5YTY0ODhhMGY0YjAxZjk2NDEyMzZhMjc4MDcyNzdhNjEzNWE5NGU4NzE0ZjQyYTQ2YTRiMGI3ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcyNTliMjRiYjI0NjI1NWU5NDlhMGQwNThlNWYxYzZjMzJiMjQyNjhjYzJkNGNiMGRlODhhMWI2NDA0NDEwMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTJjN2JhN2Q2ZDE4MzMxYzAxOTU2ODUxZTFkMWQ1Mzk4MjgwNTdiMGJiYWFiNGFkMjcwNTFiYzI0Yjg5YjM1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjBkMDQ5MjRlZGQ1OTY4ODczZWQ5ZWM0NzNkODJiMTZmZjM5MTU5M2UwNDA5MjQzNTZjNzEzY2M4MjcyZjY5NyJ9"
+        },
+        {
+          "resource": "repo://src/shared/util.ts#L1-L11",
+          "version": "repo-lines-v1:sha256:6064b76915eb8764cf0c8a034cc31ebc4dffa413b603f9bf938c4906b8e3d5a9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiOTYyZjkzMTM0MDllZjZlYWRjMmYwYzNmM2Y5M2I2MzI3Mzg1MTJmZWJiZTFiMDg5YWJhMDQ0YjMxODQyODQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0ZjU2M2U1MGU3ODIwNjExNGRhYmYyOTZmYjM5YjBlM2UwZjRkYmYzZmE5MmRjMDIyYzdhMjBkM2M4NjMxZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQxODk4MDNjMTdkZmI2ZDUwOTI4NzZjYTRmMGE1OWVjOTA1NjljZDU3MTlmYTMyOGY5YTY4NWJjNjAyOWVlOWMifQ"
+        },
+        {
+          "resource": "repo://src/shared/util.ts#L19-L34",
+          "version": "repo-lines-v1:sha256:61e22f177da31fd87ee0f4c5235f1f367be391b25485fb8c2babf84ad664210d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1NDE4OTU0ZmNkNzQ1MDQ1ZDk5Y2VlOWQ1YjYxMWYxNWViN2Q0ZWU4YzI5Y2ZkM2UzN2U5NmVkODZjM2EyZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3OTA1YmY1N2JkZWEwZjAzYWQ5MjY5ODU1MGU5NDExOWFkZGY5OTE1MDg2NTE0YjEzYTAwMTNmNjJiOGRhODQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dac1ba30921c485691ef5846e6a0ca6c",
+      "statement": "语料层删除后保留的可观测痕迹是刻意设计而非遗留缺口：/repo 走 parseCommand 的 default 分支返回 { kind: \"error\" }（「不认识的命令」）而不是被静默当成提问，_host.ts 的 statusText() 改报长期记忆规模与云文档授权，test/smoke.ts 有一条端到端测试守住 /repo 不会落到模型。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L695-L710",
+          "version": "repo-lines-v1:sha256:ff34edb16cf14fc188021c7e12140e1474b2445292688baf704fd98fc09e6044:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzYmRiZWI2NDUwYTcwMDZhOGE2ZTlmZmFhMjQ5NWQ1NjFlMjAyZWJkMTA1NmIxNDQxMTQwYjEwZmE0ZTdmZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmMGNkYjk3MmE3YmZiN2VkMjQ2ZjlmZjY3MjM4NWU1NWY0OTY4ZmMxMTA0M2RjNWI2ODRkNTFkZmEzMWRiY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliMzAzMjEzMGE3M2NjM2Y1ZDEzYmQ5N2QyYzVhNDM2Y2RmYzA2NzM4ODQ0YjU5MzgxYjYyNGQ5ZDBjNDhkYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhjZDViMjExMTc4ZTczNTdlOGE1YmFlNzJjNDEzYzU5MmQ4NzA3YzM0NTNiMzdjZTI1YTY3NjUyZDEyYjIwNWMifQ"
+        },
+        {
+          "resource": "repo://src/feishu/commands.ts#L36-L81",
+          "version": "repo-lines-v1:sha256:d2e35e6613999d94909769440c7fecf90c2f65b8263c1e18063bb6daa490ed82:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJhY2M4MDc2ZjYyNjJiMThjOGRmNmUyYzg3NTM2MjA2NGJkZTU1ZjU2Y2JjZDJjOTA0MDhkYTc0ZjllODE5NjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L867-L887",
+          "version": "repo-lines-v1:sha256:cd6bd9b999eac638b459d3035a2055ef2c032b990fbcc6797839c2aee94fa059:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ODI3YzczMmY2N2ZiNjQ3NWVkM2I2NDZiOTQxZTY3Y2UwMjVjNDQ4ZjBmYmIwNzUwZGEwNjE1ZjlmMDI1OTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0ZWVlNmI2Y2I0MWM2NDFlYTUyM2MzZDIwYjY4MGVkM2JhNGYwZDQyZGEwMTdkNjlkZjcyMThhN2UyOTIzYjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2MjliMmYxNzkwMWI4ZDExOGNmYzY4MGFlMjNmMjRjNjAyMmYyMzllMGJlZmRjOGE3NzJmYWU1ODNmODYxMWIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

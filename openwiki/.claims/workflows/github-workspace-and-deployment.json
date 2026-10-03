@@ -1,0 +1,476 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:0bf6cfe882b10930e68532989cfdc91fadff986e5f9854744067db6ce6d65407",
+  "claims": [
+    {
+      "id": "claim_74ee0133152244e9a12a885e2515c7db",
+      "statement": "此仓库的 agent 能读写它自己的一个 GitHub 私有仓库（默认 guci314/cf-agent-workspace），能力由五个工具构成：ws_ls / ws_read / ws_write / ws_rm 走 Contents API（/contents/*），ws_commit 走 Git Data API（/git/*）。两条端点在 fine-grained PAT 上同属 Contents 权限，因此引入 ws_commit 时那把既有的 Contents PAT 不需要换或扩权。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L344-L353",
+          "version": "repo-lines-v1:sha256:05c661c3f6685c240110311a3f1ee30971c16d8416cea12dae70085d4be73424:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczM2NmOGUwYTE0YWM3YmM2M2Y1MzhlMTExNGNmY2M0NWI0YTE0M2I2MmI4NTJkYmVmZWUyMGJlZDdlNmEzZDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2YjVmOTQ4OGQ3ZjMzZWZkZGU4NGNkMmFhZGRjOTA3NmJjYjZmODI4ZTIzMmYyZGNlMzk1MDA1MjNhODc4NWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiZGE2YzQzODM1ZjhhNTBlYjQwMjNiZmQ2ZmEwOWVkYTMwM2Y3YmQ1YzYxMTFlZjVjNDRjYmEzYTVlMTYyMjcifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L383-L482",
+          "version": "repo-lines-v1:sha256:ba703032b99393b83a55e86e33f18a2d4e107b2d6b9722d6430d472be7f67ed9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmYTBhZGVmYWE3Y2VkZThmOTc1MThlZjRjMTJlZGM2OTU2MDU3NDFhMTQyMGI4ODBkOTM1Y2JiMjdjMTg4OTJlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0Mjg4NzY0NmM5NDQ2MjFlNThhOGRkZWMzZmE1NmE1YjUxOWE0ZTY3NDA3ODg4MzlhMDBkNTI1NDkwM2RiNTJmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L325-L392",
+          "version": "repo-lines-v1:sha256:9d36d607253a5b1dcb198b1e37076abfd5d71bfa287eaf4fc73173132b5905b2:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3ZmMwZTM1NGEyNGNjMmExMjU0YzRlMjA5N2FjN2U4OTE0MWFiNjkwNmNmNzZiN2JjOTQ1YmRhMWRhYzUzODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiYzRkMjgyZTliNGI3YzdkY2U1MjA1Mzk2ZjI3ZGJhN2I4NTA1ZWQ1M2JiZGYyMjJjMGQ3MmZlNjU4NDU1NGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmNDJmYTc2YjA0MTVlODZlMzAzMzFiNDViNjRjODZjN2I5YTk4M2ZhYzJmMzE3NDNiNmUxMjdjNWEyZGExZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L80-L132",
+          "version": "repo-lines-v1:sha256:aaa39d505b1c025175fc2d31648613daaade48ab499492e95813d429f69bb362:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwMTdmNmE5YmRjMGQ4NmZjZWIwZDVkNDcyZGI1OTZiZWQyZjQ1ODlhNGY5ZjUwZTYyZDFmZjYyNzJmZDY4ZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMTgwYmQwOGRiNGMxMzFmYTg1ODdjODczYTdkZTJjNzZlZDY3ZDQ2NDAxN2IwMTNhMTM0MGM0ZTU2YjIzNzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyM2Q5NmNhMjQxMzhlODRhZTE4MGQyZjI2ZDNhNjMwNzVmMGRiZjBiOTYwNGZiOGJhMDYyYTYwNjNlNzZiYjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3faedcf1d25849eab2cdeebbcd6677cb",
+      "statement": "工作区工具族的挂载判据是 ghWorkspaceConfig(env)：没配 GITHUB_WORKSPACE_TOKEN、或仓库名认不出 owner/name 形状时返回 null，makeGithubTools(null) 返回空数组，五个工具一个都不挂；提示词段落 WORKSPACE_PROMPT 由 _host.ts 用同一份 ghCfg 拼接，因而工具族与提示词同开同关。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L498-L541",
+          "version": "repo-lines-v1:sha256:f23076b118152e65bdc769f8cf5d9a3b3bd0b5519136d92e9be816ea35fdcc46:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI3ODhiYzkyNmEwY2Y2YjMzZDhjNTlhMGVmM2MxYjhlNDVjZGY0YWIyY2Y2NzdjMWFlZDBhNmFiOWIxYzViMDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4OTMxNmM5OWFhNzMzZjc2Mzk3ODY0ODliZDU5ZjFjNmJjOTZiYzM5ZGE2ZmM5NTkxZTNiNTNhYTIzMGQ2YzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY0NDRkYmFkODcyNjdhYWQxOTMwZGZlYzBjYzdlMDUwMDViNjM1YzcxMjg5OTFkN2I1ZTAxMzY1NjU3OTVlMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4M2VmM2Q0ZTYyNDllNzhkZjE0MGFkMWU2ODc3ZjdlZDQ3YjJmMGMxYTc3ZDQwODM4YWRhMzc3ZWZjMzNkZDgifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L575-L576",
+          "version": "repo-lines-v1:sha256:a6239afcb114824732c444336d3936b8affc4c89e9e2d1f1d9d213e9be3a144f:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2Q1ZWZhNzI2NmU0NmY0NmQzMDUwNzE5ZTY2ZDUyNGYwZjg0NjkzOTRjYjk3ZDUzNWIwYzc4NmIzYmExMjE0YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzAzYmU0MDk5MjNkYTBlYzRkYzIzODQ5ZmU5NTYxZDU2NjNmZWVmODY4ZmIwOTY0YjE5ZWI2NTk4MDE3NThiMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2NhOGFlODY0N2JjZTE4ZWM4ZDc3ZDNmNGEwOTAwZmMzYTgzYzM0NDk1OTI3M2ZiZWY5N2ZhOWJlZjRlYzJlOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDcyNzZkMzhkNjRlZGE4ZTg2NjRkZDU5Y2Q5ZGJkMDgzYWRmOTY5MDZmYzg1MTE2MzA0YjBjNDM0M2M1NmI3OCJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L136-L147",
+          "version": "repo-lines-v1:sha256:086c185607c418f60249a0b5b5d10b39b68d0bf5ec1bd732f53fc766f96850c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmZWJlYWI1MTM4MDM5MmI5MDEwNTMxYTljMjRjNTZjMmE2ZTk2ZTFhMzYyOGRkYjA2Mzg1MmRjMzU2YjY1ZjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJhYjNkN2E1ZTM5NmY5NzVmZWQzNTFjYWFiMzE2ZTU3NGNkZDEyMGE3NThkYzZiNjM2NDAwYjE5ZTQ5NmYyMjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNlYzg4NWYzMmVmMWMzOWM0OTJlNTQxNzZlYWJmNjRjOTZlODgwNGE2YjdmNzJjYjlmZThhNDkyZjM0NTdmNzEifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L54-L72",
+          "version": "repo-lines-v1:sha256:eda936bde894a9c284b2687242e52cf1f5ecf10f4fa74186084f4b4bb13864a9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyNzljZGNkOTg5YmVhNTY0ZjNiMDc2ZTc4NDMzOGYxMTU2OWE3ZjYzZWFkNTIyYmY4N2U3YTNmNDA2Zjg0Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NmIzNWFlOTUyYjAwMTMwMDBjY2M4YzhhZWM0YTYwOTdiNzAxZmE3ZTg1MmQyNWM3OGVjYjZlZjhmMTUyZGYifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L80-L82",
+          "version": "repo-lines-v1:sha256:cf20b1c83d66bd3556dba8deb942b6253ff4cfbd68d5425af8afc0acee7fac5a:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTAxN2Y2YTliZGMwZDg2ZmNlYjBkNWQ0NzJkYjU5NmJlZDJmNDU4OWE0ZjlmNTBlNjJkMWZmNjI3MmZkNjhmMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzdkMmQ4ODJiY2U4MWEzYTZhM2RhZWJmZDM1ZGM5ZDcwYThmZDA1MzJiODFiYjZkYjI0YjdmYjZlOGJhZjMwNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjMxODBiZDA4ZGI0YzEzMWZhODU4N2M4NzNhN2RlMmM3NmVkNjdkNDY0MDE3YjAxM2ExMzQwYzRlNTZiMjM3OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGE1NzFjNTIzYjkxMDFhNWE1MDg4MGUyYTUyM2Q1Mzk4MTQ3MDM3ZWZmYmRiZjllMjJiMjFmNTA2MTQ5MTg4MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8cdf19745b4e43aab327d3667ae475b6",
+      "statement": "工作区的写操作自己解析 sha：putFile / deleteFile 在调用方未给 sha 时先 getFile 读当前 sha（getFile 对 404 返回 null 而非抛错，正是为了让「不存在 = 创建」这条判断成立），形成 last-write-wins；读到写之间被改动导致 409/422 时只重读 sha 再试一次，因为模型看懂 sha 冲突的报错几乎不可能、会反复重试烧掉步数预算。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L230-L342",
+          "version": "repo-lines-v1:sha256:3b2edf6e9a3e9eba21ad4015059bcf8222e3469817649c2e45877e223635864f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiZDBmMmQzYTNhYWRhMjc1ODY0NTc4ZDBhNDM5MTU2MzhkNTQzZmVjYTJjOTQ4NThkYjk0MTIxMWU4NmNlZjJiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkZTRiZWM3N2Q0ZDRkNWM3NGYyMDJmMDMxYzNlNTllNjhiMGU4OTI4OTVlYmM0ODBkZGNlMDU5NGIxYjQxYzk1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_a9c9dce0d4c945a49fbf2f0751c5a558",
+      "statement": "Contents API 返回的 base64 内容每 60 字符夹一个换行，仓库用自写的 src/shared/base64.ts（fromBase64 跳过空白、遇 '=' 停止）而非 atob 来解码；文件内容含 NUL 字节时判为二进制并把 text 置为空串，由工具层明确报「读不出文本」，以免 TextDecoder 把非法字节变成 U+FFFD 交给模型。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L246-L273",
+          "version": "repo-lines-v1:sha256:357f40b714f9a5a66e24f98847f0b3bac77501d3e75dba27ca8f36da705c83fa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1MTQ1ODdjMjQ5MmVjNmU4MDhmYzE4YjM4OTQzZDE3NTRkOTAyOGUwZDVlNzZmZjJhYTExZDVlNDc5MGQ4YzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0MDZlYjllYmJlNmJlMTZmMWYyYTI3MzgwNDExNTAzNTlmYzk2ZGVjOWJjNThmZmU2OGYwZGMxNzY5Yzk4OTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlODM2NDZhNzZkNTNkMTExOTFjODc5NGE2MzI5OTFmNDhhOTg0NGE4OTBiOTYxY2EzMTcwZjM1OTUzOTViNWUifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L171-L173",
+          "version": "repo-lines-v1:sha256:8adb11bce42b3ed530c8405eb439bc45bbfbb7989ca2ec816a86fce2d3ab61da:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDRmZDdiOGRhZmUxNTEyZDI3MTIyMjhmN2RiNjE2Mjg2MGM5YTQxYjNlYzEwZTAyY2FlMTJjN2FjZDBjMjUxNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZiMDQ0OTE0Njk3MjJlODM2M2E5NGU0MDQ0NTM4ZTAxM2EyYTIxN2UzNmIxZTU2OGJhNjBhY2I3YjRjOGYyZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTVkMDcyNDUyOWE1OTIwMmQ0ZjhlYzhkYWYxMDViMDVjZTg0NDRhYmRlOWU4NTM1NThlODI5NjRkMGI1ZWE5MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDVhOWNhYjU3ZjExOTZiYmE0MjQzMGJmMjgwNWI3N2MxNjA1N2U3NzA0ODhjN2I4ZjY3MjBiYTM4YmEwOGYxOSJ9"
+        },
+        {
+          "resource": "repo://src/shared/base64.ts#L1-L68",
+          "version": "repo-lines-v1:sha256:3a9807520e22d50e1019cd99fd23ef1e948b08cfdef596cc217dcac2d5e692ce:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyMmVlMTc1NGU2NjY1NTg5ZGQ5YmYzNjVmMDlmMGVlOGFmOGEwMGU0YmUyNzJhMDBmN2Q2ZmNmODIwZGU1MzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1NWE2NGM4YjBlODc3NmNmNTI1ZTVkODMwOTMxYWVkZWNhMzRkM2IzNzRlMmRjZjY2YTVmZjI4Zjc1NTUyMzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4eb82e52191b4d7ca67d179af9825468",
+      "statement": "超过 Contents API 单文件上限（1MB）的文件 GitHub 回 encoding:\"none\" 加空 content；getFile 对这种响应抛 UsageError 说明无法返回内容，而不是当成空文件返回——后者是静默的谎，模型会据此下错误结论。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L246-L253",
+          "version": "repo-lines-v1:sha256:383e839d084c12c52e19874c8e4bd7b47f5089e7c13a1ac5ca6c1f6204cee940:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzUxNDU4N2MyNDkyZWM2ZTgwOGZjMThiMzg5NDNkMTc1NGQ5MDI4ZTBkNWU3NmZmMmFhMTFkNWU0NzkwZDhjNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTQwNmViOWViYmU2YmUxNmYxZjJhMjczODA0MTE1MDM1OWZjOTZkZWM5YmM1OGZmZTY4ZjBkYzE3NjljOTg5MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjBkMzU3MTUwYmFjM2Q5ODIzMWFlNGNhNjY4NzBlM2I5ODMwNWRhYmYxNjU0MGRhMDk2YTgwMWFlOWE5NGJlNyJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L140-L143",
+          "version": "repo-lines-v1:sha256:56b07a257db725992c7fd2dbb980d95fcbd09afa0dbf253588d7bd68e1de6f6f:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODJhM2Q4Y2Q2YjkwZTAyM2EzMmEzNjZlMjc4NmQ3Y2Y5YzAwY2IxYTA3MDJjY2RjODhiOThiYTIyMDgwNWEyYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQxZTI5NjE2ZjIwNTAwNmJkYzE0MjJlMDdkMTY3ZDM5NDMwYWEzMjRlZDA2Y2M3ODlmM2FmNDdhYzBmM2E1OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGU4ODVjOGQ2NjdmNDA3NjY2MmJiMjU4YjE4YzU1NWQ2NDkyZDYwM2JiMDVmODY5ZmQ0ZmE3Y2M1MDgxOTVlYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjdlYzMyNzJhY2Q4ODAxOTc1NDVlY2Y0ZTk3ZjlmYTAyYWJiYThhOWFjZjA5ZDAyNWY2MDY0YTAzYjJjNDk5YSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5942e0495beb48c28c4450874e4bfd3e",
+      "statement": "GitHub 对「路径不存在」「仓库名写错」「这把 PAT 未被授权访问该仓库」故意都回 404，以避免泄漏私有仓库是否存在；因此两族的错误文案都把三种可能并列，ws_read 读不到文件时还附一句自查（若 ws_ls 连根目录都列不出来则是凭证未授权）。错误信息只提取响应体的 message，绝不回显请求头，因为这个错误会被模型读、被飞书卡片渲染、被用户复制出去。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L162-L206",
+          "version": "repo-lines-v1:sha256:c8a6d7b4a95aa5c57c8954bc24c4f413568f9e3c7691863c6ab2963826855733:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiNjU5NDk1NjgxMjFlNjNlMTc4ZDhmYmNhN2RmYWE0ZjU2ZWQyZmU0YTM2MDA0ZThjMTc4ZmEyZTE2MjExNDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3ZjQxYTgzZmYzNWExOWUyOTY1ODQwMGQ2NjYyNDI0MDkxYzNhZGU1ZTNlMmM0YzBmZjEwNmE3NjA1YWYxMjIifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L125-L166",
+          "version": "repo-lines-v1:sha256:4eefdcf47f60a1515532139a0060cb85ece89e4d50226b2c7568bd4996742194:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE2MTE5MTNjYmI1MjliNmNkM2Y4MGQ4NzNiY2Q4ZTQ3NTcwODljZWE0MTliMWY2YTY2NWFhNzcwNGY5YmNlY2YifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L160-L170",
+          "version": "repo-lines-v1:sha256:6fa5315a1b3422be7eba08ba43b476b2c342363589b8bcab9adbad0cdbfd4a8b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4ZTBjMjhiYzg0NTI5NjBkZDI1YzljZTRmNTk5MTJmNDFkMTE2NWYzYjNlNDM1NjUwNDgzY2M3NTFkYWM1NzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjZmU3ODc2NjNkZmQ5MGYxN2I4MTJiNGY3ZTAxMTI0MzQ1ZWEzMjdlYTI1Yjg3NTQyNGNjMDFmZTU2MjlmNzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhhZGIxMWJjZTQyYjNlZDUzMGM4NDA1ZWI0MzliYzQ1YmJmYmI3OTg5Y2EyZWM4MTZhODZmY2UyZDNhYjYxZGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d951cdb0c615451292cdbdfdda47a19e",
+      "statement": "GitHub 读写的超时被刻意放宽到读 25 秒 / 写 30 秒，而不是按「GitHub 正常几百毫秒就回」定的 10s/15s：写一个文件不是一次请求（先 GET 拿 sha 再 PUT），任何一次慢都让整个写操作失败，而模型拿到超时后往往重试，于是一轮对话里反复卡同一个慢请求。代价是极端情况下单次工具调用最长等这么久，但「等得久」远好过「明明能成却报错」。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L27-L38",
+          "version": "repo-lines-v1:sha256:2065d32fa62a0278480378456931cc3fb6b85da4d7b25ba95c3d6b910afaea75:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkZWE5NDZkOWI3NmM5MTk3YTE4ZTFhZDI0MjJjOTk5YWIyOTI0YjUyZjM3YjQ3Yzk4MTA2ODIyNTdlNjUxY2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkYTBlZGQyMzg2ZWU4NzRjNGU5M2JjNzM5NjZmZGViZGE0NjdlM2ZhMmMzMGE1MjAyOWYxYjViOWZjNjQ1OTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1ZmMzZjZlMzk1OTBlNGI2MzEzOTQwODAyNjYzMDA1MWY3MDQ4MWMyNzgxYTI5NzQ5Njg2MWNjYTdjMTg3NjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2NzhmNDFjYTlkNGI2YzA3NmUxYWNmMzQwOTUzZTc3ODliYmYyZTA3MGY1OTA1NGIwZmY0ZTM5YmE4NmFkMDIifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L23-L24",
+          "version": "repo-lines-v1:sha256:56d5efc966d218ef36627c914da40d97c91c97dcac5d4a1e14e02d8b67531d8a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjYzMGNmMDQxMzBjNjM0MzJiZWMwYzIwMTU2ZTVhZWEzZjc4YzYzN2JlMmYxMTkwZDMwMzg1ODJhN2RkMjUyMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGRhMGVkZDIzODZlZTg3NGM0ZTkzYmM3Mzk2NmZkZWJkYTQ2N2UzZmEyYzMwYTUyMDI5ZjFiNWI5ZmM2NDU5OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTUwMzllZjUwMjU4NDAyOTFjZjUxNWM1MTFjOTVkMzc2ZWFjYWI3MDBjMjA1NDE1OTQzZmM1YzBmZDFmOTYzOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGQ0MjlmYmQ2NmNiMGZiMDM2NGMxNTdiYjIyYmYwNTIwM2Q5YTBkNjQyNTc4NjViMGQ2ODRjYjNhYmU4NTQ4NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9a16dc79c7a94ac9a69a544e5aefcc1b",
+      "statement": "失败状态码各自指向一个不同的动作，否则模型只能瞎试：401 要人去重新生成凭证；403 靠 x-ratelimit-remaining 是否为 0 区分限流与权限不足；404 列出三种可能；409/422 提示重新读一次再写。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L161-L206",
+          "version": "repo-lines-v1:sha256:0d46d611b97fa0575f1513f55cd491b6b605272b45885666fcf8266b6eef57e1:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3ZjQxYTgzZmYzNWExOWUyOTY1ODQwMGQ2NjYyNDI0MDkxYzNhZGU1ZTNlMmM0YzBmZjEwNmE3NjA1YWYxMjIifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L140-L165",
+          "version": "repo-lines-v1:sha256:d336c96db797757e2c59d8d67b9dc69065e54133a3d6399b25139359ad371e17:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0OTczNjczMTI2ODJjODhlOTNlZjczN2EwMTEzMzE5ZDExOGIyZDhiMDA3NTMyNTc0MDIwYjUzMjRlMzI4MDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkMGVkYzY2ZWRiMjY5ZWYzZWQ0ZTU3M2Y2YWRhZmI5MTgxNWU0MDgyOGJiMmRiYzAwMTRjNTk2ZDI3ODM5NjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlMGM3NmQyZjkyOTA0MzFjZWIwYWRkZGY0ZTk2YzJkOWYyNGNkNTM3MWM0MWFlYjQ5NzlkZWRmMjM1NjU5MWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzNGU2MWVhNTA4MjNkNjJkN2IyMWUxYjIwZGJiOWFmMjE4N2JhZWQxYWQyYzMzYTEyNzE0MjU1YzZlMjMzMzAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8a06d1d1e66847a996f87c042242a005",
+      "statement": "ws_commit 存在的原因是部署次数：ws_write / ws_rm 一次一个文件即一个 commit，而工作区仓库里 projects/<名字>/ 下每个目录都是一个接自动部署的项目，一次调整往往动五六个文件，就会触发多次 CI 与多个可能部署失败的中间态。该工具把这批文件合成一个 commit。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L344-L352",
+          "version": "repo-lines-v1:sha256:022451eaab22df127a2bbd3deba756559328bf0c7d1b36d3bdbd14f3ffaf6fc6:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzMzY2Y4ZTBhMTRhYzdiYzYzZjUzOGUxMTE0Y2ZjYzQ1YjRhMTQzYjYyYjg1MmRiZWZlZTIwYmVkN2U2YTNkOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjg4MmI2MzUxOTE1OTMwNzQ4NDY4MzgxNDcxOTFjMjg3ZjkzY2I2NjQ5N2ZjNDY0YWYxNWEzMmQ5YTY1ODAzOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjZiNWY5NDg4ZDdmMzNlZmRkZTg0Y2QyYWFkZGM5MDc2YmNiNmY4MjhlMjMyZjJkY2UzOTUwMDUyM2E4Nzg1ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGFjYzIzMWM2MjU3MTE0ZmNmNGE4ZGYyMzBhZWE5YjQyNWFiN2ZlYjE2YzE2ZTVkM2M3ODMyNGZmM2JkNGMxZCJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L320-L332",
+          "version": "repo-lines-v1:sha256:74870e9aa738d7ee1e0a550b73526ea8b3ed57408e7e9ff42e85899d34183417:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkMTUwM2FlYzI2NzNlZmI2NmY2YzkxZDUyNzY1YzY2MDlhNzVmZDhkZDMzN2QxMWY4N2FlNGNhMjNhZDc0NzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGFkZGQxYTE3NzRlYmNhYTNjOGFlMjg0ZWY5M2Q5ZjA0ZTgyNjQwOGJjMjQ4MTcxYTY0ZGE3YWVhNzE0NGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYWE0ZTlkYWI1MzhiNTM2Y2I4M2UzYzBkNzMzOWUxYzVkOTMyZDE4MDI3MTk1N2E5ZjY4ZTQzZDM2ZmEzNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2NTQ2Y2I0YjRkODA2NDg5N2M5ZWNlZTI4OWU5NzI2MzVmZDhlOWQxMjRhZjQ3ZWYwNmE3NTVlYmFjMzQ2YTIifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2864-L2867",
+          "version": "repo-lines-v1:sha256:7cd10e921245383ede47f324c8198de44faebcc8986f2fe0b1c7af9e40bd941f:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTMyNzhmOTc4NjFlNWViMTFkN2UxMzliNDg2YjQyNjRjZmZjZmMwYzMxMTlhMWY5MTEyMDhjOGU2ZDBiYjQ5MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTIyN2QxMmY3ZDkyMmZjYTQ3NjdkNjY3NDEyZjRkZjNiYTc1OWE5MzdhZmZkNDYxYWRlNjc1OGI2NmM1YjA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjE3ZDNiYWQwMTNjZjMxZDU1ODE1MTRjYTBhNGQ4ODVhYjAyMzdlNjJiZWQ5MDNiNDAyMjRjNzQzNWYyNTY5YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGRkZjA1ZjYxYTNiMzZlNGRmYjVkYjU5Y2EyODlmYTZkM2UzMGZhYjNkZjgyNzI2ZTFmODIwMjQ5ZDM0OGY0MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ccc806e93ce74beca374faeacbd4f784",
+      "statement": "commitFiles 按 Git Data API 的标准六步执行：取分支头 commit → 取该提交的 tree → 每个文件 POST /git/blobs（encoding utf-8）→ 以 base_tree 加新条目建新 tree → 建 commit（parent 为头提交）→ PATCH 分支指针，且指针更新必须是 fast-forward（force=false 为默认），以免冲掉别人期间的提交。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L374-L482",
+          "version": "repo-lines-v1:sha256:72f4f67a2cef5eb747d91664d8609f78d4157f685e90f26bf3f6a09f95240d66:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlYWYyMmNmMDczMjU5MmMyNDcxNDFjYmU2MWVmYTExMDEyNjEyZjVhMzEyMmI5YWY5YmJhZjUyZjU3MjRkMTk0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjY2NlNjFjOWI5ODMyNzM0NzIwYmNmODZmZjM2MjdjNjkyNDIzZDI2NzIzYTg2ZTkyZGVhMTk0NzI3ZmJhNzQ3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_1b9c968ea265470ab8a8f2c236df58c6",
+      "statement": "base_tree 是 ws_commit 可用的前提：带上它 GitHub 只在该树上打补丁、未提到的文件原样保留，因此调用方只需送本次改动的文件而非整个项目快照；少了它会用新树替换整棵树、把未提到的文件全删掉。删除文件也用树条目 sha:null 表达，不另调 DELETE 端点。仓库有测试专门钉住 base_tree 与 sha:null 的形状。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L448-L459",
+          "version": "repo-lines-v1:sha256:528b63d8415dafa7ed6db9af97963b7c6c5d886139ae7b8171cfea14eb05905e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0MmE4MjExMDA5OTcwNmY2OTQ0YzNhOWZhYmY5YWM0MmE1MWNiOTJkN2ZhZjY4YzYzNGQwMzc2ZTU5Mzk2NTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkNTdkMjFhNTU1ZmY0ZTFhYTkwYjRiYzVkMjFkZjkwOTI1NzcwMTk5MDQzZDQ2MTkyZjQ5YWMxYjgyZWE2Y2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAxM2E4NGQ4ZDZjMjU0ZGEzOGM4YTg3NTI0ZThiOGFmY2YwYjU3NGNmOThhNzBlZmExN2RkNTExODM2OTk2MGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkzY2Q4Mjc5N2E0MjQ0NTE5NzQ4YWM0MTEwMTdlZjI5OWQzNzU1ODY4YjBkMTQ3YjQ0M2YxOGVmODI0ODZkMjQifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2913-L2939",
+          "version": "repo-lines-v1:sha256:4e5463357d9491da9c9b0e262d18d3488a18ac5820238dad269223a3d3a6b8e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5MTUyYmNkMDk2YmJiODYwMjRkOTFhMzhiMjdlMDdhNmU0OGVkNjU2NTVlMDgzMTNhMDI2ZGQyZTQwNTljMzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyMDE5NTIzODY1N2VlZWZjNGY3ZWJiYzNlMjRjYTlhNWZhOWY2NDM2MDNjN2FkMWMxZTAwMmE2NjcwOGE2NzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFmNTdhMTU3YTU4MmU2MGI5NjRhMzIxY2ZmOTcyYzIyMWViNTAxZjdjNDI0NGQ2YmExNTJlNTA5NDRlNGZlOGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_41a6d3d3d96e4d958709d64a84daeaeb",
+      "statement": "ws_commit 的一次提交上限全部挡在本地、超限即拒且一个请求都不发，以便不送到 GitHub 换一个模型无法解读的 413/422：文件数上限 COMMIT_MAX_FILES=60、合计内容上限 COMMIT_MAX_BYTES=512KB、message 不可为空（截断到 200 字）、files 与 remove 不可同时为空、每个路径都要过 checkPath（拒绝空段、. 、.. 与控制字符/反斜杠）。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L360-L372",
+          "version": "repo-lines-v1:sha256:0f7404a82022b5472a049737e18f53d80bd365a037843a453b795554e1800a07:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQxMjc2YjA1ZWE5NmQxZDVkMDU2NzkyNDg1MDI3NzdkYzVmN2UxMzI4ZmY0MDQzZGFiZWZmNzUwNzQyNDE2ZmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwNThkYzVjOTk0OGZjMTg5N2NhYWE2ZWZiZjMwYWUwMjY5M2UyOTk2MjQ4MmM1ZGIwMDI3YjU4ZTQzNGMwZmEifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L345-L376",
+          "version": "repo-lines-v1:sha256:6bb394aabac6996305b969180d41f8ca60a1cc5780061dbea647a25bfaeaed70:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzZWFlYTBkY2QyNWZkOGJiOTc4MzY3ZWMwNzQzOTJhZDMzNjRjY2JjOGJkMTQ5M2U2OGRkODcyNzJmZDAxNzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwZGUxNWEwNjhmNGY0YWEzZTU4MWVmYTk3ODA3MTdiMzE5NzFkYmIwZDE2NzZlOTkzMmMyODc0NDE4MjJjOWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2YzA0NzQwZTkzN2Y0YTYyNWZlZjgwY2QxNjEwOWIzY2E0ZjI1ODU2MGMyNWViZDkzYTdjMzVmMWZiZDA3ODkifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2941-L2965",
+          "version": "repo-lines-v1:sha256:c459a3e456835d09f2c876a36d2001d49b772d82fee5bbb60d1a52e042ba71f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyYzE3ZGU4MjlmY2JkZTQyZTQyZGUzMzc2YTE0ZmNhMGI1NmFlOGI4MWY3ZGIzMzAzMWFjNjE4NThkYzQ1NTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI1MzU5NmY2MmZiMDg4YWQ4OTQzYmYyOWRmNTU0MjJhZmRhMTU1NDM4MjdjMzRkNTMzZGM1MGEwZDFjNzk4MWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkOTFhYjFjNjc3NWRjMTY2OWZlMmJiYTk5NzgwNzk4MzFhY2U0YTZjZDE4YjE3MWJjZTU2ZmMxMGYzOTk0ZjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c496c3f6fb6a4dc68942ed5267c359cf",
+      "statement": "工作区仓库接有一条自动部署链路：projects/<名字>/ 下每个目录都是一个能上线的项目，目录名即项目名；往那里写代码、commit 到 main 后，GitHub Actions 自动跑该项目的 npm test（挂了就不部署），随后同时部署到 Cloudflare（Workers 与静态资源）和 EdgeOne Pages，各得到一个公网 URL；新增一个项目只需新建一个 projects/<名字>/ 目录，两个平台都会自动建项目。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L154-L170",
+          "version": "repo-lines-v1:sha256:08734e871e52cd027cd866c0bd2555e7b809f6e78b7620b98912fea714f3dad2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhN2VhMjc4ODg4MjVjYmU2NDFhOTNmY2NiOWFmM2QwMzU2MmQ0NDI0YjViOGMwNmVhYzEwMzliZTZkNmZkYTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxZGVjMGU4NzM5YWYzN2QzODAxYWE3NjE1NjVlNjI4MDY2ZThmODI3MGVhYmExY2NhYTViYTZmZTAwMzk0YjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0YjhmMTU3YTBmZGJhZDU1ODY4YWViODJiMmE1ZmVmODQxOTc4MDZkMGU4N2YyYWUzZmEwMTQwZmNhOGRlMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIwZDMwYzk1YjM2ZGRkMzhhNmU0MzAzODRjYWJhNGRlYmFiZGVjZDc1MjFkYzVkYzM5ODY4MzRmNmE1NDQ3NTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_240904f783b942fe80cfa9ca7cc4356c",
+      "statement": "部署结果不在 agent 的上下文里，但 workflow 会把它写回 projects/<名字>/.deploy-status.json（上一次成没成、两个 URL、跑的哪个 commit），由 agent 用 ws_read 读回；刚提交完那一刻该文件仍是上一次的结果，要核对需比较里面的 sha 与刚拿到的 commit，读不到最新结果时应如实说「已提交，结果还没出来」而不是声称已经上线。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L162-L167",
+          "version": "repo-lines-v1:sha256:3d0ff656295d20e132c69ca19dcb6266154cc1c79fe6ac2ec5f45d9c913c237b:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDNjMmFhYzUwMDQzNjUxZGMzZjYxZjMwY2RiMzUzYTQ5OTA5MTk5ZWUxNDA4YmEzYjFiYzI1YmM2MzExOGEyMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmE2NTcwNTg1NTFkOTQyODVhYmM4NGNiM2RiYmIwMDMxZmQ5YmUwZjg1YzQwMjIyZDg2Mjg1ZTUxM2Y5OGQyYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGE4NDAyMDQxNmQxMDNjMDdiZjBlZjkxYmE3NGY4YjcyZTdjMWNjYTk5ZTAwNzI2ZGZlNjczMzcyM2FhMmJjZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmM0N2ZjOWQ1ZTVhM2U2YWQ5YjNlMGNhNTM0YTZiM2ZlOWNjYTUxNzdmZDcxMDY1OTliNzhlMzhkM2EwN2Q5OSJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L380-L388",
+          "version": "repo-lines-v1:sha256:b430bc0022dd47f90664742f75c4e7779e0653de74c6b66cd228cf9c8de4cb37:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTM5ZWIxNTE1ZTgyMTU0ZjkyN2QwOWQ3M2Q2OTNjNTIyMzkyYzM5MWVjMDAyZWFkYjdmZjRkZGY2MzVjZjJkMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzVjZGVmODA4NWFlNzRhYjYzNmQ2NDU5ZjVjNmQ1ZmJmYjBkYjI2NGYxYjBkNzViYWM1MTljOWIzZjY3MTdhYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODZjMDQ3NDBlOTM3ZjRhNjI1ZmVmODBjZDE2MTA5YjNjYTRmMjU4NTYwYzI1ZWJkOTNhN2MzNWYxZmJkMDc4OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2VhYTRlOWRhYjUzOGI1MzZjYjgzZTNjMGQ3MzM5ZTFjNWQ5MzJkMTgwMjcxOTU3YTlmNjhlNDNkMzZmYTM3MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_bbb0671a25d74b14b77d9da97012202b",
+      "statement": "ws_commit 的返回值里带一条固定 note，提醒「已提交到 main、Actions 会自动跑测试并部署，但结果你看不到，要如实告诉用户去 Actions 页面看」。这条与提示词里「读不到最新结果时如实说已提交、别声称已经上线」是同一约束在工具契约侧的落点。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L380-L388",
+          "version": "repo-lines-v1:sha256:b430bc0022dd47f90664742f75c4e7779e0653de74c6b66cd228cf9c8de4cb37:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTM5ZWIxNTE1ZTgyMTU0ZjkyN2QwOWQ3M2Q2OTNjNTIyMzkyYzM5MWVjMDAyZWFkYjdmZjRkZGY2MzVjZjJkMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzVjZGVmODA4NWFlNzRhYjYzNmQ2NDU5ZjVjNmQ1ZmJmYjBkYjI2NGYxYjBkNzViYWM1MTljOWIzZjY3MTdhYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODZjMDQ3NDBlOTM3ZjRhNjI1ZmVmODBjZDE2MTA5YjNjYTRmMjU4NTYwYzI1ZWJkOTNhN2MzNWYxZmJkMDc4OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2VhYTRlOWRhYjUzOGI1MzZjYjgzZTNjMGQ3MzM5ZTFjNWQ5MzJkMTgwMjcxOTU3YTlmNjhlNDNkMzZmYTM3MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9cba5cc874a8424abb4348166eac44fe",
+      "statement": "工具定义与提示词都要求：部署门禁是项目自己的 npm test，挂了就不部署，因此往 projects/ 写能跑的代码时应先写测试再写实现，或至少保证 test 能跑过。这条门禁与仓库自身 .github/workflows/deploy.yml 里把 npm run typecheck 与 npm test 排在 deploy 步骤之前是同一形状。",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L42-L58",
+          "version": "repo-lines-v1:sha256:cd6c61876ea3f9744b9e414547aafa5958703447c00f691e8aa13d832d762895:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4MDBmNzE5YzIwNmI2MGVkZTRkOGJjMzcwNDVmMzMxM2JhZTA0YmU5MjBkZTY2MDBiYTFjMWViY2VkNjJlNjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgyZWRkMjk3NDI1ODY0YzcwZWExOTE4MWQ3MjdlY2Y1OTY0YzI3NmJmYmM3ZDdjNWNiYWI3MWNmM2Q2NWY5NzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZDE4MmFlZDUwMmZhOTJjM2RmNjQyODJlNTdmMmI3ZTk1YWEzNzc1ZWZmZTRkNWViNDRmNzRiOGM1ZTdjN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2YjQwNWYwNGRhODdiMTZlZmYzZjFhMmE0MWJlOTZmZDIxMmNkYjlhYTJiZTY3NzM5ZjBiMmQ1OGFkOGI3NjEifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L169-L170",
+          "version": "repo-lines-v1:sha256:b894bc5292f09350792078a9e74accba41e385cdd40ee132e72ded5dd2e07efc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTFjNzJlZGZlNTVkMGFmYWI1YTA4NmIxZWY2MWVhYTgxYjhmMGE0Yjc2MjdkYTMyMDNmMzE3NTk3NGU1ZWQyZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjFkZWMwZTg3MzlhZjM3ZDM4MDFhYTc2MTU2NWU2MjgwNjZlOGY4MjcwZWFiYTFjY2FhNWJhNmZlMDAzOTRiOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODBmYTU4YTVmYjk3Y2VjNWMxNTlkYTUwN2Y5MGNiM2ViYjhkYTdiMjE1ZWY4OWZkYTVmYWI4MDEwNmIzNzBmNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjBkMzBjOTViMzZkZGQzOGE2ZTQzMDM4NGNhYmE0ZGViYWJkZWNkNzUyMWRjNWRjMzk4NjgzNGY2YTU0NDc1OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_51614926ea7746c3b376414e88badd8f",
+      "statement": "GitHub issue 工具族（gh_issue_create / gh_issue_comment）使用独立于工作区的凭证与配置：GITHUB_ISSUE_TOKEN 必须是另一把 PAT，因为 GITHUB_WORKSPACE_TOKEN 只授了 Contents 而 Issues API 不属于 Contents 权限范围，拿现有 token 提 issue 会 403——所以这不是加个工具而是一次扩权，混用会让「改工作区凭证」这个动作意外影响 issue 能力，反之亦然。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L130-L137",
+          "version": "repo-lines-v1:sha256:15ba3b302cf5e5a3c6d7cc2ca7cf04e7d22ede30fcefd2f53980f43cc2b5d408:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYyYTJmOTk2ZjA4ZTY4MGJkMjkyMTM1YTZmYTQ5NzhiZGEyNmU2MDJkODRmMzNjYjFkNTk0Nzc1ZDQzMDRiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGE1ODAzNTVkOWQwZWEzOWQxYmM0MzcyMDBmYTAwOWIxYjk5NzhhZWZiNGFjMzk1OTQ5MjZhMGViN2Q2NzY5NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWMxY2Y4MGUzZDVlMGE1NTEzMTc5OGI4NjZiMDgwOTdlZjg0ZjkzNzhhNzkwNzg1MmMzMjgwODk0OWI4YWUwZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjQzNzg1NjQ5NDJiMjM0MzE5NDE5ODc3NjIwN2I5NTUyNGVlZDczYWYwY2MzNWFiNDUzMWExOTM2OTQ2MjFjYiJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L577-L579",
+          "version": "repo-lines-v1:sha256:47276d38d64eda8e8664dd59cd9dbd083adf96906fc85116304b0c4343c56b78:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTdmYWRmMWE1ZmE5NWVkNjEzYzI3ODdhMjY5YzI0ZjY0MGI0YWY1ZjNhMTM0YjA1YWZjNmIzYzZiY2YzZTU4MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzY1NGI5OTY4M2NjZGVjNmE1YjY0N2ExZjY2ODE4ZjdlMDUwYTlkMmMxOGIxNjVjNzVkYjRiZTI1M2YwYWU2MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWU0N2I1ZTYwODYwNjliN2IxN2NiN2UwNDkyZmFmNDNjNDI0ZTAzZGUwYzk3MmJkYjFjNTQ5NzQ1MGNhZjNjMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODdmOTliZmNjMDg4YmU3YzU2YTMyZTUzYmM5OTA0ZmU0YzYxNDcxMzZmNWY0OWZmZmVmYWExYTM5ZjM3MWM5MCJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L1-L7",
+          "version": "repo-lines-v1:sha256:1739373c2d3d2bfbc7b8acddc32717d83d162d75743a9384d7da4a9f7767406d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWM5MDVlOWFiMDM1NzdkYjkyYWQxMDBlY2UzYWFkZDJkNTJlMTkwMjdjOGVjZDVkZDA3NzhjZGY4N2U1NTU0NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDFlZGUzYzM2NGZhYjI3MjhiOTJkY2U2OTQwMTU3OWJkZTVkMDM1NzE4OTk2MDMzMzQxMTNmMzMwZGFiYTFhZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDNmNjNkNzM5MmMzM2YxOGY2NDdlN2M5ZGY5OGRjYmM1OGQxNWRkNGM1YTEwOTcwNWQ0MDViZDIwOWRkZTQ0NyJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L1-L12",
+          "version": "repo-lines-v1:sha256:309be9591504e627e5eb29ee1a2b04fa0eb19868961b8ae295479355b1861c05:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzOTExZDFlZTFkMWUwOWMzODU0YWI2MjkwNWIwY2VhNDM3NmFkNTVmZjA0ZWU0ZDU4N2NhNTAyNmE5ZjMwZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzZjRiNDg0N2ZiOWM4ZWM0MzcwZDNmYmIxN2U5Y2EzMTdjOTJjM2ExZGNmMmIwMDlmNDdmYWNjNTg2NDZiYmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmMDJlMWRlNTY2OWQyZDBhN2JlNGVjZDgxNzY4NDE1N2QxOWVlNjM2NDU4N2Y1ZmU5M2U4NDc3NjMyZmI2OTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_56278072093542e6add8a77a087d7184",
+      "statement": "ghIssueConfig 在 token 缺失、或 GITHUB_ISSUE_REPOS 白名单为空/全部非法时返回 null，于是整族 issue 工具一个都不挂。白名单为空时返回 null 是必须的：没有白名单就意味着这把 token 能开的仓库全都能开，而 issue 是对外可见的副作用，不能挂出一族能往任意仓库写公开内容的工具。这是全仓最明确的一条 fail-closed，测试直接钉住了「只有 token 没有白名单」返回 null。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L52-L55",
+          "version": "repo-lines-v1:sha256:b7787f47f80ce09d584dc02e92db7558cc1bd5a397f81fe5762eef3be31364f6:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2NiYjUzMDc1YzFjNGZhZDgxM2IyM2RkOGVhYjUwNGE5YTYwYjU4NzJjY2RhNTIzYTc0ZWMyMzFmN2M2Y2JkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzdkMmQ4ODJiY2U4MWEzYTZhM2RhZWJmZDM1ZGM5ZDcwYThmZDA1MzJiODFiYjZkYjI0YjdmYjZlOGJhZjMwNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTdhNmMyZDVlMzRlODNmODk1Y2E0NTAyMjkxMzRjZGE5YTU5NGFjNjQ2M2EyODJlMjYzZTFiNDFmYzUyMzM5YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzljOGIxYjZlMzk1YWZhYWRiMGQ1NmMxNTI1MjZkYzBjYTE0MTQzMWZiNzhjYTM0NmM1YmJhYmMzZTA2YWM0MyJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L44-L68",
+          "version": "repo-lines-v1:sha256:69d797236748669fb3ef8962b43eb4514369505eeffa8936c01d03fffe61c60d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyNzljZGNkOTg5YmVhNTY0ZjNiMDc2ZTc4NDMzOGYxMTU2OWE3ZjYzZWFkNTIyYmY4N2U3YTNmNDA2Zjg0Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxNWJjNzcwN2VkZTY3Nzc4Y2I3ZmU1NWI0ZTlkZGE0YzU5NDc1NWY2N2ViOTM1ZWIzMjUyMjQzYTEyOWQyMzEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2999-L3006",
+          "version": "repo-lines-v1:sha256:75a616cd7cdb051b82193d64bc5c0a5c33de982d3b5215fd3c9c5c518a29013d:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGRkYjUzM2E1ZGI4NTkxNjUxZTkyYjU5ZTBlNjZlYzg0NzY5ZDk3ZGQyZTNkN2ZhMGZmYmJiMmEzMzg3NTI1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDI2ZmFlZDVlYmRmYTAzYWExNjIxN2U2YzM0YjE5MDFhNDg5OTY1MmQxZmNhYjNjZWYyZmU4NzJjNzU1MDlhMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjMwNGZhZDFmNDBhMjE0YmU0ZmVkODIzYWFlMjQ4NzM1MzI3YmFkZjIyODFiMTA2NzRmOWYxZjFmZjhkNjEyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_27c910228dea476ebc1080ce69345b6b",
+      "statement": "issue 白名单比对大小写不敏感（统一按小写存储），因为 GitHub 的 owner/repo 本就不分大小写；未命中白名单时抛 UsageError 并列出当前允许的仓库名（只说「不允许」模型会去猜或者道歉），且该校验在本地完成、一个请求都不发。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L60-L86",
+          "version": "repo-lines-v1:sha256:d918c7aa6f48e04c013d19f3ba61c1bd99e9c7e0a664b422c9ee9a98132e3390:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlNjAwYjlmMTI5ODc2ZWMzOTYwOWI3YWU2YjNlNmM4YWRlNjc0NDkxZWRjOGIyNzM2OGE2MDZmYWE5OTFhYWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM1ZDdjYzY2ZDFjNWQ1NjFhZjJiMDQ2Y2IyOWNkZTJkYzllNDg5ZmRjNzIwNDIzOTQzMzhmMzYwMzZhMDAyMDAifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2979-L2981",
+          "version": "repo-lines-v1:sha256:13b4c9997ba99869b2666f7d8385d688944ec18b64434106a35f24f94c717cdd:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGU4NDM5ZGMwNWY1OTg1OTY1MGZlMTdmYmE5MTMzYWFmY2Q3ZWQxNzU1YWExZTZjMjk3ZDg1N2M3Yzg5NGQ0NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmM4NWQzOGE1OTk0YzY4NDIyNjJhN2M3ZWU0Zjk4MjBkYWM4YzhhMjllYWI3NmYxNmUxMTcwNjA4OTI2Y2Y3NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTljODc3YzIwNjE2YjYxMjM0NWE4ZGNkNWU3ZWFhODlkMzlmNTUyNjQzZDJjYmQ1N2M4YjI5MmJkZDk0MThhMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjQwZGYzMGQyM2JkYWJlZjQ4ZTVlZWY3Mjg2NmQzODg2Y2MxZTg1NzliOWFkN2E3MDQ1NjdiYzEwN2RiZTZiZiJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L3012-L3026",
+          "version": "repo-lines-v1:sha256:e65eec1fb5b900f8b7f2fd7e99b7be1796ff6a58419a34b8f757657196d5812e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OWUzZGMwNzgzMGFkMGJhZjc5NjEyMTRjYjE1YzAyNTk2MDA3NTQwMTNmOTkxYTY1MDQ2ZjcwNzJjYzc0MWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyNzlmYWQ4ZTVjN2M2Njc5MzBlNmI1NTg3ODA1YjBlYjgxYjA4Mjk5Nzc0Zjc1NGFjNmUzNTY2NWRiMTgyYjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRhZWIwMDA4ZjVkN2Y3NjA0MmUzMTYwMDcwOGUzM2UwMDg1MjVmMzkxYjczOWJlMTI1OWU5YjM0Y2NiYTdlNTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_591efaa071d9456fba1c0a4a92eb357a",
+      "statement": "issue 工具族只提供「开 issue + 加评论」，刻意不提供关闭：开 issue 可逆（能关），而关闭别人提的 issue 是破坏性且面向他人的操作，agent 误操作一次就影响协作者。这与 ws_rm 只删文件不删目录、平台沙箱的 files_remove 被 EXCLUDED 排除是同一条约定。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L91-L120",
+          "version": "repo-lines-v1:sha256:67db62d904933c6b023490773eb80353674064afb06bfc67ae0a70d8d5b5b07d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2MTcwMmM2MTZkYzYzMDU3NjZjZmNmNzU0ZWIxZDRkOGM4ZTUzNjk0M2ZlMDFiNWNiNzBiMmVmZGY3NTY1N2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1MDYyMDFlMmFhN2VjNTAxYmUwNzM1Mjc4YzU1ZDNmOThkYzkzYzExNjQ0NmNlNTdkNjBlYjM4ZTRjNzU5MmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYWE0ZTlkYWI1MzhiNTM2Y2I4M2UzYzBkNzMzOWUxYzVkOTMyZDE4MDI3MTk1N2E5ZjY4ZTQzZDM2ZmEzNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L9-L12",
+          "version": "repo-lines-v1:sha256:aafd669f997c044e0e2aabd1e7780c30f9ceb4b642391e8f8cf23fe9e4868e5c:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTRhMTljN2NjOGVmYTEyNzZhNmQ5ODQ5NDQyMjAzNGJmNzM1MDFiNTM3NjE5NjExNjI0ZDc4NDhlOTY4OTlmMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTNmNGI0ODQ3ZmI5YzhlYzQzNzBkM2ZiYjE3ZTljYTMxN2M5MmMzYTFkY2YyYjAwOWY0N2ZhY2M1ODY0NmJiYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDZiYjg2YzI5YjFlOGNkMDBmZDA3ZGVhMzdmMjYwNjM3MzRjMmQ4ZmIzOWUzMDZkNTM3MTllZWFiYzc5MWUyMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGYwMmUxZGU1NjY5ZDJkMGE3YmU0ZWNkODE3Njg0MTU3ZDE5ZWU2MzY0NTg3ZjVmZTkzZTg0Nzc2MzJmYjY5NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0ad19b8509154373bb29954873ba4eda",
+      "statement": "issue 工具族的契约重点是可见性边界而非用法：工具描述、提示词段落 ISSUE_PROMPT 与返回值 note 三处都强调 issue 是对外可见的、发出去撤回不了、开之前先把标题和要点念给用户确认、agent 关不掉 issue 需让用户去 GitHub 操作，并且不要在正文里贴密钥、内网地址、用户隐私。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L172-L186",
+          "version": "repo-lines-v1:sha256:516058e1aeb51cc5cedacea2c94b71ba11cc681d667557fd0a2ba72f2ff9483e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2NTk3NzQ4MDBkYjM0N2Y3ZTQzOWQyY2YyNGJjMWNlNWNiNGRkMDA2Njg1ZGNjMmZiYTJhYWU0MzE2ODQzZTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2ODFiMGZmZGY4YjdhODA3NmE5YTFmM2JmMzg0MDdjMWZkZjEwYTRkMzgwZjhhNThjZWJiOGMxOGY3MmM5OWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L47-L50",
+          "version": "repo-lines-v1:sha256:0fabff45fa460bf212f0a9b8d3583f7a791fadeef75200dc5a4fd60225f4a9d5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2QyMGFjY2EzZmRiYTkxMGNlNzQ3ZjRkYTVhNzM0ZTQwNDlhMWVmMThhNjI5MDc2YjczMzNkNmYwY2YzYWUwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjQ0ZDg1MTI1ZmU5NzA3ZDVjOTVkN2JlZDk1NTUxODgxM2I1ZDQ1ODA3ZjM3NWVjNDA5ZWU1ZWUyNGVjYjFlNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTlmMWJmY2JkZTIzN2ExMjE0MTIwNTI0NGE5Y2E0MDMzYjg4ZWRjMDA1OWY2ZDVjMDMzZTQxNzEyZGFhMTIxYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGQ3NDk4M2JiODY1NzBlZGU3OWRmYjA5YjYwYjE1MGY3NjllYTVkOTRmZjU2ODdhMDJiMTk1YmMyMjcxYWIzZSJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L80-L87",
+          "version": "repo-lines-v1:sha256:3df1207f5371a63ff4751136c1e91964cebb2aebc576e07a35b2344cb1ddc309:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTM5ZWIxNTE1ZTgyMTU0ZjkyN2QwOWQ3M2Q2OTNjNTIyMzkyYzM5MWVjMDAyZWFkYjdmZjRkZGY2MzVjZjJkMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzVjZGVmODA4NWFlNzRhYjYzNmQ2NDU5ZjVjNmQ1ZmJmYjBkYjI2NGYxYjBkNzViYWM1MTljOWIzZjY3MTdhYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjJhNmI0ZDc4MzI2N2ZjNTQxMTY2YzQxOTQ2MDllN2JlNDAzZjgwNmNjODg1MjBmOWI4NzY5OTFhMjgyYTMwYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2VhYTRlOWRhYjUzOGI1MzZjYjgzZTNjMGQ3MzM5ZTFjNWQ5MzJkMTgwMjcxOTU3YTlmNjhlNDNkMzZmYTM3MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_132c934826c44864b4bb165fe095603f",
+      "statement": "issue 的标题与正文长度在本地先挡（标题上限 ISSUE_TITLE_MAX=250 字，留出 GitHub 256 上限的余量；正文与评论上限 ISSUE_BODY_MAX=60000 字），评论的 issue 号必须是正整数，超限或非法时直接返回 { error } 而不发请求——送上去换一个 422 模型看不出是哪个字段的问题。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L101-L113",
+          "version": "repo-lines-v1:sha256:ad3f1f241cfd0f55899abf3b9c7f6cc9f9d59d2dc44dd6050442b69fbfc3144a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5ODAwMGE0ZTNhNDIwZWNiYTVkNDc4NDA0NTJmMzY2N2ZmOTRlOWI3MzUyODM0NDgwNWFkZGQ4MTY3YzU2NzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxNTg5YTdhZWE5MWE1NzY2MGYxODFkOGQ2NzFmOTljNjg3YTY5MDNkYjI5MTA5MTg0ZDcxMmY1ZTYyNWZjNGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4NzEzMzdmOTA5MzliMjYxNDk3ZDJmZTRlN2JhZDVhMTExN2UxMDQxZWFmMjA1OGViZGU5NDM0NzVhNGRlNjAifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L35-L45",
+          "version": "repo-lines-v1:sha256:3b874435e47dc113af756f4379565901858e7d2d136a003fd42d93b595ac4548:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkZTcwOWIzMDM3MmE4NGUzODc1M2U1ZjUzYzc2MzU0ZDIwOGI5MjViNGMzNjJjMGUxZDk1MDJiMDhiZTk1ODUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlMzA4YzFkYTJmY2ZhNjI2OWYzMzQ4NTIwNjFjOTAxZmM0ZTRkNzEwZGNlNWY0YzJmNWEwNWE1MjUyNDQzYWQifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L26-L28",
+          "version": "repo-lines-v1:sha256:dad5849384782194f32af0bc5e134695ec581d62754c9bdfe382019fd85275d3:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzFhMTE5YzJlYmM1MjIwZGVkYjQ0MjNhZWFhNWRlNDFkYjRkOGIyNmMxYzQ3MGUxNTg4N2M1NTEwYTBhZTBhZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmE4ZGJjMDM3MmIzZjQ0MTczMjQzODQzYTdjNDU3NGE4MzkwNTkzZjFlNTM1NDI5MjQxOGU4MTA3ZWRmNWM2NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGQ2NGUwNjM2NTQ0MmFkMDk0NTdkNWIwNmQ3ZjFkZThhMmQxZDQ0NjVmZDFmNjQ3YzZmY2U4NDdhYmIzNjVlMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTJkZWQyZDc0NzlhOGZmMzA1MDA4N2Q3ZTg2ZDIxNWE5YzkwYzQxYmI0NmMzODE2ZTkzNDljODMzZjRlYjMxMyJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L3050-L3059",
+          "version": "repo-lines-v1:sha256:14415a2779865c013ba415c5681329117cd3a215606d922977cc5ce5068d9960:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5YmJiYTVmMTBjNDAyNTBhYTkxNmVlNDg3NzE5M2NhNTE1NWRjNDRmNzA0OTdmYmJiMGI5ZDFlMjU1ZWJjMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmM2ZiMWNiOTU1MTQ2MmFhYTg2YWY2NzljMmNiYzgxZGEwOTU0YmRmMTgxNDY1NTkxNzlmN2U5NmQ5OTQ1MjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1M2U1Y2ZiNzM2MmM0ZDQ2ODA3MDBhMWE3MTk4YWI4ZTAyN2EzZmJkY2M5NDYzNjFiNzUyMjZjODJkNTEzOWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzMmU0NzI3NzQ5YjYxMzNmOTNmZTk2MTM4ZGVmNzdjMGE2MzM1OTA1Mjk3MjhiOWU2YzE5ZDBhYzE3Yzc5ZWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6feeaca45a064ec8951a3da09c56a82e",
+      "statement": "两族都以 { error } 形式返回用法错而不是让 guarded 包成「工具执行失败：」：usageError() 把 UsageError（拿错工具、文件太大、路径非法、白名单外、仓库名写错）翻成不带前缀的干净错误，其余异常才交给 guarded。理由是消息语义——「工具执行失败：」读起来像环境坏了，模型可能因此去重试或道歉，而正确反应是换个工具、换个仓库，或告诉用户去改配置。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L74-L81",
+          "version": "repo-lines-v1:sha256:1df0fbd648f00d6297c3771fbefcf71c45ca04f23fb60345bb5517bd398df101:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTBmOWNlYjIxNTIzODg1ZGMxNDExOThkOWE0YzgyMGUzNTcyYTUxNWRkM2E2MjJlYTFmZjY4ZjE5OGUzZWQ4YyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTIwNDBlMDk1YTk0ZTJhZGE3NGU0MjFmMzcxODc1MWE5MWE4MTBiZmQ2NmY0OGY0ZTkzOWM3Yjc0ODBlYjY3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGMxMGI2MDFlOTQ5M2RjNTEzM2YzZGRiNDVjYjJiZWYyOTNjM2UyMjQ1NjkzNmVkODVlNzgyZDRjYWM0YmNhZiJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issue-tools.ts#L21-L33",
+          "version": "repo-lines-v1:sha256:73a1467c8f764d22066ab06ebf5dac76bea69c4028c84fba4f14539ba185d623:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmOGNjMDVlN2I3ZWRhZDZlNDUxODQzMGZmMzI4MmVhZWQ1Y2Q2ZDYzYjM3NzhjM2NmZWZmOTE1Yzk1ZGMzNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkxYTAwMTRjMDRiYWZhZDk4Y2MyMjZlMThhYWE4ZjBmYzFkNzZlZWFhNmUxOGJlOWJlMzljNDA3ZjU4NDU0ODkifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L57-L70",
+          "version": "repo-lines-v1:sha256:87f3ff83c75e3c105ac7335d225abd2c335c6e38750a46b946a7ba6f393b6a3f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE3MWYxODNkYTI4Y2YyMzg5NDRkNWRlMzc0ZjVjM2JkZDA1ZWIxYzI5ODcxZjFhNjg5NGFiOTQzN2JlZDc5NDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU0ZTFmZGRkNjg4YTJiMTRhYWQ5MDVhZTIwNDY2MmU2ODM1NTI2Mzk0NzQ1YWNmZjFiZDQ4ZmMxMGZiNmEyYzIifQ"
+        },
+        {
+          "resource": "repo://src/shared/util.ts#L19-L34",
+          "version": "repo-lines-v1:sha256:61e22f177da31fd87ee0f4c5235f1f367be391b25485fb8c2babf84ad664210d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1NDE4OTU0ZmNkNzQ1MDQ1ZDk5Y2VlOWQ1YjYxMWYxNWViN2Q0ZWU4YzI5Y2ZkM2UzN2U5NmVkODZjM2EyZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3OTA1YmY1N2JkZWEwZjAzYWQ5MjY5ODU1MGU5NDExOWFkZGY5OTE1MDg2NTE0YjEzYTAwMTNmNjJiOGRhODQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_be24693a07e246cf99ef00dce23c444e",
+      "statement": "token 绝不进入错误信息，且有测试钉住：issue 族的 403 分支只说缺 Issues: Read and write 并附上 GitHub 自己返回的 message，断言错误字符串里不出现 TOKEN 值；401 分支要指明「这需要人去换凭证」而不是让模型重试。",
+      "evidence": [
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L140-L150",
+          "version": "repo-lines-v1:sha256:4968d838a46d779d8e60f65ff496d9f723747e0e8cbe1b7d65bcc35fce00ac23:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0OTczNjczMTI2ODJjODhlOTNlZjczN2EwMTEzMzE5ZDExOGIyZDhiMDA3NTMyNTc0MDIwYjUzMjRlMzI4MDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlMGM3NmQyZjkyOTA0MzFjZWIwYWRkZGY0ZTk2YzJkOWYyNGNkNTM3MWM0MWFlYjQ5NzlkZWRmMjM1NjU5MWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNiMzFkYmY4Y2Q5ZDQ5YzZlMGNmZjAwZThkZGJmZjBjMDhiYzU0OTI1MjdkN2IwNTZiMmRjN2IyZWRkN2VkMjcifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L3066-L3094",
+          "version": "repo-lines-v1:sha256:178a7d48804ebf147686988c5aab620863c75bbdb5149042ee03c001d53474fe:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhNmViYzhiODE5MzhkODJiNGMzYzFkYjVlY2RiNjYzZTI4NjBlMmM5MjNhM2ZjZTIyMDUwNTBlNDExMGJmMmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2YmM3YzYyMDhhZTgxMzRkZmMzNDBiNmY3NmIwZmI5ZjBlOGM1M2ZmZjdhMDkzNGE5ZjEwNmM1ZjY1OGJkYmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhiOTE4ZTVlOWY1N2Y3Zjc0MDlhNGJkYmE3MzQzZWZhNDI2YzMxOGRhNTNmZDk3ZmIxMGUwZTYwMDY1YWZlOTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d5379d97eef14bc1a85920e075daa3d9",
+      "statement": "工作区提示词里有一条硬规矩：绝对不要把密钥、token、密码、cookie、.env 的内容写进工作区仓库，因为它是 GitHub 上的仓库，一旦提交就永久留在 git 历史里、删不干净；要写配置就用占位符（如 ${OPENCODE_API_KEY}）并说明那是占位符。ws_rm 能删掉文件但删不掉 git 历史。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L151-L154",
+          "version": "repo-lines-v1:sha256:d737672ee9cd3de81b66c24c7159e4480a8563bd3b5c7850f27d714bfb78d18e:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjFjNGZhNjQ1ZmMyMWI2NTcxNjZhNDBjMDMwMWQzODYyNTAwM2IzOGNhY2I2ZDVhZDRkNzE3NGY3ZjFlMTZmNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWE3ZWEyNzg4ODgyNWNiZTY0MWE5M2ZjY2I5YWYzZDAzNTYyZDQ0MjRiNWI4YzA2ZWFjMTAzOWJlNmQ2ZmRhMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2VjODg1ZjMyZWYxYzM5YzQ5MmU1NDE3NmVhYmY2NGM5NmU4ODA0YTZiN2Y3MmNiOWZlOGE0OTJmMzQ1N2Y3MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMThkZGYyYmI4YWY5MDRiMWQ2MWZkZDM1ZWZjZDllOTdkYmRiNGY0NmM0ZTIwZjQ3OTg2NDgzYTNjMTM0OGVjZiJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/tools.ts#L283-L286",
+          "version": "repo-lines-v1:sha256:c7a9081a7703c8942fef6fa1e9d3bc3968f0d9bd4cd8eb6d54a84215b17c643b:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcwNWM0Zjg0Nzc4MDYxNTE2MzA1NDAxYWUxYjliMzI1YmUzYjYwYzIwZGU3NzhjY2EwMGM1NTFhNTJjNThiMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTFlNDU0YzU2MDA3OTAzNmNlODA0MDdjNDgxNDc0MWI5ZDkwNWRhM2RjYTA4N2FmMzBlY2IyMDg5ODQ1MDk4MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGU5ZDhhYWQ4Mzg5OTg4MjU1YjM0OTRjNDQwNjA2YTk0OTRlZDVkMGY3MTlmOGI3MTdlMzI3ZDk4ZDQxNjQ4ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzM5NWYzMGRhMDVkYzE5Y2Y5Y2I4NmM4Y2RiZDEyY2Q2OTYzMDFlOWFjOTcyYzJiMzdmZDQxYjQ3N2Y1YjhhOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_158d6b60e15d47c18fd69e8ec4d50abe",
+      "statement": "工作区与 issue 两族的 PAT 都必须是普通环境变量而不是 AI_GATEWAY_*：那三个键由平台托管，每次 edgeone makers deploy 都会被 CLI 覆盖回平台值，自定义凭证放进去活不过一轮部署。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L118-L136",
+          "version": "repo-lines-v1:sha256:7d2aa636750434cd8bac38b2bfce071312e1c93da69bf9cae7c830d3def6fb15:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlNzExMjdmN2Y1ZjE3MTdiOTZlN2U5NzY5MGE3ZDE4MWE1MDcyMzdmY2FkMTg4NDBiYmIwOTM0MDIyYTkyMGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlNjM3YTQ1MTAyZjFlN2Q0MDY4OGNjMDY0MTM4M2ZkZjE3MDBmODczMTM2N2I3ZGY3NjNhNjZiMTg2NGFiMzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMDdlZjgxMjNhMDg1MDU1ZjgzNjBjNjZiMGQyMDVkMjY2ZmI5MzA5OWQ0MzRlM2NkYzM5OTAyZWNmNjViODEifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_instructions.ts#L152-L154",
+          "version": "repo-lines-v1:sha256:88f7a6832061706118ab5518d16d2a58e1337c5225d33d879f62a94d7f6c9450:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDI2YTc5NGEzM2RjOTBlZjk3MjEyZTc0NzhhOTljZThjZDcxNTQ2YjM1ZTU5MjRhNDI3MTFjMzZhYWM0MjI4ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWE3ZWEyNzg4ODgyNWNiZTY0MWE5M2ZjY2I5YWYzZDAzNTYyZDQ0MjRiNWI4YzA2ZWFjMTAzOWJlNmQ2ZmRhMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWQxZTYwNzQ1NWEyMzE0YTIzOTk2ZjYxZDlhOGM2OGI4MThlNmQyZjAxMjEwODFiZjQzNDRkMDA4NjU1OTNkOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMThkZGYyYmI4YWY5MDRiMWQ2MWZkZDM1ZWZjZDllOTdkYmRiNGY0NmM0ZTIwZjQ3OTg2NDgzYTNjMTM0OGVjZiJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L8-L11",
+          "version": "repo-lines-v1:sha256:2e001ff8a6fb759662e757dfaaf3bdf0279d9b2512ab8da63cf1c788e0647b03:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGZlZmEzZTdhNDZlMzQzZGYzNDllMzgzZjE1MWMzMzAzZDk1YjJlYTg5ZTk1N2FiMjUyOWY0OTliMmNiNGRhOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjk1M2JiYWZjMTEyM2RiNzJkNGY2ZWUxYzg5M2IwOTk4ZGUyMWYzNTg0MjVjNjNhYWY2OWZlY2FiNjExZjkwZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDNiZjI3ZDFjYjE2YzM2NGYyYzM2MTMxOGE0NDYwODNlOGM3NGQ3OTg5NzIxZDg0MmRmZGE5NjdjNjAzYjBmYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTAwNWQyZDhkMWVjZWM2YzQ3NGJiNDM4ZWFiMjIzMmFiODVjYWE4ZTQ4NDc2MjU5MDJiZDQ1NWZmZGRiMjg3OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d5a27f6464134c77b19eb16e15b62fd4",
+      "statement": "GITHUB_API_BASE 只为本地测试指向 mock、生产不要设，默认值是 https://api.github.com；两族的配置解析都对它做去尾斜杠处理。注意 _host.ts 的 AgentEnv 接口并未声明这个变量（集成测试直接构造 env 对象传入），因此它不会被 ?probe=env 的白名单正则回显。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L111-L164",
+          "version": "repo-lines-v1:sha256:5f8194582e3718f390faf3d252aa0dcc69b497a4db73206c1c72988c1e3ba558:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4NWY0MTdmZDUyNTI1MjBhNWRjYWY3MGU5YjYxMTM2OTRlY2JjODVkNGNiZjNhMmM2ODdlYTgwYWRkMWM4Y2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3NjEwZmY5Y2UxMjQ4MzUyMWY4Yzk1MmMyNGY5MjlkZmVhNTY0NThmMjFjMjYwY2UwMTM4MjEzNzMxYTVkYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkZWIzYzAwNzVjNDJhOTNiYzA3YTQ2NDczOTA0MTQ5NzIxM2U2NDIwODQ5YWJjM2UzMWE3MTE1YmIzNTNjYjUifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L23-L25",
+          "version": "repo-lines-v1:sha256:faf57a6140c0d033d0051020e36da9ab9567088b9b1319ff6bbe5b52f2cfa454:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODA1NjAxYWU2YjJkMzA3YmU1Mzc0ODQxYzM2YjFjZWEyMTEzMGFmOTU1M2NkOTIwOGI1YjZjODFiZjlhZGQwNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzg0ZTlhNTMzMGNlYTM2YmRmNmFlZGI5OGYzYjQ3Nzg5ZDVkYTIzMjg3ZjQwMGUyMDM3NGNlNzhjMzc4YjI3YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzMzMDRkYTc3Nzc0NmM5NjM2NGEwZjM3OWI5NGJhMjUwOWE0MzkyOTBjMTk2YjgzMDBiNWYzMjZkYTdkNWZkNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjEwZDg1MDllYTFhNGE5ZmQ3MjdlNzI5MWRkMTExZDFjM2RmZGQ4M2JmMjAxZDMwMjk0MWVlZDQwMTI4YWQ2NiJ9"
+        },
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L66-L71",
+          "version": "repo-lines-v1:sha256:c04739a655e251fc711b24b91a8db0938a96c7b20e29df4a1390c877bd610f05:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDJhMmNiMjVhMTIyYjQ0MjIxYTYyMzRlYzY2MGE3YjVmYjdmOWJkZTdiM2I5ZTJiM2M1NTlhMGQ5NmZhYzczOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDJlZGI5MjNmMTU2ZGJiM2FiNmE2NWM1YTU1MTA0NzUxZjIxMzg4NzdhYzgyMjcwYWE0YzUwZmZiMzI5MGJjNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzc5MjllOTFlMGY5OWMzZTgyNWRlNjliNDM1ZmI2NDg0ZDFiMGExZGYyZjQ2NTYxYWJmMWEyOWYwNDE4OGI4OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_334f8786f41b428da6e7d7b518a78ccb",
+      "statement": "test/smoke.ts 的 L 节用全局 stub 的 fetch 打假 GitHub 覆盖工作区五工具：断言工具名清单恰为 ws_commit/ws_ls/ws_read/ws_rm/ws_write（防重构改掉工具名，而工具名是模型选工具的唯一依据）、ws_write 覆盖时带读到的 sha 而创建不带、ws_rm 先取 sha 再删、404 的三种原因都要出现。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L2709-L2766",
+          "version": "repo-lines-v1:sha256:d0c2bb566568b4ba82651d72038aac41054e6b6f1085327d5c08219437230e29:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiNjE5MWJkODZlMjY2YWI5MzQ2MjA4ZTk4MTUyMGI3MzljM2FiZmI1ODA3NGUwMGYxMDQ2MzMwOWVhYmI0YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZjM2I0YzQxYzNiOTRmY2E5YzliZTA0YzQ0NGIzMGMwMTdkY2VjNmE4MzA4MDhiZDQ2MjUwZjZkM2Q4NTU1YmUifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2801-L2863",
+          "version": "repo-lines-v1:sha256:632e2cd701b676228984d6339a5493704c7fcbb96301f581bf509412b14d2965:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiYjEwMWE5ODNkOTNhNmRlMTNmNzgyNzlhOWZmOTFhYjNjZjEyOTZmYjY1YmFjMTk2NDc1N2M1MmEyYzBkYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1ZDQ5YWI4MGIwOTczZGI4ODMyNTZhNzQ0NDk4NmU3OTdjMjhiZDY1MDM3ZmQ5YWMyZDhmMGY2NGM3YWFlOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgxZDliMjIyNTQ0MzQ0NWNjYzE1MTUyNzIxOTFkYWE5ZjRmZDdkZTc1MjEwMjQzYTA4NjRlN2MyYzM2NGYyMWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c628334636e543358f5fcd91da937dad",
+      "statement": "测试中最核心的 ws_commit 断言是「多个文件只产生一次 POST /git/commits」——注释写明少了这条它退化成 N 次 ws_write 的包装、等于没做；同时断言每个文件各一个 blob、分支指针被 PATCH 挪到新 commit、changed 计入写入与删除总数。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L2864-L2911",
+          "version": "repo-lines-v1:sha256:5885fab6e30d0f7b0b951d6c5deefca5be522f71e67c37c20a6d33916bcb4ef5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzMjc4Zjk3ODYxZTVlYjExZDdlMTM5YjQ4NmI0MjY0Y2ZmY2ZjMGMzMTE5YTFmOTExMjA4YzhlNmQwYmI0OTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxN2QzYmFkMDEzY2YzMWQ1NTgxNTE0Y2EwYTRkODg1YWIwMjM3ZTYyYmVkOTAzYjQwMjI0Yzc0MzVmMjU2OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA0YTBiOWYxZWIyZWEzN2Y5YjA4Y2E1MTJjMTA5NTk3OWQ4YmM3MGRhMTA1YmU1MmM0M2FlMmZiYjdmN2UxZDQifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

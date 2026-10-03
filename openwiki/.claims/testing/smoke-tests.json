@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:3c61a9fe55dac0fc46cd02e3fc7c3bfac2396faeace6bf09caab27593a0e40ed",
+  "claims": [
+    {
+      "id": "claim_a5482f1076ea41508e1366035da44584",
+      "statement": "`test/smoke.ts` 由 `npm test`（`node --experimental-strip-types test/smoke.ts`）以裸 Node 运行，不开 EdgeOne 服务、不连飞书、不发真实网络请求，因为这条链路里最容易错的判据（验签与解密顺序、去重窗口、conversation_id、docx 载荷字段名）都不依赖平台；相比之下 tools/*.mjs 的端到端验证脚本需要 AGENT_URL / INTERNAL_TOKEN 等凭证，两者互补而不重叠。",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L96-L101",
+          "version": "repo-lines-v1:sha256:5d0764f111b2a5d92ece34cf04ed081aed1224a1c3d89aff999cd2c5fbf23640:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2M1MDBiNzllMjIyYzc2MTUwMTBiMzMxZjQwMDA2ZWI4YTBjZmFkMjE3OGRlNzVlMWQ3NTcyZGFlNjZmZDFmYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQxMGVlYmZiODI5ZTFjOGRiN2IyZjQ3ODA1YTk1MWQxOTcxZmJkNGIwNjk4MmZkNDA5YjU0OTAwNzQxY2ZjMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDJhMmM5ZDNmZThmMzFjMjg4OTY2OTFlNWE2NDJiZWNlMzhlMTdmOWRjNTE2MzM3ZTIyYzVhNjNkNzQ2MWE2MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTQxNjkxOGM0MGJhYzBkZTgzNWJmMmI3ZTA4OWUyNzk4OWFhZDdjOTNkZWRhMDNhODI0ZjkzYmIxYWE4OWZlNCJ9"
+        },
+        {
+          "resource": "repo://package.json#L12-L14",
+          "version": "repo-lines-v1:sha256:8b8b3febc75758117c66d7da4c9778810fa624a391b77b0657664cb62a88db01:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTViOWFiMDFhYTNkZmIzYWI1ZTkzYWNlMjNhODQ0NmExMjE2MmVjZDAwOGY1MmEzZWNiOWFhZTNiZDY4NmE3YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTJjNGIyNmJhNTNhOWJhYjg3NWVkYzAxMjU0YTVlOGIxZjJmN2FmZTllYmEyN2VjMTQ2ZjZiMTI4OGU2MjA2MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTRiMjkwYzJmMWVkNGU3MTFjMjUzYzQ1ZGQ0MmEyYmVjOTJkMjc1YjljNDQ1NzdiMDA2MTA4ODc3NzNiNDE3ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTcwYTQ4M2JkNzdiZWUxYjk2YTk3NGEwNDFkODdkNzU1OWNmMDdjMWQ3N2IxZjFjYmRiMGZjOWE5MTAzNzk5YSJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1-L31",
+          "version": "repo-lines-v1:sha256:46747b70c92cbe181902544235325c47b3e3a038b2b89a8de1da454054fb0d9e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwMzMxMjE5NDE2OGNhNGMzOGI3OTJkMjcyZGYyNTk5ZGYzNGZjMzkzMTcyYzZjOGIzNGFmNWM3YjI3ZWU1MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyOGVhYWQwODQ2NTIwM2Y2YWU1YzNhMzI4N2EyNTBjNzk0ZmEzZTcxMjQ2YTAwZDAzZDJjMzNhZTBkY2E0M2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a845ba7be67d4815bf3302b25477ad31",
+      "statement": "该套件在一个进程、同一份顶层作用域里顺次 await 十三节 A~M，全局 fetch 被 stubFetch 整体替换、任何一节装桩都会作废前一节的桩，所以小节之间不得互相依赖（每节自装桩、各自定义 ENV）；被替换的全局还包括 K 节临时改写的 globalThis.__EDGEONE_AGENT_RUNTIME__ 与三个 projectId 环境变量，靠 try/finally 还原。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L117-L130",
+          "version": "repo-lines-v1:sha256:b199563322fe5729dd13f346f771b473185d66857f0d9071bd2490566272c0f4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5NTcwYTk1ZWIwMWNiNzQ0OTQxODM5ZDllZmM1ZmU5ZmYyZjZhZmI2MDlkMmFhMGNkZWQzNGQxMmJkNjYxMGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5YzUxYzkyNGUyZjUyMmE3M2FkY2U5YjEwMTk2ZmU0YjRhMGMxNjMzMzVmOTZhMTBkZjExNjEzMDA5YTQ2ODIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwYThhZDliZDlmMzNkNTFjM2U0NTA0OTU1ZmU3ZmNhNzI1YjFiYzc5OGIxYzI1NjRhNmFkMTdjYTY4ZGQyZTgifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2598-L2646",
+          "version": "repo-lines-v1:sha256:909a9972459daa151aaba570544b7a7c1020292058109bb517f3f912b8796e34:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiY2Y0ZGVlODFmN2FmYjhiNjhiOGM5OWZhZmEyODJlNDUzZmUyNDJjN2E3MDk4YzhlMTY3OWRmNjdkZjhlYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyNTg1OTAwMTQ2YTQwNmZlMTlhMmU2MTViMzQxNDEzZWU5OTBhZGUxNmQ5NzVkZjM1ZDE5NjY5YTQ4NGU2MGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmNDY5YTQzYzUxY2M4NTkxODJkMTEzY2U5MzQwOTUzYzFiNmY2MjI4YmNjZTk4MGVhZTQyZjZmZGUwNDViMDIifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L29-L30",
+          "version": "repo-lines-v1:sha256:ad7b5dbad296530dcbc9c6f0a458f83a37d13e0134773df0243f8badb30a9e3a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2VkNjA2NmEwMWFjZDRkN2M4NmU3NGE3YTAyOGIxNzUyYzNlOWMxYThkZTUxMmRjNDkwNDBmNTAzMmM1M2M5ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjc0NmEwYmFmYjA4NTA4NzQ2MDk0Nzg1MTJiMzdkOWNkOWY4ODc5MWMxMDhmMjIzN2Q1NTAyMGZjODcwM2NiYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2I4N2JiNTg1NTUzMzIwMzE1ZTllYmEwMGExMzhiZjY4Y2EyNGZjMmM4NWQ3MjRkYmJlNjM3NTNjMTQ4NDI1MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDExNDY4NjQwYTI3NjFmZGFjZTU1NWE2YjNhZWE0ZGIzZWFhNDcyMDkyZmJjOTAxZmI0NzFjMmJkNGNjYjQxZiJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L3099-L3108",
+          "version": "repo-lines-v1:sha256:1851f2c881e4851831900ebce45132416ca6dc830269ee3c68c821f4914b34f5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1OTQxMDZiN2QxODFjOTgyOWZjNjI2N2MyMGM0MmEyYjFkMzJlODIxYTdjMzNlZWU1ZGU1YTYyYzUzNTI1OTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzYTA2OTRmMjM5ZDA1YTM0NjdhYzhmOGNmMjE5MDA4NWY2NThhYjU1MTllYzUwYzAwYWVjZGI1NjY3ZGVlMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2084dddaeceb4313b36ccabbc3150c43",
+      "statement": "小自研框架（describe/it/eq/ok）按节标记失败信息、捕获单条失败但不中断其余用例，收尾时在 failures 非空的情况下设置 process.exitCode = 1。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L83-L116",
+          "version": "repo-lines-v1:sha256:268d820bc4fca8d6c1c1934c93b3bb824ab47994ff4c1e52e2a179cc399f681b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3ODFmMDMxMmU5MjgxOTA5OGM2MmUyYmIwMDU2ZGZlYzRjYjRkZjUwYmMwNzc5YTdkNDQyNWRiYmRmYzI4NDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5NjJkYjY0MDYwODdkYzkxZjE4N2U4N2I1ZjJjZWE4MTNmOWE3ZjkxMTZiNjhlOTY5Njc0YjdmYmMyNjdkNzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxZTcxMDgzN2JjMTk4MWE2Y2I2Y2JkOTA1ZWFkMTE2OGE1ODhjOWJiZmY3N2I1YjliMWQyMDg2ZjQwYzgyOTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4a1fb15ab98c400484803368a1430877",
+      "statement": "`npm run typecheck` 与 `npm test` 在 `.github/workflows/deploy.yml` 里作为 push main 的部署门禁，挂在 npm install 之后、`edgeone makers deploy` 之前；这两步不依赖 EdgeOne、不连飞书，因此失败总是代码问题而非环境抖动。",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L39-L58",
+          "version": "repo-lines-v1:sha256:2790197c82002c2fe009904084a9e6a41c728e103b8ac26ec8c49c9c661e8b4c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkMGMzNDQ2ZTRjOGEwNzNhNDFjZmRjODMzMTFhOGQwNWRmYThjNzgzYTU4ZDU4YzQ3MWYyN2E5YTEzNDc0ODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgyZWRkMjk3NDI1ODY0YzcwZWExOTE4MWQ3MjdlY2Y1OTY0YzI3NmJmYmM3ZDdjNWNiYWI3MWNmM2Q2NWY5NzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhNjNkOWMzYWZiNTU1NDIxYTIxNzJmZWEyZTZkYzI2ZjFlOGFhZGE3NTZjOWJkOWI4YzBmNDVkNGYyMjYwZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2YjQwNWYwNGRhODdiMTZlZmYzZjFhMmE0MWJlOTZmZDIxMmNkYjlhYTJiZTY3NzM5ZjBiMmQ1OGFkOGI3NjEifQ"
+        },
+        {
+          "resource": "repo://package.json#L7-L17",
+          "version": "repo-lines-v1:sha256:1704dd235597dbd602c8f6993d6b482a11e4d0c120afe6f5d9e241a3c8b8e7d2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlNDAxNjFlZTY5NDhmMGFhM2M1Y2JiNjM3Y2JmOThmYTI4ZWMyYzY4MGZlYmU4NjQ0YTFkNDBlMDQ2OTM0ZjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ2OGI2YTlhNmJhNGFlZmUyNjQxYzMwYTljY2RhNzVkMGExY2M3OTU0YzI4NTFlOTU3NTY5NGIxMDAwNjNjYzAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e7ef043976c24ff28a06b588edd081ab",
+      "statement": "套件跑在 strip-only 的 `--experimental-strip-types` 下，Node 只剥类型、不做代码生成，因此 src/ 不能用 TypeScript 构造函数参数属性（会报 ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX）；FeishuStore 与 UserTokenManager 因此写成手写字段 + 构造器显式赋值 —— 测试的运行时选择对生产代码写法构成约束。",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L12-L14",
+          "version": "repo-lines-v1:sha256:8b8b3febc75758117c66d7da4c9778810fa624a391b77b0657664cb62a88db01:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTViOWFiMDFhYTNkZmIzYWI1ZTkzYWNlMjNhODQ0NmExMjE2MmVjZDAwOGY1MmEzZWNiOWFhZTNiZDY4NmE3YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTJjNGIyNmJhNTNhOWJhYjg3NWVkYzAxMjU0YTVlOGIxZjJmN2FmZTllYmEyN2VjMTQ2ZjZiMTI4OGU2MjA2MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTRiMjkwYzJmMWVkNGU3MTFjMjUzYzQ1ZGQ0MmEyYmVjOTJkMjc1YjljNDQ1NzdiMDA2MTA4ODc3NzNiNDE3ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTcwYTQ4M2JkNzdiZWUxYjk2YTk3NGEwNDFkODdkNzU1OWNmMDdjMWQ3N2IxZjFjYmRiMGZjOWE5MTAzNzk5YSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/store.ts#L104-L114",
+          "version": "repo-lines-v1:sha256:b01353d0782b1e99140b0b1080f5405ed731af6414bae5403181f508c409d150:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg2MGY5NDE5MDUxZjFhYTJkMzVmYjllY2ZhZTBmMzIzMGUwNmJhOWE5YTEwYjUzYjMzMTM3ZWRmYjdkNWFmY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlmMWUxNzI1NjZlMTI2YmU2MmI0ZDY2NjNmZTlkNjIyNzdlMDgxYjc3Yjk4YzAyYjNhOTg1ZGE3YWFjYmE1MTUifQ"
+        },
+        {
+          "resource": "repo://src/feishu/user-token.ts#L66-L73",
+          "version": "repo-lines-v1:sha256:1700cdf78fc67b32f3d434f7793db9b74093a739024861a363601e085672b57a:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2VmNGQ4YjAzMzU4OWY2YzljMThjZTk1MTZiYzMzMWFiNTdmNTQ2MGNjZjRmYzM0MzhlYjc0ODllODcxMGQ0MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDQ1M2I3MjBmOWQ2YTU2YjFjMWY4NTExNmM5ZGJkMTBmNTg1YjNmN2ZmNWJjOTdkMjkyMDM5NzZkYzZiN2RmZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmExYTZjMWU5OGRkNGNjNTEwOTE5YTRiODY5YzllOTY1NDdjZTNlYjYxNjRiYzU0YmIxOGFiZmFlZGI2NTQxNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_20d0faf8efca4e2fae9f2034fab66561",
+      "statement": "工具类测试统一通过 callTool(t, args) 调用 t.invoke({}, JSON.stringify(args)) 并 JSON.parse 结果，因为 @openai/agents-core 的 invoke(runContext, input: string) 会对 JSON 字符串做 parser、解析失败被 toolErrorFunction 兜成一段英文错误文本返回而不抛异常，所以传对象进去表现为「每个工具都返回英文错误」而非报错。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L418-L437",
+          "version": "repo-lines-v1:sha256:59ce770745430b5f2380457a5438f35eb812630e321330f1e200831a6dd92f2a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjMzg3NDFmMjZhZmQ4ODNjYjFmOGU4MGNhNmM1ZTMyMmJhMTk1YWJiYzNjODJiYTY0MzU5YWE2Yzg5NDI4YjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_79476bac52cc4f6989f7ca2017bac6a3",
+      "statement": "E 节用假 Request 端到端驱动 cloud-functions/feishu-webhook：断言 challenge 回声且不验签、token 不对 401、正常消息 ACK 并转发一次、转发带 x-internal-token、sender_type=app 自环防护、chat_id 形状不合法 / 超长文本 / 白名单外静默忽略、非 JSON 400、非 POST 405、缺凭证 503、agent 4xx/5xx 回 500，以及配了 Encrypt Key 时「解密 → 验签 → 转发」的顺序（签名算的是原始 body，不是明文）。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L443-L730",
+          "version": "repo-lines-v1:sha256:c5e8650b5e56c383dab10f53335e42adcc282eddc7ac1273dcfb43f10b5558ad:eyJzZWxlY3RlZExpbmVDb3VudCI6Mjg4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1MzAxOGQxMTBjYjBiMmQ5NmZjZjNiNWU0ZjdmYjQwZTUyODM2NDU2Y2Q2NTJiN2UxYmUzNGYxZTExNzU4ZTIxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJmNmY1YjQwYjE1ODQ1N2QxNzg2NGYyMTc5MDc4NmRkNWEyZWNkYjY0YjY2YTY1MWY3ODhkNGUyNWNkMzMwM2QyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjMjc3MDc4YjdkZWVkNjE0NGZhMTQ1MDY1NmEzMGZiYzY3NGM4ZTMxYzc0YTNhMzIxNDMxNWY4MDM0NjJhYWVkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlYjllMjM0ZmFmYTMwY2ZkMWE5NzNiZmI4NjQ3ZTAwOGE3ZTNlMTM2MmMxYTU4ODM0MjEzZGE3YmY1ZTczMGZhIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_378a1e0ed3ec491b86fcbda74251b61f",
+      "statement": "E 节断言 conversation_id 满足平台约束：以 `fs-` 开头、长度落在 6~36 字符、字符集匹配 /^[0-9a-zA-Z._-]+$/，并把反例本身钉死（`fs-${REAL_CHAT_ID}` 长 38 字符、超过 36 上限 —— 即原版写法全线 400 的原因）；同 chat 永远同 id、不同 chat 不同 id（粘性路由的前提）。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L505-L539",
+          "version": "repo-lines-v1:sha256:607f2ee213d0915ab5f177204ba7c9bd61067c9f3a3cb1b4ab29f6c630de961f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Nzc4OGQ5OGRiNjhkNjAwMWJkNGI0N2E0MzhmYzJmZmM2NmFlN2FkZThhMDAzYjk5OGFhNmU1YTlkZDRmYTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU2NWI0NmUxZjczNjc4ODEyN2YwYzY1MTU1YmUyMDkxNjJlOTE4MDg5ZDFjMjZkYjVlMzcyMTk0MjY5YjFiMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEyMWQ3NTc3ZGIyMTBmZDU0Zjg3MTk3N2VkYTg2NDI0OGU5MzdhZmUxZDQyOTRjYzJjNDNjMmM5MDdjY2Q0YzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8cbf4fd08530433b9da00f7e49d15886",
+      "statement": "F 节以宿主 stub 端到端驱动 runFeishuTurn：命令各自路由到对应宿主方法、/forget 把键名（含空串）原样透传、宿主抛错时仍发得出消息而非静默、streamed=true 时不再补发文本、元命令不调用 host.ask，且 /repo 只回「不认识的命令」不落到模型。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L736-L961",
+          "version": "repo-lines-v1:sha256:97a7dc9483a94fc7ba801c53b9d5be6a0adb5e2098dd6d6b0579a461250958e5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjI2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3MTU3ZmZlMDVkYzhjYWZhYTk1NDhjYmJlOWZlNjdlZmRhYzhmOTQ3NzQ0NTYwY2RhYjQ2NjU5OGU5NzA0ZjE5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJmNmY1YjQwYjE1ODQ1N2QxNzg2NGYyMTc5MDc4NmRkNWEyZWNkYjY0YjY2YTY1MWY3ODhkNGUyNWNkMzMwM2QyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwOWVmNjdlMjYyNTY0YmUwYzViNjBhYzBlZWFlODBjNmVjNjhkYzhlNzJmZWU3YmEwODg4YTkxOTkwMjAxYzRlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlY2ZhZDA2MzEzOGEzYTk1Y2Q4MjlkZWE5N2QxNmNmOGE0NmM0MGFkNzExMGNlMTU0YTMyZjZmMjkyODY1ZGYxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_0e7871dbfe044424b2ed3045a0002c7b",
+      "statement": "G 节把自动压缩的判据 shouldCompact **等价于「renderTranscript 会不会被截断」** 写成断言（只与截断标记有关、与条数无关），并单独钉住 renderTranscript(items).includes(\"中间省略约\") —— 该标记与 clampTranscript 共用 compact.ts 的 CLAMP_MARKER，改短省略文案会让自动压缩静默失效，这条断言就是拦截点。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/compact.ts#L41-L48",
+          "version": "repo-lines-v1:sha256:0b5965aad213c212376c114ce3089f8cd2097a475f5fdda5be4a8b4818a84299:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTk5NzhmZTVkYWFkOWE4Y2VlM2FkZTUwMjA4YjczMGYyZjk2MzRiMzhlNzY2M2FjZjkwODg2NDU3NmM0NmZmOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzFiNDkyNjU1ZDMzNThiMDZkYjM4ZDY2OGE5NjI1NzJlNmFhZWM3YmY5OGJiMTEyZDBjZjk5NDU5NjU2MGRlMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDExYTRhMzBjZDU1MGE0ZjljOWM1Y2I5NTI0YWViMDY3YjlhOTdmNjU1ZGRmY2VkMDQxNmVkMzlhM2FmZmMxYSJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1038-L1076",
+          "version": "repo-lines-v1:sha256:55f860ad55ffb939eaff0287e4f2dd387d9f82faa1f368facda08f82a4f60639:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1MmU4MmE1NjgzOTQ1NjhiODZkM2I3NmJmMTQwNDhhMjc0YTBkNmMxM2I2M2UwYTZjNzhjYjhkMWM3YzQyZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZjZWY1OTlmMzU5MGYzMGQwNDJjOGY4NWMxZjQ3ZjczNDBmNjQ4YTVlMWY4MWQ4OTBiOTQ4YzE1NjA0OTJlYzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzZTllM2M5ZWUyMTA4YjJkNTUzNTZhYWFjNzU1NGZkOTE2NWJjOTI3ZGEyMDJiNjA2OTM2YTUyMjg4ZjFjNjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a8bf53eae4144d42aa0145ead8e61e41",
+      "statement": "J 节把「断言抄实现」这个假信心陷阱本身做成断言：feishu_docx_write 的段落载荷字段名真实是 `text`，期望值曾写成 `paragraph`（与刚写完的实现出自同一份误解）导致测试长期全绿而真实 API 回 1770001 invalid param；现在同时正断言 text.elements[0].text_run.content、反断言 !(\"paragraph\" in para)，新建文档那条也复用同一判据。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L1649-L1678",
+          "version": "repo-lines-v1:sha256:35356ed69a18e8e155afc37d8cc7070218540a57cbcb8537d1160070c5a85c0d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5MDViNTQ2MDc0YWRkYzAyMTk3YmMxYTc4ZWZmODI2Mjc1MmIyYjViOTc5NGNkNDkyMTRmYTUyMWNmMTU0NGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBlYzg4OTI3MDUwYmM2Nzc3ZGY4ZDgyYmI2YWIwYTM4ZDQ0ZGJmOTQ0YjM5OTBkYTNhMGM2MDM0N2EwNGNjNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRkZDZhYjcxMzBjNGE1OGJiODI3MjUwNzNjYzY1ODIyMTQzYmZlZTZhMTU2MDRkNTlhMDExZjcwYmM4MWQzMDAifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2155-L2179",
+          "version": "repo-lines-v1:sha256:ad33d11a687013e2a428c90164243d4f67b79ebd8e291d158bd9d56c7c62fb77:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyZDZmNjc3Nzc1ZjRiZDMyYzkyYTAzYzI2ODY5Y2FiMDNkN2ZiMDE0MmI3NzI1OGMwOTU2ZWE3OTkyOWRjYTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5ZmIyN2EwYTJlOGVlNzhlNTU0YThlYjRmNDYyMTU0MzA5N2E4MGZkOGMwOTU5YmMwNmMwNWQxOGZiNGIyNzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYwZDA0YjhmMDIwMDdmZTEyNjcyNDRmOTJkYTkxMDU3MDQxNzUxNmQyNzgxMmM0OWQ0NDM4NWEwYjE1ZTRiNGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d003ecc0ebb04302bb8f1a36c8a28410",
+      "statement": "J 节为身份敏感路径补了两条显式授权断言：建文档走用户身份时 tenant_access_token 的调用次数必须为 0 且建 + 追加两跳的 authorization 都是 Bearer at-1；未授权时不退回应用身份（tenant_access_token 与 POST /docx/v1/documents 调用次数都为 0）并给出 /login。这补上了此前 4 条创建测试全绿却区分不出身份（按 URL 路由的桩谁发的都接）的缺口。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L1706-L1746",
+          "version": "repo-lines-v1:sha256:95b0088580edd59d9ee05708f7e8a9b28ce5bcb9539f7f083788d0c8b35fdb98:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhMzhkMzZhNTNlMjhkODdjYzFlZmI1NTUzMjE5NTE3ZDhhNDFhN2UwYzE0NDZmMTRjYjE3MmZiODgzNGFkMTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3MTc1YmIxMmZkNjRiYmM5MDgwNjk3NDQ0ZjQxNzI1YWYwMGE1Zjg0ZDUzYzIwZDlkNDU2MjU3YTNlZDVlZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1NzgxOGEyYmZlNjhmZmUzN2M1YThiZDE1ZWM4NTNjN2FiODhiODNhNjIzMGRjMmRjNGYwMjUwODAzNzEwOWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_90601d906bf44eacbaf297d02889d5ba",
+      "statement": "J 节用「调用次数 + 认证头序列」验证云文档读取的三层身份兜底：raw_content 恰好发三次，authorization 依次为 Bearer tt-1（应用）→ Bearer at-stale（用户被判无效）→ Bearer at-fresh（续期后重试）——因为只断言「最终读到了正文」无法区分三层兜底与一步成功。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L1966-L2010",
+          "version": "repo-lines-v1:sha256:dc3ebbeb51f003dbeee51b380902c1ddc8257954b252a023066ff61c16456da7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5MzY4MjRkMGI1ZGQxY2ViNmIxODMyODRiYmIwYmZiZjdkOThmNzJhOWIzZmQ0ZTQ2NjIxMTBjYjg3YzkyYTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxMDA4Mzk0OTlhMTIxYmM0M2IyODdlYzEyOTQ1ZDlkNGU5ODE3ZmYwNmU0MjVkZWQzY2M0Zjg4MDQzNmRlMjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImExZTk5MWRlYTlhN2VlMGExMDVlNjRlZWUwYWFjMDQ5NjhmNGUyNThiNTUyNDgwY2VhZTNjNjJkNGI5NTQ2ZTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_40269e5329594579ba6baae68190fbba",
+      "statement": "H 节有一条跨仓库签名的守门测试：signState 对固定输入必须签出固定串（测试里内联的 base64url 串 + `.wsYFQ-kz...` 签名），且不得带 base64 填充 —— 本仓库用 WebCrypto、中转用 node:crypto，任何一边的填充或 HMAC 参数不同都会让整条授权链路静默断在「链接无效」上。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L1166-L1185",
+          "version": "repo-lines-v1:sha256:ab89956c4e11d0ef4289e4d3b3584b077a0de98ee02caa6d71920d029638d494:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyODJhYjNjYzQ5MTdhOGVlZmIzOTRhNjg3NmRkNjJlYWRiNTE5MTBhNWE5ZjdhZWNhYzEwNDZiZWFlNjIwYjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzY2MzZDNjNDhlNTc4MTc1MDRjOWQ2NzZlMWI2OWRjZmVhY2Y2NTBkYzY2NDlkOTQ0MTlhZjBmMTAwNDRjM2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQxNTBkMzViYTUwYzliNDEzMTI0ZDkyMjllNTk0NjAzNzY0OWY1YTE1ZDM5OTM4YjU0YThhYWQ1MWM2ZmYyNzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_042ef71aeeca4b3ab89b1aa11a53d9e9",
+      "statement": "D 节把去重语义钉成「判据是时间窗口而不是状态」：markDone 之后窗口内仍然拦住、窗口外同 id 重新放行；并对 recentCount / overLimit（10 条）、prune 的 TTL、token 缓存跨实例恢复、事件数组 ≤500 条上限各有一条断言。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L356-L416",
+          "version": "repo-lines-v1:sha256:7b26ead187964a6fd79b23a5a9643bb665caa6157103db7ccd83a9955a5f004e:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxM2IyYzNlYmU0YTZlNjc4ZjhhYjE0MWI1ZWEyOTdmOTIyOGNkNTI0ODdhMGZlMGRkMDQ0ODVmMzMxYTkwODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkMjJkNzlkNDNlN2IxNzI2MDQzYzRmM2U3NzZlNGJlN2ZmYmQzOWU3Y2Y3NzhiNzlmNjlmODUxMDRhYTRmY2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhMGM5YmRiNDAxZDQ5MTcwZjdmYzM2ODU4MDc5MmU5YmNiNmQzODk0MDU0MzFhNjBkYWM3ZWZiMzllM2QxYWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a49f24dbd4c7427aabff0ba3082b5758",
+      "statement": "I 节覆盖用户令牌管理器的续期不变量：响应没带 refresh_token 时必须保留旧值（否则唯一的长效凭据被写成空串）、并发取令牌只续一次（单飞）、续期失败先重读一次再重试、怎么都不行时清掉坏记录并返回 needAuth、invalidate 绕过时间判据；并断言不同 openId 用不同槽（共用槽会让群里最后授权的人把权限出借给全群）。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L1240-L1435",
+          "version": "repo-lines-v1:sha256:9354ccf0c09ad2dc1d40ac841ba5134ea257870ff95438c8f0e578cd081f0dca:eyJzZWxlY3RlZExpbmVDb3VudCI6MTk2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxZmJmY2ZkMGM4ZWEyODg5MjMxZGYzNjZiYjMxYTQ0ZGJlOWI1YjA5OTFkYjVlNDA5MDgyOTRlYzg3ZTNlMWNkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIzYTNlNDZmOTQyNzZiNmY2ZjRlZDFmMDJhZjc4YmVmNmEyZWUxYzQzOWRkNTU4NGI5NzM5NDgzMTMyMTRkMmI3IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjM2JkMTdlMGM3YjEyY2EwMmRmOGRhYWIxZGFlOTViZjEwMDkxMjA3ZTdjMTI3NDY0NDRlMGJjNzEyNjVkZDA5IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlY2Q5ZGVkOWIwNTBiMTNjMDg1OWNlMDJkMGQyNzJjOWViMjY3MjkyZTY5MzRhODJiZDUzZTgzODhhMDZkM2UzIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_4a01aaf123e34686aa3d72184d253971",
+      "statement": "K 节钉住记忆的权限边界在**每个入口**都成立：recall_facts 不返回别人的按人记忆（模型侧这个入口曾漏过滤，群聊里任何人问一句就能拿到别人的个人事实）、forget_fact 与 forgetLoose 删不掉别人的、renderForPrompt/renderMemoryList 只显示提问人自己的，且拿不到身份时按人的记忆一律不可见。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L2313-L2326",
+          "version": "repo-lines-v1:sha256:262a3129a24347b27af092487387982b765eceb9e9d4cd474c3dfc62bd30218b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxZTcwZWUwZDdmMmRjZDdlZTIyYjE4YzRkNTc3NTdmOWMwNDI1NzJlZDIwYjU5NzUxM2ViOWQ3MjU4Y2YwYjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwNWUwOGZmOTk5Yzc1ZDhkZWFiYzk2MzgzMTczYzU3NTQ4YWFjNDlhNGU4YjM2ZGIzZjdjODFlMjA0M2EyYmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlODRjNzgxMjI1YmIwMjUyYjhhZGIwZTE2NmFhYjkzYjc3ZGYwM2IwN2YzMThlOWQwYjYyMDZjYjI1NzJiYTQifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2417-L2483",
+          "version": "repo-lines-v1:sha256:b66432d5784c8bef7cb301a0aa6b08d00638ebc6bc8814987ba0bfcf54f3d8eb:eyJzZWxlY3RlZExpbmVDb3VudCI6NjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRlZjY5NTlmZjBkM2ZhNDkzMTMxODQyMWVkNWE0N2Q2YmMwMmNhOGQ5YWQ0MWIzZjA4ZmI1YmE3NGI3MWZhNzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViNmIxYWVhMzg1MjFhMjFmNzJhMWMyNjAyYjI0NjVkYTI4YWNlMjA0ZGIyNmMzOWY4ZWQ0ODA0MWJiMzViOTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5ZTM5NGRmYjc4MDFhODAyMjlmYzEwZGUyODMxOWQwNTMxZDJjNTU2NzgyYzcxNmNjYTllZjZmMDVhYjA4MjQifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2575-L2588",
+          "version": "repo-lines-v1:sha256:366b91f4784d05ef6a70388b5eb48cfb2e55ecf963af5627dc6970b672a81d2f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ODBjMWNjYTZhYzQ5MDkyODYyNjQyNzIxZmRiOTkwMzljYmYzZjJhYWExODg0MTc2ZmI2ZTRlNjcxNGU1OGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmMTEzMDQxOTM4YmNkN2FjMjM2NzYyZTUxZTQ3NGM3ZjgyMzBkZjMyYTcwM2Y0N2ViN2Y2MWI5MTY2NjE5ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmOTJmMDZmZTFjMDEzMTJmOWU2MWFmZTlhN2ZiMjg3NzUyYjIzYWYyZWZjMWYwZmQzY2VkZTIwNTRiYjU0MDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2906c2b409b2496fa3342afd1bbc7460",
+      "statement": "K 节把「写入前后 recall 读数不同（0 → 2）是正常序列」钉住：提示词末尾的清单是本轮快照、recall_facts 是实时查询，list 写后立即可见 —— 免得有人看到变化去改存储层，重演线上模型当众撤回正确答案那次故障。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L2352-L2373",
+          "version": "repo-lines-v1:sha256:494c5ec90886e0ed084444c81440f6d4ee68445f8c376909ead44aa640c0e9b7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzMDU5ZDVlNTdhZmQ2OTdlNDQ1MTY2NDA2ZjkzNjJkZDQ4MGNlN2RjYmQ3ZWY1ZjNlNzJkMWEzOWE0YzEzOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEwNjlmOTNhNjhkOTU1OWU5NzA4NTQ4NTAwZDZjNjBkYzBiY2U4ZTdlNTBhODYzMzRhZWQwM2NjNGE4MGJkOGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImExYmYzNzI5Zjg2ZmU0Yzg5MjNmNTUwMWRlNjE1MDBlMDhhNGU3ZGI0OTdmOWZjMDI1MzZjZDhiYWFjMTViNzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_77d6b5b7a3b64d84bdfc297b9f97d721",
+      "statement": "K 节还断言「一个 key 只装一件事」这条规则写在模型看得见的地方（remember_fact 的 description 与 key 字段说明），而不是只留在源码注释里 —— 线上实测这条规则只在注释里时模型会把两条事实并成一个 key，丢掉「不丢更新」的保证。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/global-memory.ts#L551-L552",
+          "version": "repo-lines-v1:sha256:dfcf027fae7482124e694b1dd1a1265d2015387fd849001cdd76adb8343cc9af:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMThkYWQyYzU0NDBmYzU0MDRhNTQ0ODQyMGQyMmU0ZGM3OGFlOGQxZTFjYzE5M2M4NWIyYzA3ZDZjODFlYTQ4NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWZjNGQzNWQzNjBkNjNhOTZjNTdlZDJkZjY3ZWQ1ODZjZTJiMmNkMGFmNmE3MWQxOTQwNzVmNDllNmMyMzZkOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzE1MDE1ZDZjODA1NTRkZjE0MGIyODg4NzJhMWViNTI4MGJmYzM3MDVhYjI4MWYxZTMwODY1YjBiZGNkNWZlMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODMxYThiZmU4MmQ0NjliODY2M2ViZjVhYjdlZDBjYTY3ODcwODRlMTU5Njk3ZGM2MDM5OTU3MzMzMTQ2ZjAwMyJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2375-L2400",
+          "version": "repo-lines-v1:sha256:08ef55a2881aa4886809aab505161ffcebbe8b3348ceda09e6a51ab8a3107af4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFjZGRkMDI0MTEwMjlhOGVlNjk1NDhkNDZiNWI5N2ZhZmMzNTBmNDNmYjI4Zjk0N2NkOTJjNzI5M2M4NDg4OTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlZTY1ODdmMzhjMzJiZjg5ZGVkMTZlMTY1NmQ0Njg1M2VkMTQyODhiZTQ0MjgwMzY0OTM4NTczNWEyOWZiYmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhM2UwMDEzZDQ0ZDVmMDg5OWFkYmE2NmZkM2NhNWJmYTUxMGVhNmJkYzA1OTg5NTg1ZDJjMTRlOGEzMWU4YWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_278ec0d727c846a292a8758e50b60fcd",
+      "statement": "M 节的重点是副作用对外可见的边界而非「能不能开」：没配 token 或没配仓库白名单时整族工具不挂、白名单大小写不敏感、白名单外拒绝且列出允许哪些并一个请求都不发、开 issue 的请求体只含 title/body、token 绝不出现在错误信息里（403/401 文案要指明是人该处理的）。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L2969-L3094",
+          "version": "repo-lines-v1:sha256:cc4aedd7514c2f1d9df0cb9c513dfc6dca769639a0ec82bcb7ab5e7d077cd8c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YjYxOTFiZDg2ZTI2NmFiOTM0NjIwOGU5ODE1MjBiNzM5YzNhYmZiNTgwNzRlMDBmMTA0NjMzMDllYWJiNGFmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIzYTNlNDZmOTQyNzZiNmY2ZjRlZDFmMDJhZjc4YmVmNmEyZWUxYzQzOWRkNTU4NGI5NzM5NDgzMTMyMTRkMmI3IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyZDkxYWIxYzY3NzVkYzE2NjlmZTJiYmE5OTc4MDc5ODMxYWNlNGE2Y2QxOGIxNzFiY2U1NmZjMTBmMzk5NGY5IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4YjkxOGU1ZTlmNTdmN2Y3NDA5YTRiZGJhNzM0M2VmYTQyNmMzMThkYTUzZmQ5N2ZiMTBlMGU2MDA2NWFmZTkxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_956fb1232a6749aeb695e186acfbac1a",
+      "statement": "L 节断言 ws_commit 的**核心价值是一次提交多个文件只产生一个 commit**（POST /git/commits 恰好一次，3 写 + 1 删各一个 blob），且建树必须带 base_tree（否则 GitHub 会用新树替换整棵树、未提到的文件全丢），删除用 sha:null 表达。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L2864-L2939",
+          "version": "repo-lines-v1:sha256:eb9e4860a0cc950de1519635c4d02a248085153015119c6f013ccf51074cacae:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzMjc4Zjk3ODYxZTVlYjExZDdlMTM5YjQ4NmI0MjY0Y2ZmY2ZjMGMzMTE5YTFmOTExMjA4YzhlNmQwYmI0OTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxN2QzYmFkMDEzY2YzMWQ1NTgxNTE0Y2EwYTRkODg1YWIwMjM3ZTYyYmVkOTAzYjQwMjI0Yzc0MzVmMjU2OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFmNTdhMTU3YTU4MmU2MGI5NjRhMzIxY2ZmOTcyYzIyMWViNTAxZjdjNDI0NGQ2YmExNTJlNTA5NDRlNGZlOGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_60f41745cc3247ed9fa58ca5d967cac7",
+      "statement": "文件里还有一段无字母编号的会话历史消毒分组（裸块 + `await it(...)`，不算一节），覆盖 sanitizeHistory / sanitizeAndAppend：开头与中间的孤儿 tool 消息丢弃、同一 callId 只消费一次、空 assistant 丢弃、有 tool_calls 无文本的 assistant 必须留、丢弃时回调而没丢时不回调。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L2192-L2288",
+          "version": "repo-lines-v1:sha256:9687b5df4e1ce2337058ad1232f040a1148b189eb4dd459167588b580ca06e74:eyJzZWxlY3RlZExpbmVDb3VudCI6OTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwOWQ3MTk0MzNmZjgxZjdlMGJhN2ZkZDJmNDdjZjU4YmFmZTg1NzZlY2M2MDczZTg5NGQ1MzUzMmQ1YjIyYjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczZDQwMTEzNTA3ZWE2YzQ1Mzc5ZWRlOTlkZWFjY2Y3MWNmODYyN2ZlZTg2M2FlOGI5NWU1YmRiMTk1OTAwMGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0bc02230bb5c4093aa86f90d959c7a0f",
+      "statement": "套件的覆盖面有结构性缺口：断言方向全是白盒（不含任何来自真实飞书或 GitHub 响应的证据，桩的形状本身可能是错的，如 SH1 那套理想化响应掩盖了「飞书把整个网格补空行回给你」这个 bug，直到 SH2 按真实形状构造才暴露）；真实飞书入站 webhook 这一跳没有任何自动化证据（README 明说没跑过）；shouldCompact 在真实会话里的触发与平台侧静默施加的配置（openaiSession 的 100 条窗口、沙箱工具注册名、tools.all() 的对象形状）同样验不到。",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L29-L30",
+          "version": "repo-lines-v1:sha256:539b6f0cc07def103d9425ab135d40622c95c8937603154a4d7ddaf7f6e82f8c:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjI1ZjdlNTY2ZWUwMDZkNzQ3NzU4YzIzYjc4MTU4NGRjMTRlYzg1MDY3ODliZjk2NGNlZTRiMTY1MmM5MTI0YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjE3MGE5NjExMTQ4YjljNDkwNWI1ODlmMGE2OWIwODM0ZmQ2Y2JjMzM3Mzc1MGE0ZGZjNzk4MDhkMDA2YjEzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWIzZDM4ZjMyNTllYjQzNzNhYjAxYTY1YWQ4NDU5YzRkYTYzNTBlODE3ZjhlMGMyZGRiZjY5ZWVjY2Q3ZjZjNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2RlYjJkODBiYzA2ZmIxMzVjMTkxNmRiYmFhMmQ2ZGEyZGJmYWJhMTUyMDUwMTFjYWUwN2M5N2I2ZGViZDUxMCJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1522-L1549",
+          "version": "repo-lines-v1:sha256:3c206f9d12edacf985c09ef3e9d3ab58f76ab2b489d9d37b7434bf04b4122c7a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwYzc0NmRmOWY0MDE0NjEwZDBlZTBlM2U3NWY2YTIyODhmNzFkZTFkMjZjMjQ1YWE4ZDI3Mjc5NDU1NDZiMjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMwNjNiZjJlNzlmMDBjMDliZmUwNGExMzVkZmRjNmY4NTk1ZjUyODU2MmIzMWFlNDIzY2ZkN2MxNGI2MDlhNWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlZGMwMGQxMGNhZTU3ZTYwMTBjY2FjNDBmNmE1NzBjMTA5MzQzMjRmMThmYjk5ODQ3YmE4Y2YyY2ZmNTQ4YjYifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L652-L667",
+          "version": "repo-lines-v1:sha256:6e4e345ccded6c4f6f1f7be0c52770c49b15e00affff405803788a06703c4b51:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4YjIxYmQ1MzUxNmEzMmQyMmYxOGFkNzk4YWRmZGIwMDAxMjA5YmM1MDc4NjBlNGU2OTNhZTk2OTJiMjE0MWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlNDIyZTdiZDQzNmI0ZTFlYTAyZGI5NjljY2MxMDNmZjVlMDJmNmY4NWMwOThlMDIzMjEzNDk5YmNkY2NlYTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_395a89bfd93a46f6971984dd5af54a83",
+      "statement": "维护这套测试的不变量是：每节自带桩、绝不跨节依赖（忘了装桩会以「测试没有为这个请求准备响应」失败而不是静默跳过）；带着解释「为什么这条判据存在」的注释不能随重构删掉；断言消息要写清期望、实际与为什么重要，因为这条链路里最贵的成本是误诊而不是执行时间。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L119-L130",
+          "version": "repo-lines-v1:sha256:dbe8ed3878fcb7e7487b322619d9662a73993fb01acdcd510bf64df982e1c900:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjZGM0YTUyM2UxOTdlZTY0NDJkNzRiZDNkMWNhMTNmYjRkZjBhZDBhODE3ZTg4NzZhODM3NDNhZmQxZGE1MDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3YzhlZGYwMzg3OWEzMzhmZTM2NTM4YWNmMGQzNzhmMWYwZTk3ODM0NjMxZjUxODlhM2QzZGU0MjNmYzQyYjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwYThhZDliZDlmMzNkNTFjM2U0NTA0OTU1ZmU3ZmNhNzI1YjFiYzc5OGIxYzI1NjRhNmFkMTdjYTY4ZGQyZTgifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L505-L518",
+          "version": "repo-lines-v1:sha256:9fa1755acff2e0f000f7f25de4677098480bcf6816dc3a0b51323703ef779867:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Nzc4OGQ5OGRiNjhkNjAwMWJkNGI0N2E0MzhmYzJmZmM2NmFlN2FkZThhMDAzYjk5OGFhNmU1YTlkZDRmYTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU2NWI0NmUxZjczNjc4ODEyN2YwYzY1MTU1YmUyMDkxNjJlOTE4MDg5ZDFjMjZkYjVlMzcyMTk0MjY5YjFiMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlYWQ2NmZhNTQ0MWRmNmU5NWIwNmRlMTQxZDZjY2I3YjAwODY0NTg3ZjlkZmMxZTJmYjc1NmI3NDAwZDgwYmIifQ"
+        },
+        {
+          "resource": "repo://tools/ask-bot.mjs#L1-L20",
+          "version": "repo-lines-v1:sha256:2c972965d57ced0d850d1595c910019444a5de8ad334c13cbb3b192a04830144:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwN2E4ZTQ4ODdiZWViYmRiNmFlNTJhMDA3MTkwZjdlN2JhZjgwMDY1MWQ4OGY1MzFkZGE1ZGI3ZDcxYWRlODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhMmViYmYxMWQ1MmQzMGIzZmJiMzk4NmJjNTJkYzRmM2MyODM3YjMxMzdmYjViOTg3MGY5MDBkZTExMzQxYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2NmMzMDhjMWNmNDFlMmEwN2RjMzQyZTgzNGNhNDk4NTViNWJlM2U3MmIwYTA4NDc2ZDU0Y2U4ZTc5ZTU4YTkifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

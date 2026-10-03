@@ -12,3 +12,7 @@ dist/
 
 # Tencent Cloud EdgeOne
 .tef_dist/*
+
+# OpenWiki 的**运行期**状态：run 进行中才存在，finish 后自动删除。
+# 其余 openwiki/ 内容（含 .claims/、.page-manifest.json）都是要入库的。
+openwiki/.run.json

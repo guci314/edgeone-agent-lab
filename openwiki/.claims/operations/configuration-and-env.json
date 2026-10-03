@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:f9932ca4b92d698856c87d2d462259f385f9bd27bcfbe468d607c25e7d0d687d",
+  "claims": [
+    {
+      "id": "claim_7a4f25115ebc4fd99f6bf4caa3354708",
+      "statement": "OpenWiki does not read .gitignore and reads the workspace rather than the git index, so .openwikiignore is the only exclusion file it honors; it must explicitly list .env and its variants, otherwise live secrets would be read as corpus and written into the git-committed openwiki/ pages (a second-order leak after the earlier .env exposure incident).",
+      "evidence": [
+        {
+          "resource": "repo://.gitignore#L1-L14",
+          "version": "repo-lines-v1:sha256:d2d93a37811c8df369b75f65f0a4ae5800dab5dfbea38d75a0232466c347a89c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNTY5NTJiMGZiMTNiZjhmOWI2YzEzYTZkNGMzNGEwNzViYWMzYWY0NDc2MzZhMWRmNDMzNWQ3NTc2ZTJmOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2ODZjOTMzZjI1YjdjYWZkMmIwYzE4MTVkNjgzZWZmMmMwYzY3ZWI3MzFmYzBlNzAyZGRkYjU1ZGExOWNiMzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://.openwikiignore#L1-L37",
+          "version": "repo-lines-v1:sha256:4f6be838dbf615ae1416e97c4d1c3e36f55939728fc5508c3f9b1b499f964464:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhNTNmNzllODBjN2Y3M2MyZWNhOGQwZWRjMDNjM2I4ODkzMzUwNGM5YjQ2YWM3YzU0ZDRmZDE3YWIxODg5MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmMjM3YzdhZmY0NGVmYmU2ZTUwMmU2NDVjM2UwNmRhMDNhNjlkN2JkZWI0MzM5MjEwOGVmMzM0ODE0MzQxN2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a351fd1e4f1541f2bfa8022f49d07ecd",
+      "statement": "INTERNAL_TOKEN is a fail-closed gate enforced at both entrypoints: agents/feishu/index.ts returns 503 when the token is unset and 401 on mismatch, and cloud-functions/feishu-webhook/index.ts likewise returns 503 when unset — because the agents/ route is publicly reachable and anyone could otherwise burn the project's model quota.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L16-L19",
+          "version": "repo-lines-v1:sha256:9352035d12709ed23165128451ea2b442ccaf1b37c4a0e28752d032e2cf471fc:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjY0Y2UxNzA3YmRkNDQ3MmNmNTNjMTI1ODkzY2RmYjU4NTI4NGZkYTkzZDI0NzdhNTlmMDQ3YmQ5YzFkMTVhYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzU3NjFlZGVjOWFmZjRjNDg0OWJlMGVmY2NhNDk4ZWY0ZjAzMzIxZmIzZDkxZTgxMWYxZTUyZGMwMTE5N2MyOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTQ0ZmU0NjNlZjFkMmNlMTNhYzI4MTYwMjJjZDliYTJmNmZiOTc2MjQwNjRlMGFkNTcxNzU3ZWQwMDcxOWFhNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjNmZTM4ZWE4M2FlNjgwNDhjMjVkZTFkY2M2MGMyZmUwMWI0ZjU0NGE4MmJjYmI3NmU5YWMzODI2MmMwNGRlNSJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/index.ts#L77-L99",
+          "version": "repo-lines-v1:sha256:008416a11811933f9f8aa01e5be383232838aa17e4f367a1e55a87f5193b614e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZDk5ZDJkOTI5NzFmNjJhODkxODQ3NTVhMGY2YTU5YjFlOTUzMjk2N2U4MWEyM2M4M2M3YWMyYjZmYmFkNjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkZGQ4OGM0YmI5MWRlMWE2YmRiNzVmMWU5Yjg2NzU3NGNhZTAwY2IwOTBlNDA3MzYwNzg1NzJmMmRkYzliYmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlOGU2M2RiM2Q0MWYxNzI4ZjA0ZGE0MGE1NWJhZjMzNjM0NmJhZTVjYjczZjE0OGE2ZjIyMGU2MjhmYjI2Y2EifQ"
+        },
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L100-L109",
+          "version": "repo-lines-v1:sha256:aaa0ee7fbd660345a9bf7d993825ac34c291492fbc72e24dc12f05474f8d105e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4ZWRlYzI0Y2MxMDFhN2I0MGJmMzM5NTQ5OGQ1ODI3OGE2ZTNmYmViMTYxNDA5ZjUwNzQ4YzQzZTU4NWQ4MzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ5NmJmNDE4NTQ2NzdlNjVmMGNiYzY1NDVkM2E1MDQyOTI3MTFmZWFmOGFiNzFlMGI5ZTIzNjU4ZTQxYjA2OTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE3MGI2ZDhhNjJkNzJjNDA0MGFlMGU0ZGIwN2E0MDE5YjhmNWI0ZDE3YjY5N2IwOWYyZDczNjIzNzNkY2M3YTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6e9de3ef602c463ea1d94d785ae773bc",
+      "statement": "INTERNAL_TOKEN doubles as the HMAC signing key for OAuth state: /login signs state with it and the OAuth callback verifies with the same value, so the CF relay (cf-agent-lab) that holds the same EO_INTERNAL_TOKEN value can verify it without distributing an extra secret.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L712-L733",
+          "version": "repo-lines-v1:sha256:9a0bf1fd4ad09ac4ac833c76349910b617f2c86a44b168bd08d8a53f501f9633:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyM2EyMjdjYWViMzZjZmMyZTMyNjBjOGYxYTQwMWUxMjdjOTRiN2VlZDE3M2U3ZjZmZTkzYmJmYmE3MTVmNjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhN2ZlZGFiZmQ4NmVmMmE1ZDBjZDk2Yjk5YTUwYWNkOTZmOWY3Y2M3MTQ0YWY4YTBlOWRmNjNmNzIxNTMxNDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNmYTYzMjU3OGE1Mjc1NjUxZTgxNWFiNTI5ZWFlOTMyZjc4YjA1MjE5OWU1Nzg0MDdiNDgzYjI3NTEyMzM0ZDUifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/index.ts#L202-L221",
+          "version": "repo-lines-v1:sha256:f47eac4d0f085914dc105149e965c9741d3da6a9b042c426712521355b7c7fc8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhYWE3NzI1ZmI5NGI3MjIyZTAzM2U1NWJiMmVhYTUwMDg0YTRkZjI3Mzc1ZGIzMzAwZjRkMjNkZDZiYTNjMWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRmNjlkMTE1ZWJmODhhNGMxY2QyYTNkZTc5MmFkNjY2M2U0NTFhZDU4NTU4MmMwMzExMWZjNTMyYmE2MDg2NzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwZWJkODQ5NjgzMDBjMDRlMWYyMmFlYzgzNmY5MGZhNmUwYTUyYTNkMzI3MDZjYTkwZDk0YjBjODEzODM5NTkifQ"
+        },
+        {
+          "resource": "repo://src/feishu/oauth.ts#L58-L79",
+          "version": "repo-lines-v1:sha256:5e8656b378e0ff77d6efd576e1170dfc1e0386f0d2ed0cd635c7ac94d73432fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5ZDBmNDk5NDE0MzIyYTAyZjczNTk3YTMwNzY2MTYyMGJhYTFkYjljYjJkOWFhMTMxNWM1OTFiYTI4N2ViZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmYzcwMjI3NzQ0ZTkzY2I5MmNjYzQzNWJiYmM5YjM5YjcxZjI5YWMyYzY0MmZkOGIzNzI3YmNmMzUzMTJmYTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjYTk0MWE3ZDE1Y2E1ZjRjMjcwYTk4MDE3ZDQ1MmY4YTQ2NmU1MDBlOTU0MGYzNjlmYWI1OGEyZDQyYzE0ZmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_856835d1363f490d93745ced1c7d21e0",
+      "statement": "resolveModelRoute(env) picks credentials and base URL strictly by source as a pair — OPENCODE_* if both OPENCODE_API_KEY and OPENCODE_BASE_URL are non-empty, otherwise AI_GATEWAY_* if both are present, otherwise both undefined with source '未配置' — so a half-configured pair is treated as entirely unconfigured rather than mixing a key from one gateway with a URL from another (which caused stable 401 API key not found).",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L219-L256",
+          "version": "repo-lines-v1:sha256:f9d84a8d144f742f57fcb40b121e27ef3838d721aca395b671df9f081727d857:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMDM2MjA1MTFkMzkyZDRkOWNkODBjZDc3MGJjYzE0MGU0MDcxOWQ5ZjgyOGFiM2VkZjdiOWM1ZjZjODZiYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZhNzhiZjU2Y2I0ZDhhMTJmOTQ5ZmRmN2NlZDRkZmZjNmMxNDE1Y2Q1M2JlMzZmMjQwZmNkZWYwYWVlMWMwM2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_abe6a03a4c4c475b9dddfa9ad51f48bd",
+      "statement": "AI_GATEWAY_API_KEY / AI_GATEWAY_BASE_URL / AI_GATEWAY_MODEL are platform-managed and reset on every deploy by the CLI's 'Bound AI Gateway credentials to project', so custom credentials must use ordinary key names (OPENCODE_*, GITHUB_WORKSPACE_TOKEN) that survive deployment; the model name has its own independent precedence OPENCODE_MODEL → AI_GATEWAY_MODEL → hardcoded default.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L211-L217",
+          "version": "repo-lines-v1:sha256:d82aebcf2aaf4b006579a6cdae8e29eb6d9118339179951d332fa1dbcb2e65be:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIzY2I0YzEzZDY3NzU5ZDU0Zjc2NzFkNDQwMzQ5NzJkMDkwM2EzOWQwOGFmYWU3M2JiOTgxZWI5YWIwZGNmMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWI0ZTM2YjY3M2U2M2VjMmRiMDk2NDU5MTcwMjM0NTkxNDQ1Yzk0YzQ1YzlkMWRhMzQ2YTMxZGZmOTlkZjhkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTljZjljYzdiODk0MzI4YmQ5Y2EzYmMzNTBhYjc2Mjk5OWRlZTlkZTkzNTQyZDY2MWVjZDM5ODRkNzNlYTg0ZSJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L228-L239",
+          "version": "repo-lines-v1:sha256:d3847d1a5cac55eceb6401975cb9464ad31c5a34f2e9346d9c1e8ab3ca0ae4b6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkMzNmMzVmNjU2YTI0M2Y4MWY5Njk3MTg5NGRhYzA0ZDY0OGZhNGVjM2I0ODZkYTYwNTgzYzFiNGFiOTlkYTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1MWI4OTBhNmExZmY4ODMwNTU1ZWViYTMxNzVmYWU4MzkzZjY2OTNhOGFlMmNmYjZkYTJjY2Y1MjA4M2RlMWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE1MzU3N2QxYjk4MzU2ZWE3NDAxMjAzNGNlN2QxZDNhNzRjOTQ0MDNhNDcwZDFiYzUyM2QwMGViM2RkMzIxMTIifQ"
+        },
+        {
+          "resource": "repo://edgeone.json#L1-L9",
+          "version": "repo-lines-v1:sha256:49869c3b79b79ed9b7921a734a62c6dc25b27deb8ec76f1eaf49e055327c4a75:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTE0NDgzNzYxMDVmMDJiNzE0OTg4NTk5YmE4M2I1NTk2MjMyM2U5MzExN2Y5MGRkOTkyMGU3NTk1YTcyNTI1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3fb7ebf3f99645eea85424f225c3500d",
+      "statement": "FEISHU_DISPATCH_MODE selects async (default: reply 202 then run the turn in the background, webhook ACKs immediately) or sync (run to completion before responding, not depending on background execution), can be overridden per-request by the ?mode= query parameter, and the correct value is decided by the ?probe=start/?probe=check self-test — sync also returns the turn's replies in the response body.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L151-L190",
+          "version": "repo-lines-v1:sha256:d54356b4264beb66ab569fa9cdd60b0bc75df7d6b44595697925f7ae3afef4db:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzMzM2MjVkNDFlYmJhYjBhNjgzNzM3MjIxMTJjZjQ1OGI3MzlkZTdkMTI0NWNiMzA0ZmYxZTdkODRiMmIyNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmYTJjMWEwZWUyMWVhNWNmYWU4NDk0MGZhNDkyODQ1NzJmZmNiMmNmMjJkM2I5ODM5ODU2NGE0MDZjZmQ0ZDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNkNDQ3Mzc0ZTRhZGU1OTliMDE0ZWNjYTcxZWRhZmU0OWJkZjQyMGY3NjFkOWViMDJmZWE2YjYzMmZjOTVkMTMifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/index.ts#L21-L29",
+          "version": "repo-lines-v1:sha256:81b39c96475c9086d041fda380d328c4a10d0518522419556a217cca978966ae:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2YyMzk5YzQ2NmJiYjJhNWRkYjgzZWU0NjQ4ODhhNmUxOGYzZDQxNTllYzRmNWIyMjJmZGQ3ZDI3Njg5ZDIwMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWQ1MTU4OTQxM2ZkM2Q3N2MyMjE1MzA5YzQ5NWFmMDk3Mjc5NTY5ZmZmNmRlMzQ5MjBmNWQyOWZhNTY3YzkwMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWJiNzJjZWI4OWFmODMxZjM4M2Y1M2NmMTIzNTQzMWVkMWMyYmMwZGY0MjgyNDI0N2UxOTg0ODU1NWJhYjk3NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzJjZDQ3YzliYjdiOWQ2MjllNjY1ZDY0ZWRhMzRmMzZlOWQxZjVlNDg4Mjc0M2M4ZGZhYzRkYzA0ZTQ4ZTNkMCJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/index.ts#L698-L715",
+          "version": "repo-lines-v1:sha256:992a8ccdc14702056f5aa279618369a1f5f5292ec4b83e67b0e06bfd5e21f9bf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5MzNlODRmYzQ4ZDlkODNhNmE3ZDFkYzEwNmVkYmY5MzA1NDM0MWZiMDljMjRlODI2NzAyM2IxZTE0MzFiOGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyYjI2YjVmMTJjOGI4ZThhZDEzZmRhMGRhOGRlYzNmOTA3MmQ2NTYzNGNmNzFjZDY1ZTg4NDc0OWFiZjRiNDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczMWNkZTJiMGRmMzA2YmUxZGQzNTM1MmEzN2YzNGYzZmU2MzIxMGVlYzFmZWU2NDA0ZjNiZWQ5MWY0YmJiN2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6e74d99da6264abaadfd803147ef63bb",
+      "statement": "SANDBOX_ENABLED governs the whole platform sandbox tool family: setting it to 0/false/off (case-insensitive, unset means enabled) removes every platform tool, and even when enabled a fixed set (browser_screenshot/browser_click/browser_type/browser_evaluate/files_remove) is always excluded, with the platform's built-in web_search additionally stripped whenever the self-built serper web_search is mounted.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L580-L588",
+          "version": "repo-lines-v1:sha256:be74f620c13f3e7ba5945db79f4a838fb829d47f6e7aed74b78a454b1f12b2a5:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzlmYjliMDI3ZGZhZGZiNjM2ZTMzNzgzNmE0NzYyMDNkZjlmOGFkOGU4OTdkMjc5M2UwY2Q2OThmMmMxMzQ2YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEwNDdhZjRhZjMyZTZlYTY4OTY2NjM0YzZkYmI2ODg1ODA3ZWIxN2VjZjIwMjRlNDdjNzZhYmJjYjg2NWJkNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDcyNzZkMzhkNjRlZGE4ZTg2NjRkZDU5Y2Q5ZGJkMDgzYWRmOTY5MDZmYzg1MTE2MzA0YjBjNDM0M2M1NmI3OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjY5NDAxNzU4YWJmMTgxYmY2ZjA4NDRiOTY4ODQyNDc0YTIwODZlN2Y3YTc4YTAzY2FhNTU3OTY1NmM3NDhiNSJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L54-L103",
+          "version": "repo-lines-v1:sha256:98063528f13ec145ce4477a4ee06134b5aa39cfb3f4e5b8273c1f22d50b724e6:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlZTEyOWY3N2U4YzQzMTcwNWY3ZGJlMWExYzkwM2Y2ZjhmMmI2NWNkNThjM2QyMmRhNzU5Nzg5NjliYTQxYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiZDM0Y2Q2NmYxN2NhMzk2MWZkNzRhMGFiNWY4OTVkZjg2ODE0NWI5ZmM4NGU0NDM2MDY3ZDQ5NTg2YTJhNDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhiYmJkY2U1NDM2YWU0ZDUyYjVjMzA4NWExZjYwMjhlYzhkMWU2Zjc3OWI0ZjNjODkzNzI0ZWMyYTIwMTU3ZDkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_021783991f2a4b66a5f20cd62a544800",
+      "statement": "Cross-session memory resolves its Blob namespace from projectId fallbacks checked in both context.env and process.env (env.PAGES_PROJECT_ID → env.ProjectId → process.env.PAGES_PROJECT_ID → process.env.ProjectId → process.env.EDGEONE_PROJECT_ID), or from an explicit AGENT_MEMORY_NAMESPACE; when getStore or projectId is unavailable the backend resolves to null so memory tools and the prompt's memory section disappear entirely instead of degrading to a per-turn fake.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L292-L305",
+          "version": "repo-lines-v1:sha256:60fdef37a2858f47a888687d66b22b777127827c216b1c972a38fb8cdd32757b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkM2I1ZjZlNzYwOTE5OTViZmM0MmQxM2E4MTgyNjgzNmZkNTM2NmQ1NDZjZmVjY2MyNmUxMGY3ZGYwNThjMDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlZTEyNjFjZDQ3NjI2ZDU4ZTdjY2Y1ZGY4NTI0MzYyYWJjYjUwY2VjM2ViZWIxN2Y4MzZjMzFmMGNlYzNiYjcifQ"
+        },
+        {
+          "resource": "repo://src/feishu/global-memory.ts#L143-L193",
+          "version": "repo-lines-v1:sha256:5038991809300e8b10628964f8a16ec844edbe65bcd150b341e7454f2b399179:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwZDE4Y2RkN2E5Y2U3M2UyMDFjZDUxMjA5MGJiMDg0MDk0ZDVjMDA2OTBkYzVmMWM3ZmY0NWNkY2YwMDYxNGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2NGYxYmI3YTY3OTc4ZWU4MDYxN2Y2MjBjYzBiZWU5ZTYwYTA0MzdlNGEwNjIwMjEwZDlhOGYxYjhlODFiZGMifQ"
+        },
+        {
+          "resource": "repo://src/feishu/global-memory.ts#L195-L226",
+          "version": "repo-lines-v1:sha256:5244afcfe3fa8ad665509b631989a52ea050ddd463de85f2a47e503371a3af9f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5MmZlNjAxYzg5MjZlOWU5NWQwY2Y5MGFhYmY5YWEyY2FiNThiMmQyZjEwODBiYjgwZjc4YjIzMTRkYjI0YTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3d6378980a1f4fd09ec2d2b7959f7a66",
+      "statement": "ghWorkspaceConfig returns null (mounting no workspace tools at all) when GITHUB_WORKSPACE_TOKEN is absent or the repo name is not a valid owner/name, defaulting the repo to guci314/cf-agent-workspace and honoring GITHUB_WORKSPACE_REPO / GITHUB_API_BASE overrides.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L119-L129",
+          "version": "repo-lines-v1:sha256:58c2e4b98effeaef8eb3d24d9e676af71e252a2deb8d34c6b7749ce88d5d9141:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1MjM4YTdjZDRlZmY2ODU3Mjk1NmNmMDJiYjFhYmFlNjI1OTlkYWY1OWM1NjA1YTA0NTI2ODcxZmFhOGI2ZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwYjIxMTI0MmU0OTQyYWU1YTMyYjY2OGY5MGFlYWRkNzg2ZmE5M2U2OWYwMTQyODc1YjM0MjA2ZTIzOTRhZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJjYmYxZjkwZWZiYzhhODE0NDJiZDJlNDk4YzQxZTkzN2VmNjcxMDlkMjhjYmFmMTMzY2JmYjA2OTM0Njc1NmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ2MzJmNzY5ZGI0OTgzOTkzYTUzMmUyYmIwMjMwMWQ4ODRhNTc4NTE4MDlkMDZmOTEwNTQ1OTMzYjNmYWZmYjUifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/client.ts#L54-L72",
+          "version": "repo-lines-v1:sha256:eda936bde894a9c284b2687242e52cf1f5ecf10f4fa74186084f4b4bb13864a9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyNzljZGNkOTg5YmVhNTY0ZjNiMDc2ZTc4NDMzOGYxMTU2OWE3ZjYzZWFkNTIyYmY4N2U3YTNmNDA2Zjg0Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NmIzNWFlOTUyYjAwMTMwMDBjY2M4YzhhZWM0YTYwOTdiNzAxZmE3ZTg1MmQyNWM3OGVjYjZlZjhmMTUyZGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eb3b62e5a9304732a0817c338fc26830",
+      "statement": "GitHub issue tools require a separate GITHUB_ISSUE_TOKEN (the workspace token's Contents scope cannot create issues — a 403) plus a non-empty GITHUB_ISSUE_REPOS whitelist; ghIssueConfig returns null unless both are valid, because an empty whitelist would let the token open issues in any repository it can reach, which is unacceptable for a publicly visible side effect.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L130-L144",
+          "version": "repo-lines-v1:sha256:c3559af18f3d529c8313a59c26a02eabb7a49116ca4a9d59bac3a65deefb19ed:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljZGYwODIyNzIyZmMwZGJlNTJiMTYwYjE3N2E5NDEyMWM5ZWQwN2M0NDg3NGMwNGJlZDYyNDcxZDVmNzZkNGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljMWNmODBlM2Q1ZTBhNTUxMzE3OThiODY2YjA4MDk3ZWY4NGY5Mzc4YTc5MDc4NTJjMzI4MDg5NDliOGFlMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3NTY4MGZiODFmNDA0MjU4ZDA1N2VkMTM2MTQwMGI1YmNmNmEyZDQ0YzM5ODZiNDRmMzhjMTAxNTY3YTZhYzYifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L44-L68",
+          "version": "repo-lines-v1:sha256:69d797236748669fb3ef8962b43eb4514369505eeffa8936c01d03fffe61c60d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyNzljZGNkOTg5YmVhNTY0ZjNiMDc2ZTc4NDMzOGYxMTU2OWE3ZjYzZWFkNTIyYmY4N2U3YTNmNDA2Zjg0Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxNWJjNzcwN2VkZTY3Nzc4Y2I3ZmU1NWI0ZTlkZGE0YzU5NDc1NWY2N2ViOTM1ZWIzMjUyMjQzYTEyOWQyMzEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2999-L3006",
+          "version": "repo-lines-v1:sha256:75a616cd7cdb051b82193d64bc5c0a5c33de982d3b5215fd3c9c5c518a29013d:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGRkYjUzM2E1ZGI4NTkxNjUxZTkyYjU5ZTBlNjZlYzg0NzY5ZDk3ZGQyZTNkN2ZhMGZmYmJiMmEzMzg3NTI1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDI2ZmFlZDVlYmRmYTAzYWExNjIxN2U2YzM0YjE5MDFhNDg5OTY1MmQxZmNhYjNjZWYyZmU4NzJjNzU1MDlhMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjMwNGZhZDFmNDBhMjE0YmU0ZmVkODIzYWFlMjQ4NzM1MzI3YmFkZjIyODFiMTA2NzRmOWYxZjFmZjhkNjEyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_cb241bc82716434a914b960b4dc45616",
+      "statement": "FEISHU_OAUTH_REDIRECT_URI has no default by design: redirectUri() throws a clear configuration error when unset, since a guessed callback address produces an opaque Feishu error page; the same env is read both when building the authorize URL and when exchanging the code so the two always match.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L728-L732",
+          "version": "repo-lines-v1:sha256:bc1c4367db2d6bf97e5b9d6b5060cdf3f942d31b6f2d3e6cd3112e904738b82e:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGNjOWYwOGZkYThkN2JmMWFiYjVkN2EyZjFjNTIwZWY0MmM4OWEzYmU1MTg2NzUxOTMyMTI0YzU5ZjM1ZTUwYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTVkMTMwOGM4NjVlN2NhYmNmMzE0ZTFkMTc5MWQzODdhOWJlYTVlOTBlYmUwYzczMTU4ZTI2MWUzYjExNjkwZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjRmMzQ0NjkwNmUzN2Y2NDNlMzFiNmE3NDc4MTc1M2Q5YzE2N2NjMzlkOGRkZTA0ODlmZjAwY2MwMWU4YWY5ZCJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/index.ts#L231-L235",
+          "version": "repo-lines-v1:sha256:3f44c0c78d9007666e79788fef343d3a355497702a32fb2bec7584a3a1bc2aa9:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjYyOWMxMjUxNWY2NWUyOGM4YTU3MGZhNTgwZDhmZDUwZWIxNDE1ODg5MGRhYmI0NzUxM2I5OGYwMTRlMzBjMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWE0ZGYyZTgzN2VlMzIwMzZkNDkyYzE3NjZiNWEzOGUzN2VlNmI3NTEyN2U0ZjcxODYzODkyNjAzY2ZmYjk4YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzdkOWQ5OGZiOWExYWFkNmU2ZTBiMzdkNjE5ZTJhZTI5OWJmYTVmZjk0NjMyMjM4ZTUzNmYzNTkyMmU1OTgyMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTkyZTUyODE2NWJlM2FlN2QzOTMyMmRlZmUzOTZlMmJiMDUyMzExYzMwZTQ0YjU1MDFiYzI3NjI1ZTIyNTkzMSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/oauth.ts#L58-L79",
+          "version": "repo-lines-v1:sha256:5e8656b378e0ff77d6efd576e1170dfc1e0386f0d2ed0cd635c7ac94d73432fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5ZDBmNDk5NDE0MzIyYTAyZjczNTk3YTMwNzY2MTYyMGJhYTFkYjljYjJkOWFhMTMxNWM1OTFiYTI4N2ViZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmYzcwMjI3NzQ0ZTkzY2I5MmNjYzQzNWJiYmM5YjM5YjcxZjI5YWMyYzY0MmZkOGIzNzI3YmNmMzUzMTJmYTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjYTk0MWE3ZDE1Y2E1ZjRjMjcwYTk4MDE3ZDQ1MmY4YTQ2NmU1MDBlOTU0MGYzNjlmYWI1OGEyZDQyYzE0ZmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6d9065b8084941a9af735472138a5193",
+      "statement": "The FEISHU_APP_ID + FEISHU_APP_SECRET pair is what gates the cloud-document tool family (tenant/app identity), and mounting no longer requires the user to have /login'd — user identity only adds a fallback, so reads of documents not shared with the bot report the app-identity error instead.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L461-L480",
+          "version": "repo-lines-v1:sha256:3563d2ce7b19976c0a1f361879ba5f7ddd5b5c47167600714f4445317323d972:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzZjUyYmRiOWIxMGU2YWJlYjIyZDc2Njc2ZTIzODY0NzhkOGJkYWMyOTE5NjIwNjkwNjgzZTM5MDQ4M2VkZjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZTM3MjVkYTAwMmI0NmVkOGI0ZGU4ODAwM2FkOTcxMGRjYWYxOGQ1N2M0NzAxZGMzYmVmZjBiMmM1Y2IxM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI1ZDJkZmEyZTk0NGJkYzBjNWM4YTk3YWU4MjljOTI3YTMzNTVhN2Q2YmU0MzI5ZDVlNTY5Mzk3ZmRlZTNmNzYifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L568-L574",
+          "version": "repo-lines-v1:sha256:0f4b5dde699bde5e68e2c21c2d5756ca688a81a6298aaba3e7c1b57f1023e5ea:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2I3NTVkZTIxYWNlMjNmNDY5ODhlZWYwZjRlNzJkN2U5YmVkOTQ3NWUyMzdkNWQ4YzVmODFhNWEyYjY0NzAyYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTg3NzU0ZTVmNjk0NTViMzk3Njg1ZTc4MTU5NGQ1MWY2NzFhMGMyZWU3Y2E5MjZjMGNkN2YzNzFjNmJiNjhjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2E5YmVmNWNhMWQ0ZWEyMTNkZGZkZGRlMjc0ZTkzNjZjY2RlY2U5YTc5OTBmNjgzMjIxMjQxY2ZhMDU2N2ZiMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmU4MzMzZTM5ZTJkZTAyYjE4OTIxNzdkOWI1MzM0ZjE0ZGQ4YjNiYjU5NDAwOGY4OGZjMGYxMDFhMDI0ZTE4MCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_4a7393eb02c34060b2d3c7f11bc70977",
+      "statement": "SERPER_API_KEY gates the self-built web_search: with no key makeSearchTools returns an empty array so the search tool disappears entirely (rather than mounting a failing tool the model would repeatedly hit), and mounting it forces removal of the platform's built-in same-named web_search which is broken without WSA_API_KEY.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_search.ts#L1-L67",
+          "version": "repo-lines-v1:sha256:63ff7996f584354a96e35251bef60c6b670a4119875dd559f93c73d1a3c85e15:eyJzZWxlY3RlZExpbmVDb3VudCI6NjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlNTdiMDA2ZWQ5ZTYxYjVlYmZmNWNiYjE4MmRkMzY0NjNhNmE3NjkzYmQ1M2UwYzJlNjA2YTUzMDZlYTY2M2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhYmI4Zjc1NmE4Mjk5MWQzMGU0MTBiNmU5NmIwYzA4NGI4ZDhjN2NmMDlmMzJiYjY1OGViZDFiZmJjZmY0YzIifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L62-L88",
+          "version": "repo-lines-v1:sha256:c7cb25a6a3e1ac71d7def9533e46d524e5536de7a290ea51be5be8bf876e2562:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyOWQ0NmI3ZjEwYTBiYTdjMWY3NzI0ODM4MDNjZWYzYzNjNGFhNmVlODZjOGU1YWExYmIyMDhkMzFiYTczZmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE0NWJkOTg0YTlhMjVhZWM5MWFkY2M1ZmM1MDgyMTIzOWQyN2RmNmNkN2I0ZmRjYmNkMWZjMjJiOGU4Y2M1YWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2MTMzZjE5YmUyOWQ0Y2ZkY2M0MDQ0NTc5Yjg0NzMxMzFmODhkOTk4MDRiOGM5NTkzYzQ0NDY3MzdiZjQwMzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_92ba9471af9d42dd9107dddb29acc7c0",
+      "statement": "Changing console environment variables does not take effect immediately — a running agent uses the snapshot packaged at deploy time, so config changes require a redeploy; ?probe=env exists to distinguish 'wrong value' from 'not applied' by echoing the variable-name list plus INTERNAL_TOKEN's length and first 4 characters only.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L316-L330",
+          "version": "repo-lines-v1:sha256:ca4fea6b4fb3900669750a1de6fc31c016464cbd0a767b8c9e912cd26e9c41ce:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjczMzBlY2Q4NWUwZTM3NjRlNzRhNTg5ZThlMjc2YjE1ODg2YjM4ZmU0NzBiNjk5OWU4NTIxNTM3NDlkZDEzY2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzOWY2N2YwYzJiY2RjNmFiYzcxYmIwMmIyODViZjJhZjA3ZWYyOTQyZDgyMjIzNjI5NDVjMjI0NzQ0M2IwZDUifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L293-L299",
+          "version": "repo-lines-v1:sha256:a5f31d4e2a5dbb5992adb53871f96dde5f75aadef5e80a5a6572316ec584c74a:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTVlM2NkZGM3ZmYyNThlMTdiZWZhZmRmZjMyOTE2YTdjOTY0YjJjMjJmNDg2YWMyMmYyYjI5NDAwZjI0NzcyMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGM3MzJkYzZhMjVhZTdmZDc4ZDNmODlkYzNmYjRmNzZkNDM4NDY4ODMwNjc3ZWI4ZTQ3YTk4Y2VlZGU4NzdmZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTQ2Nzc2YjU4YTg5NWM1MGNkZmU3ODQwM2U3MmQyMDUxNTZiYWQ5ZTJmNGE5MDdmNzdiNDFmMTI2MTNmYjkzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWU3ZGQ2NTA4ZjRjMjRhMzc4MjcwZjdjYzM0MzdkZTBkY2U2ZTVhMmNhODNiNjkyMjM0OGRjNGQyMmUyNGQ2YiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_33320590b2cc4171b373bf14fe501586",
+      "statement": "The ?probe=env endpoint filters visible variable names through the whitelist regex /FEISHU|INTERNAL|AI_|AGENT|SANDBOX|SERPER|OPENCODE|GITHUB/, so a newly added variable stays invisible to the probe until the regex is updated — a mistake already made twice with SERPER and GITHUB.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L595-L646",
+          "version": "repo-lines-v1:sha256:20e1593c405a91e2d253075c51256c34365c513638c53a4be0127ae88b27f822:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzN2I5ODQ5ZWRiYThiY2ZkMDIwYTI0NDYwMjRiMjRlNGJlY2M3OWFiNGEyZGYwZDljMjU3Yjg4OWY0ZTE0NTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4MmIyNGUyNDlmOTA1ZDhjMjA5MDFhMGMzY2ZmZWI5M2QxNzdiNDgzOGNkMzQ4YTAxOTBlNjE3MjgyZDUxY2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZWQ3MjJjOGM3MzJjOGY0Y2ZhOTJkNzBiMTc2MzA0MjRhOWZmNTEwYTIyNTg1MjIyYjAwZmExY2FiOWQ0YjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNjNjA4NGQ5ZmVmMGFhNmI4MGYzODdkOTIzZjJkMWVlMTk0MDEyOTdiZWMzN2M4ODRlYWNiMWJmODJlOTFkOGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9c5c6408ac12473083c70ab6de1d2af9",
+      "statement": "Feature gating follows a uniform 'half-configured counts as unconfigured' rule: no half-configured credential mounts a tool family, because a family of always-failing tools only makes the model repeatedly hit a wall (shared by resolveModelRoute, searchTools, ghWorkspaceConfig, ghIssueConfig and the memory backend).",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L482-L500",
+          "version": "repo-lines-v1:sha256:bec28e2fdcddf481b3797bffabe9688ca21a4af539b089335d3d6e199d9efa30:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcwNDkyZmNjOGQwM2MzMTAxZmI0YzgzZGVlZDYzOWM4ZDk5NmYxYzg5MDBmYmY5NzM5ZGMwZmY2YWI4YjhiMTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkOTVjZDYzM2YwMzAxM2E4OTczOWJkNzFmYmQ5YzQzMzgwMGNiMzMyY2ZhZDZjMzA1Zjc3ZjU0NDE3NDRhNWIifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_search.ts#L57-L66",
+          "version": "repo-lines-v1:sha256:2694b6a66ff769bd0c90dbc338d57a8b471ddaa98dbb3e7856a5cbdcd0a97e77:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0MmY3ZjAwOWE5ZTcwNjU4NWRjYzM5OGUzM2YxOWQ3ZmEyZjMzNzBhZmVlYTA1MmExMTQ1ZTQzMGJlNGE4ZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2ZTY3MmJjNTllNTY0ZTQ1ZmRiZWM1ZWViOGFlMDlhMTk4NzIzYjQ5MjU3ZGM2OTQzNWYyZDc4MzE0ZWE1ZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmMzE0YWU0OTdlNjcwMWI5NDc0Yjc3NDU0Njg2MTRjMTk1YjY2ZTg5YjA1ZDg3N2Q3NjQ0YzljZmI1OGYyY2YifQ"
+        },
+        {
+          "resource": "repo://src/ghworkspace/issues.ts#L44-L50",
+          "version": "repo-lines-v1:sha256:2c51b53ad3421c15b67bbadbef9ed3ba45f3db65e6253b3825bcbb48a50be033:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjI3OWNkY2Q5ODliZWE1NjRmM2IwNzZlNzg0MzM4ZjExNTY5YTdmNjNlYWQ1MjJiZjg3ZTdhM2Y0MDZmODRjYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTc1MDNiYzllNmQzM2EyOWVlODQ2YjBkNWJlZGRlZmVlYjY1Njg4ZDBiY2U0YTgxZDg5Zjk2N2I4NmE5NWMwZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3c9a06be8a9948cd90f591f6766925f9",
+      "statement": "FEISHU_USER_TOKEN_SKEW_MS artificially widens the access-token expiry skew (default 5 minutes, suggesting e.g. 7200000 = 2 hours) purely so the refresh path can be exercised on demand; it is meant to be unset in normal operation and is covered by a focused test asserting that a fresh token is judged expired once the skew is widened.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L156-L163",
+          "version": "repo-lines-v1:sha256:7f05569fa13649aabbf4b782858ff708621199fcfeb6b365f00071164f43cb21:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYyYTJmOTk2ZjA4ZTY4MGJkMjkyMTM1YTZmYTQ5NzhiZGEyNmU2MDJkODRmMzNjYjFkNTk0Nzc1ZDQzMDRiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTBiNmFjOTk2NDA1NWUwM2EwMGYwMGRmM2Q3OGQyZjBlN2E1ZDk1Yjg5MDg5NzI2NWFkOGQ4OTVkOGYyNzlmZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2EzMDdiNjUxMTM4ODYyMTVmYjEzZTA2YjBiMWQ0MDNmM2E0ZmQ0NDRjYjgxZWI2MWU5NzI1MDQ1NGIyZTNlMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzc5MjllOTFlMGY5OWMzZTgyNWRlNjliNDM1ZmI2NDg0ZDFiMGExZGYyZjQ2NTYxYWJmMWEyOWYwNDE4OGI4OCJ9"
+        },
+        {
+          "resource": "repo://src/feishu/oauth.ts#L276-L286",
+          "version": "repo-lines-v1:sha256:ff725af489eaf0251bdf624a5b090deb43d76ce26d035aff5da4459e86f604c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzNGFmNGQ3ZDcyZTNjODg2YThlMGZhOTlmNmRlNzc0M2E0NWUxN2MzNzcwNWNkMzI2YjFiNDE5MzUzYzYwZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhMTQ0MGI1NWZkMTE5MjNjNTEyNzY1YzdiMzc3MmYyZWIwZjRhYzMzNGIyMTMwNmI4MTFhY2UzMzg3Yjc3MGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkNWMzMmQ0YjI5ZWVlNDVlYTlkYzk3MDM3Zjc2MDAzYTM0NDE3ZDM3ODE3YWMxMzkzZGRkOTFiN2JlZWViYTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyYzA2YmI4YTAwODRjNGMyOWRiYjk1ZTU0MzQ5OTk1Yjc2Yzk2NzMwMzg0YTk3MTI3ZmVmYTI5M2RlZDY5ODEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1414-L1417",
+          "version": "repo-lines-v1:sha256:2eef3ca658b030f59e85be7281360a5df501f7af6e2a5105bbb6c0f856a2d425:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTA4YzMzZjVkY2VjZTAyM2UwNTk5MWEyNDc3ZGQxYzgzMjg0NTE0Mzk4ZjhhZDUxNzJkMzU4ZjlhZGM4MGJjYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2NjZTEyZGMzZDZhNzMyZWUxNjc3YTViOTVjZWRhMjk0NzFmZmI0ZTIwMDE5MjQ1Y2JlN2UzODk5MmQzOTRlZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMThiMjFiZDUzNTE2YTMyZDIyZjE4YWQ3OThhZGZkYjAwMDEyMDliYzUwNzg2MGU0ZTY5M2FlOTY5MmIyMTQxYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTVhNTgxYTRhYWYwYzgxN2E5OTYyNzhiZjU1YTNmMjllMTVkZWNmYTA1ZmQxMDYzMTFiZDlhZjU0YThlYjdkMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_be0cfc31ba524032879dd945b79e3837",
+      "statement": "FEISHU_ALLOWED_OPEN_IDS is an optional webhook-side open_id whitelist (empty/unset = unrestricted) that silently ACKs non-listed senders rather than replying 'no permission', while AGENT_URL overrides the forward target (default ${origin}/feishu).",
+      "evidence": [
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L180-L193",
+          "version": "repo-lines-v1:sha256:4c4eea713b32c74d1da0a3464dfb4551fbc1caab2f97afc22a1eb68079a90296:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRlNDFjMjJmMWUzNGQ4YjYwM2YxNDg3OWRkMTVkNGFjNTcyYzlkMTQyNTY2NzYzYjUzMjQ2ZWU4YjhkNDQ4MGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMWU0OWI3ZjFlMzFmZTZmMWUxMzUxMjBiODE2NmZiNjQ3MmU4ZmJmZjBkZDAxOWYwNjMzOWJlMzBlNDM0YWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU5ZWJkZGE5YTA4NjcwODQ5NTdhZGQxMWZmZGYyYWQ0ZTIwZTY5MWM5ZTMxNjUzZDIyYTk2OWVmOTY3ZjA3MWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcwNGVhNzRhYmI5ZDIyYTk2MThiNGFjZWM1YmEwODUxNDA5YTdhY2ZhOGY4Y2Q4NDhlYTE1OWRhMDBiMzIyYTYifQ"
+        },
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L36-L41",
+          "version": "repo-lines-v1:sha256:e5729fdb1f7e4ef5737b37327e648be12fc50420b91ba48e722aa6594962faf2:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDI5YTg0YTA2NTA5ZTZhZTQ4Yjk5ZjU5NGNhNjFjYzA5MDljNmI4NGIyNmEyZDU5NGNiNGQ4NzdjYjlhYzk3ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDA4N2ZmNmM5YjU3MjI3ZGRhMTFmNTE2MmMyYmY5MjU0MjQ2NTBmYzIyZDUwZDU3MWFjZGJjNzRlZTJkNjg2YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjA5OWNiYTc3Njg4M2FmNmViYjJlYjA1MTY2ZTAyNjI0Y2I4OGE4MzhlZTgxNTM4ZjJjMWNjYjg4NTg5YTVmMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_67d2ea9614c540edb47e1b71d9c05294",
+      "statement": "The internal token reader accepts three shapes — a standard Headers object, a plain object with case variants, and the request body — because the runtime's context.request.headers is not a standard Headers instance (headers.get and forEach are absent), which previously made every forwarded request 401 with a misleading 'mismatch' message.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L964-L997",
+          "version": "repo-lines-v1:sha256:bba35dd7dbb50d7dd8b4ac317d5e6e4f0c12cd2ab354331f559ee86752996b7a:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5NzVkYjg1N2I1MGNmNGU0ODE0NTFiYzdiZjhlZGYxOTZhZWUzMmY3Y2ZkNDBiNDhhNTkzNTQyYjdmMWQ0YWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI4YTI1NWI5MTQ3NTI2ODM5MTc2MTcyYjVkZjRmNWQxZmY4NTFmMGRhNmM2ZDUyNWQ3ZDE1YTRmMzgxZTNmNmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlN2JlOTNlMzI0NWI4ZmViOGFlN2I4NmVmMGUyOGIzYjM0Y2U2YTI4YTczNTY0NDdiODkxZmE5MWM4ZDAwOGIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

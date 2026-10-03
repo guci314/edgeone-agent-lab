@@ -1,0 +1,402 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:34de6a2ae64594288ebac0051256fe03c2877f61e9b396c3a03488141d318ba3",
+  "claims": [
+    {
+      "id": "claim_692d9827cee84b92b2dae1d70f64b7cf",
+      "statement": "飞书链路使用两种身份：应用身份（tenant_access_token，app_id + app_secret 换取、缓存在按会话的 feishu.token 槽、形状为 {token, exp}）只能读写被显式共享给机器人的资源，且发消息走它；用户身份（user_access_token）走一轮 OAuth，读的是用户自己有权读写的一切。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/api.ts#L11-L31",
+          "version": "repo-lines-v1:sha256:692c51e728f1aa843b8004a2806b4ea9956bb4eb5dcd40988255f5b9de1cd586:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3NTQwOWEyMTY3ZTcyMzVlNjAxNmZlYTM1ODc5NzJkMzRlMzMyYjQ0NTNkMGJmZDIyOTExNDBmMWY4MzFiMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkOTg0YzhjN2Q2NzQwN2YzYzRmZjRkMTZiNmQzYjI1OGI3YmEyNTA1NzkwZGQ1Yjg2M2NjZjUzY2Y5MThjMDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkZDA2ZGFiMDMyNmMyYmI4MDRkNDMxNWZkODQ3ZTEyMWZkOWNjYzc2MTE1ZDQ3N2U5ZDUxMDA3YjUyMTRiODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiMDk0ZjgyODc4ZjU1YjIyNmJkMjY4N2JmZDU3ZTMzNTI2MmYyOGRmMzNmNGViMDQ3YTZhMTgyZWQ3OTkyODAifQ"
+        },
+        {
+          "resource": "repo://src/feishu/api.ts#L163-L185",
+          "version": "repo-lines-v1:sha256:ea34432c69f93fcd0f5fb69861c1c22c623a9bdacffeafba7a9e72298a9d2583:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwZmI2NDgxNjI5NDYxNGFiNTRiMmQ1MWFmMjRhNWRjNWNhMDAzY2Y0MjZmNTQ2NTc3NGMxZTE2MDU5NGRjOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI0YjU1NDc4ZDI1ZWNkNjQ0NTFjNTg0YTFmNzJiMjg5MjA2MTVmYzFkN2MwZmQzMTc4ZGIyMWM5MDYwNTMyZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjZjI0ODYyNWYzNWM2NTRkOWNkZDA3ZmUwMDJkODAwY2MzMzRkYzgxZmVhZDY1NzJiNzU3NTM3OTI2MGFkZDcifQ"
+        },
+        {
+          "resource": "repo://src/feishu/oauth.ts#L1-L16",
+          "version": "repo-lines-v1:sha256:7646484485040ddc78f660a6589075a6108d2aed9083e6d33abb01b53942ad31:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlOGU3MzExMjhhMDk5YTNiZGQ2M2QzMTJhNTY4MGJjMjM0MDFkNjg4YjcwMzRhMWExZmQxOTE3ZjZiZTQyMjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzYWRhNWM0MTc2ZjQzNWRhYzc4OTA2YmIzZTUxZmQ1MDQzOGYwZDllNWUxYzY5MmNkNjQzMGY4YWIwYzBmMzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkwZDY3MzUwYWYzZjNjY2EzNzEzMGZhNmYxZTZmZWFmNTNjM2U1NjdhYzc1ZjYyYzZkYjczZWE3NDE2OWRjZTMifQ"
+        },
+        {
+          "resource": "repo://src/feishu/store.ts#L52-L61",
+          "version": "repo-lines-v1:sha256:676ccce9c8efbcf5af546d22b114e4797329eb6201597b2c238c78d8c5e88bd0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhYTBkYjc1NDUzNjI2MGUwZDQxMTVhMmJkZGVkM2Q2MWFmYTA5NjUxMzFiMWQ5ODlkNjMzMDM5NzlmODBjMjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4ZGNjZTIyNjE0NTliMWFhNmI3OTMwZGQ1Mzg1MzM2NGNmYjQwNDIyOThhZmRhNDc3ZjJlODE3ZWU4Y2Q2OWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwODQ1Yzk5ZDhlODUxNTkzYjE5MTE5YWM3NzkxMTNiM2I1ZWQ1MzM2ZTkwNTIwZDljOTc3MzZlNGE4MDcyYmYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3fbde8044f81419da16ecdecaccb6982",
+      "statement": "tenant_access_token 的取用是「缓存优先 + 失效重试」：缓存命中且 exp > now + 60s 直接用，否则调 /auth/v3/tenant_access_token/internal 并按 expire 秒换算落盘；feishuCall 遇到业务码 99991663 时强制刷新一次再重试，以应对缓存令牌在后台被吊销的情况。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/api.ts#L163-L185",
+          "version": "repo-lines-v1:sha256:ea34432c69f93fcd0f5fb69861c1c22c623a9bdacffeafba7a9e72298a9d2583:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwZmI2NDgxNjI5NDYxNGFiNTRiMmQ1MWFmMjRhNWRjNWNhMDAzY2Y0MjZmNTQ2NTc3NGMxZTE2MDU5NGRjOGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI0YjU1NDc4ZDI1ZWNkNjQ0NTFjNTg0YTFmNzJiMjg5MjA2MTVmYzFkN2MwZmQzMTc4ZGIyMWM5MDYwNTMyZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjZjI0ODYyNWYzNWM2NTRkOWNkZDA3ZmUwMDJkODAwY2MzMzRkYzgxZmVhZDY1NzJiNzU3NTM3OTI2MGFkZDcifQ"
+        },
+        {
+          "resource": "repo://src/feishu/api.ts#L89-L125",
+          "version": "repo-lines-v1:sha256:cbf24a8e0ddef60a75c911ed3fe7a41627a35c5ec4739804793c246353efc997:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5NGQxZjIzM2ZlNzVlN2IxNGIzMzI0NzU0ZmMzY2VlZmFmY2QzNmJiNDAzZGE0OTcxZTc5NzFjZGNjMjQ0MjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0ZjAyNzU4NTMyOWI3ZGVlMmU4ODc3ZDc2MzI1N2VmZjAxMjI4YmJhMmZhYjhmZDE3Yjg3M2Q4ZTZhOGNhMjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyYTYxYjRhOTYwYzg3YjJlYWRiMjNjZDRhNjQyOGJiNTAzODM5MDA4NDliNTUzYWNkNzI2Yzg4ZTQ5YjUzMTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fd3ce631a84440eaabd4e2e30f06ebf5",
+      "statement": "飞书即使出错也返回 HTTP 200 加业务错误码，因此 api.ts 的调用层必须检查 json.code !== 0 并抛 FeishuError，不能只看 res.ok；业务码导出是为了让调用方能按码分流（如 99991663/99991664 = 令牌失效）。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/api.ts#L106-L115",
+          "version": "repo-lines-v1:sha256:3bdd1dc31d01ad1d3f6988f77b93f9013675195ba2120b08b37c34d854da9788:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMzQyZjg0NWRkNTI5MTc4YTIzMmIwODMzNjE2ZDNmYmNlMzk3ZDFkZDVhMTVmYmZmZjAzYTQ3YTUyMDI0NjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3YTQ4ZGFkZWZkMjNlYWI1ZTA4ZjcxNDA1MWY3YzdmOWQ5MWM5NzA1ZDg0OGRlM2I3NzVlNzYwYWIzYTc4NDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5YTM3ZWJjY2ZlMzdjY2M0NTkxMDkxNTlkMDZkOTI5MWFiMjAyYmI5OTEzOGFhMDY1YmRkNWYyYzBmZmRhZGMifQ"
+        },
+        {
+          "resource": "repo://src/feishu/api.ts#L49-L81",
+          "version": "repo-lines-v1:sha256:fe4c934d2dda9c17773a4d330e6d8893bbd9351e786831261fabbb66c33571e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwYjk3MTJmYmFlOGRiMWZkYjQ0YzdmNjgzZWQxOGQzYTY3MjQ0OWI0NGQ5ZDU4MmQ4ODhiZGUxM2FiZWE3NDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImExYmFhZTEzN2I0NjRiMDkyODVlZjZlMzRjZjFiMTQ1ZmM1YjQ3MGIxYmVhM2RjYWU1MmVmZDEzYmMwYTY0OGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4MTFmY2I0ZjUyYjcwOGJiOWViMDQ3NDIyOTUzOWUwMTFjYWI2ZDc3OWI3NmU5MDRlOWEyMDM3MzY3Njk2MzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d2a9e886f93a4b63b069c0d2cb31c314",
+      "statement": "DOC_SCOPES 包含 docx/wiki/bitable/sheets 各一个 :readonly 读权限、docx/bitable/sheets 三个写权限、以及 offline_access；其中 offline_access 是拿到 refresh_token 的前提，scope 里不带它时 token 端点响应没有 refresh_token 字段，用户每两小时要重新授权一次，冒烟测试有专门断言钉住这一点。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/oauth.ts#L21-L43",
+          "version": "repo-lines-v1:sha256:089d971b148f45e07e1c35dfeadc0902cf5d81e722830db95b5b5a31a9235aac:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwNjRmZjMyOTJiMGUyY2ViZDRjMmFjYjE4MThkNzM2NWE0NDU3ZTY4M2I5Nzg2MzVlNDY0ZjIyYjBlNzg5ZDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjOTI1ZTJiNTljNThhMTQ3ZGFlNzI1NDRlYjcwM2VjYmM5ODc0ZDBjN2Y2YWJiOGQ1ZGVkNWIxNzI5NDM0ZTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4NzBkNDYwNjQ1NDAyMGEwYzZmNjc1ZWJiODg0OTczZGQ0N2FmNWFjZTg3Y2ZiZTliYjQwMTA4NGM5ZTg3MGYifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1187-L1194",
+          "version": "repo-lines-v1:sha256:d672b0e58abc2aa25c3624af3e633d45466caa9442a954f47d87b0420e3b7282:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzg2YTQ2Y2M0Mjc3ZDIxYzI2ZmE5MTk0ZjQzYTU0MjgyYzlhY2FjMTc0MjAxZWJhMDY4MjZhMzM5M2Y4MmMxNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDM4MTc3ZDE0ZjkyMjI5ZTlmYWM2Y2UzYzU2NjE3YTc4YmM3NzNhYjUyNGU1NmZmYmExODBiNWY3MWFhNmE1OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDBhZGQwYWZhYjM4ZTA5NjkzYmNkMmMwNzQwNDY1YzQwNzJjZWJiYzY2M2E2OTQ4NTMwZThhYjUyOGRhNDY0MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_08a6bdbce0b9443a8108b8012f398057",
+      "statement": "刷新令牌不会带来新 scope：三个写权限是后加进 DOC_SCOPES 的，已授权用户必须重新走一次 /login 才能拿到；飞书对这种情况只回 99991679「Please request user re-authorization」却不解释原因，所以 callUserOnly 补了一句说明「旧的授权不会自动带上后加的权限」并指向 /login。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/docs.ts#L235-L243",
+          "version": "repo-lines-v1:sha256:0f2b6592b9839cc34d2b254c09f34490e9b7da9749c932ae9322b42d905887b6:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYzZjVhMzk3MGU1Njg4YjU0OGVlNTkyZDdlODllYmFjODliNWFhMTA2NzdkMjBlOTU5YWJkNTYxMTNmYWM4YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWI2MmY2MGQ4NTkwYTU3OWNmNDZmOGQ2NzM3OGM0YzU3MmI5NjJjZWNjZGI5MGM3YTVmN2I0MmI5NjA3ODJhNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmY2NjY4MjU5ZjU1ZTllNzRkYTRhYWE1NTMwYmM3YWVhYjI5ZmE3ZWExZmE5ODdmYmJlZWE4YzY4OTU1MTQxOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGNjMTg2MmJiYWQwNGJhM2NiODcwNGExOWM2YzJhYzljYmMwMTdlOTg2NTcxODViNjFkNDU4ODQ0YTRiY2Q4NyJ9"
+        },
+        {
+          "resource": "repo://src/feishu/oauth.ts#L28-L30",
+          "version": "repo-lines-v1:sha256:d9780e24a1b130e225b20a295276f143f3fe7d56c5aa449c319193da7b1cd13a:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTdjNWI4YjYxNzBhYTg1ZmUyMDc1NDM5ODNhZTQzOGNjZDkxMDQ2OTE2MTJmNWZiNjY0N2RjNzMzZDAyODI2ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDExMGUzNGQxNDU3MjM4NjljNzhhODRjOTRlMzdjNjYzYTQ4ODNlNzJlMGU4NWRiOTQxZjIwZmY0NjEwOTEzMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTY0NzU5YjlkYWNlNmNkMTc3ODljNTVjYzM5MWE4ZTAwODQ2NDJiMTQwNGJlZGFiNzQ4NjRmM2RhZjAwNGIzMyJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1751-L1768",
+          "version": "repo-lines-v1:sha256:90a6aadd932680ddb31e4e963d5dc544772fdc1cf32c4c0f456d03e4ee7385d0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjZTdlNzU1ZjE5NTBkYTU0N2M5MjJhYWUzMWFiMjQ3MjIwYjZiMWJkYzQ1ZmI3NGViNWJkZThlMDM4ODVmYTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2YWQ4MzM4N2E4MDQzY2E1MDlmNWRjNzZjYzg5ZjQ2ZDY0NzYzNTA5NWI3MTJjY2ZhYTkzN2I0ZmM0YjgxZjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY1YzEwOTUzMTJiYjZlMDZhNWExNDc1MzZiMTllYmFkNThhY2VhNmU2YTk3NDUxMTlkNGEwNDc0YWYzOGJkZTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2076f736d5f84a6883d157041448b178",
+      "statement": "OAuth state 编成 base64url(payload).base64url(hmac)，用 INTERNAL_TOKEN 做 HMAC-SHA256 签名并用常数时间比较，载荷是 {chatId, openId, nonce, issuedAt}；验签失败、载荷非法、缺 chatId/openId、或超过 STATE_TTL_MS（15 分钟）一律返回 null。签名是必须的，否则攻击者能构造 state 把自己的授权码塞进别人会话，让受害者会话以后每次提问都用攻击者的文档权限。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/oauth.ts#L81-L170",
+          "version": "repo-lines-v1:sha256:03e8b1abc627ba5583f2d4017594ca373ee3a9a7c2b3d89394cbf552708127d7:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzODc1NWYyOTE4ZDU4ZmVlY2NiMGU4OGQ1ZGFlYzg4MTJmNjAyYTBlMWNjNDIxNTQ5ZTVkM2E1M2E5NjVkYTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4ZGIzNmQwMmIwZGNmZTJkN2Q4NTY0ODNjYzIxZDJmMmRmMjZlMDE1NjU3NThmZmRmMTU2YzdiOGU2ODcyODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0Mjk1MTVjMzZjZTRmZWY1MzVkZmZmNjZlMjY5N2JlNGE3ZjZlNWQxMDI3NzViMTEzNDQzYTA4YTcyM2NmYmUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ccda476c5fdf497284a99635c26c9d4b",
+      "statement": "OAuth 回调处理只从验签通过的 state 里取 chatId/openId，不信 body 里的同名字段（body 是转发方拼的，state 是发起 /login 时自己签的），中转那边也验一遍同样签名的两道关；用户点「拒绝」时（带 error 不带 code）返回 {ok:true, denied:true} 而不报成故障。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L194-L226",
+          "version": "repo-lines-v1:sha256:8505162873312dfd172b66f2126b01e558e780da3f0c975bd465e7a8217236de:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhZGQyYTMyNDg1ZjhlMDczMzg2NGFlYzFmZjUzMTZjOGQ1M2E2ZGQyNzZlMjFmNDM1MzQwNGZhNzZhMmJiODYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkNDQ3Mzc0ZTRhZGU1OTliMDE0ZWNjYTcxZWRhZmU0OWJkZjQyMGY3NjFkOWViMDJmZWE2YjYzMmZjOTVkMTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNlZjhiNGNmZWNmN2NiNWY5MzA0ZWJjNzg1MjIwYzgxZjRhNDVlYmYzM2U2ZjVkMzQzMjNiMjNjZjI5ZDRlYzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9d705e6b094746eba2be39fedd0ceb37",
+      "statement": "OAuth 回调请求在去重/限流之前处理并同步返回，因为它不是飞书消息（没有 messageId）、套去重会在用户重试时把第二次回调当成重复丢掉，且中转那边的浏览器在等这个响应渲染结果页。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L109-L117",
+          "version": "repo-lines-v1:sha256:5a306593fde84d4a61db1aac612f126c6da32e1379b301a9a0db58aed7e5a5f4:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzkyZGJhZjNiMjg1YjIyYjllZmY5YzdlNGJiMzM1YmE5NjY2NGUyOWY4YzEzNGIyMDczOWFmMmU0YjhhNGMxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWRiM2U3Y2QwYzNhNjIzMDQ3NjY4MTYxZDEwNGU5OWQ4NjIwOWNhM2U3NzU0YTI1YjExOWE0OTA3ODc4MDQyNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDg2YzdjMTdhMjY1MWY5MWI1OWRiOTBhMDFkODgyMGU5NGU4MjUwOGQ4NzgzNTBhYmNhYmFiODQwMDFhMWYyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_bb0795fc9ac94287be480493435ec0fa",
+      "statement": "redirectUri 不做默认值，未配置 FEISHU_OAUTH_REDIRECT_URI 时直接抛错点名变量；回调地址必须和飞书后台登记的重定向 URL 完全一致，且 exchangeCode 传入的 redirect_uri 必须与发起授权时完全一致（两边读同一个 env 才天然一致）。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L231-L240",
+          "version": "repo-lines-v1:sha256:85bb7bc66fd06224b08eec22c355285eff04971951028929beae67ba825357c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2MjljMTI1MTVmNjVlMjhjOGE1NzBmYTU4MGQ4ZmQ1MGViMTQxNTg4OTBkYWJiNDc1MTNiOThmMDE0ZTMwYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3ZDlkOThmYjlhMWFhZDZlNmUwYjM3ZDYxOWUyYWUyOTliZmE1ZmY5NDYzMjIzOGU1MzZmMzU5MjJlNTk4MjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzYWZjZmUxZDE1YzM1ZDlhNmE4MWYwMjVjYzQxYzIyZTBiZjQ4MzNiZGQzN2JmN2RmOGU0MzEyMTU5ODc3YjgifQ"
+        },
+        {
+          "resource": "repo://src/feishu/oauth.ts#L58-L79",
+          "version": "repo-lines-v1:sha256:5e8656b378e0ff77d6efd576e1170dfc1e0386f0d2ed0cd635c7ac94d73432fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5ZDBmNDk5NDE0MzIyYTAyZjczNTk3YTMwNzY2MTYyMGJhYTFkYjljYjJkOWFhMTMxNWM1OTFiYTI4N2ViZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmYzcwMjI3NzQ0ZTkzY2I5MmNjYzQzNWJiYmM5YjM5YjcxZjI5YWMyYzY0MmZkOGIzNzI3YmNmMzUzMTJmYTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjYTk0MWE3ZDE1Y2E1ZjRjMjcwYTk4MDE3ZDQ1MmY4YTQ2NmU1MDBlOTU0MGYzNjlmYWI1OGEyZDQyYzE0ZmMifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1217-L1227",
+          "version": "repo-lines-v1:sha256:3071254f33646d15cea88dea6b3d0bdf251ed6dbe07d1c4e63003d028fca84b7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5YmU0NDBhNWMzZTNjYTU4NjIwODQwY2JiMjU5ZWVhMzAyZjY4YzQ1MzhhNzY4NTE1YmMyMWQ5NjQ1Y2M5ZTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk2N2U2MzVlYTE5MmE5NTJiNjdlZmZkYzE5ZmI5MjJjMTM5M2I1NDk2NTViYTdjYjM1NGRhOTQyMDFhNWIzNWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNkOTU2N2E0NGM2NWVkNjg5ZWE4NTA1Y2FiMDUzODE2NGMyNWVlMzhhZmM5ZWUxNWFlYTBkYTBjZGI0MWNiNGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0e31349045484dc58d1dfe56f0aee2f0",
+      "statement": "用户令牌按授权人分槽，落点是 feishu.userToken.<openId>（makeUserTokenStore 拼键），与按会话的事件表 feishu.events 是两个独立的槽；因为一个会话背后可能有很多人（群聊），令牌属于人不属于会话，共用一个槽会让群里最后授权的人把自己的文档权限出借给全群 —— 这是隐私事故而非 bug。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/store.ts#L52-L61",
+          "version": "repo-lines-v1:sha256:676ccce9c8efbcf5af546d22b114e4797329eb6201597b2c238c78d8c5e88bd0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhYTBkYjc1NDUzNjI2MGUwZDQxMTVhMmJkZGVkM2Q2MWFmYTA5NjUxMzFiMWQ5ODlkNjMzMDM5NzlmODBjMjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4ZGNjZTIyNjE0NTliMWFhNmI3OTMwZGQ1Mzg1MzM2NGNmYjQwNDIyOThhZmRhNDc3ZjJlODE3ZWU4Y2Q2OWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwODQ1Yzk5ZDhlODUxNTkzYjE5MTE5YWM3NzkxMTNiM2I1ZWQ1MzM2ZTkwNTIwZDljOTc3MzZlNGE4MDcyYmYifQ"
+        },
+        {
+          "resource": "repo://src/feishu/user-token.ts#L1-L37",
+          "version": "repo-lines-v1:sha256:4017b5b7bc1337175e8aecb0c01f3a2a0b6ca0da175d8cff96d475fc0afaf51b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0OTNmYzkxMTFmOGZjYTdkMDIyM2M1ODhmNzU4NjU3NmM4MjMxODUyMWEwNjlkZTkyNWUzOGI4ZWZmMzQ1YjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjViNWUwM2FkMTczYjdkYWQ1NmJhYjUxYjNlYjI3NDZiMDk2NDdmZjc2ODM5OWQ0ZWNmZWRjYzIxYzFjYzA0MzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e925e3549dd843cda3e2288fab02e3a9",
+      "statement": "冒烟测试钉住按人分槽的语义：makeUserTokenStore 为 ou_A 与 ou_B 各写一份令牌，A forget 之后 A 的槽为空、B 的令牌仍在，防止共用槽导致的权限出借回归。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L1422-L1435",
+          "version": "repo-lines-v1:sha256:cbbf5969ac57d4cb62d79f351fc3140475d104bca18b0622c4f20cf80758b6f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmYjVhY2IzOGYwZGYwMDQ2ZTA3MGRlNzZmZTJhOGRiNzdjMWJmYzU3YjVjZDM3NGYxYjE0MmY1MzE5OWYzMDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0MGRmYzc3ZGI4YzRjYmE3ZmY2ZDZlOTE0MGFlOWMzMTQ3MzFhMDVjOWQ0YTE2ZDMyZmVkYmE0OTcxOWRhZmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjZDlkZWQ5YjA1MGIxM2MwODU5Y2UwMmQwZDI3MmM5ZWIyNjcyOTJlNjkzNGE4MmJkNTNlODM4OGEwNmQzZTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6e985ffb1baf40c1a7989a234b79a14f",
+      "statement": "提问人身份（evt.openId）贯穿到工具：入口用 createHost({..., openId, chatId}) 传入，_host.ts 在 deps.kv && deps.openId 成立时建 UserTokenManager（store 为按该 openId 的槽）；没有 kv 或 openId 时 tokens 为 null，文档工具照样挂载但失去用户身份兜底层，此时 callDoc 直接抛应用身份的原始错误且提示里不提 /login（因为无用户身份可兜底，提 /login 是误导）。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L461-L480",
+          "version": "repo-lines-v1:sha256:3563d2ce7b19976c0a1f361879ba5f7ddd5b5c47167600714f4445317323d972:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzZjUyYmRiOWIxMGU2YWJlYjIyZDc2Njc2ZTIzODY0NzhkOGJkYWMyOTE5NjIwNjkwNjgzZTM5MDQ4M2VkZjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZTM3MjVkYTAwMmI0NmVkOGI0ZGU4ODAwM2FkOTcxMGRjYWYxOGQ1N2M0NzAxZGMzYmVmZjBiMmM1Y2IxM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI1ZDJkZmEyZTk0NGJkYzBjNWM4YTk3YWU4MjljOTI3YTMzNTVhN2Q2YmU0MzI5ZDVlNTY5Mzk3ZmRlZTNmNzYifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L569-L574",
+          "version": "repo-lines-v1:sha256:8a806a6c20e6eb70422e6fa9f82d33c02c7754eb16afb2161cf3984501c76ec6:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGE2YzNiN2MxNzZlZTBhMzQ2ZTcxOWNiM2FmOTc1Y2MyZDhlZDU5ZjU3MjVhNmZmYmI1MzQ5ODNlYTk0MTBjMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTg3NzU0ZTVmNjk0NTViMzk3Njg1ZTc4MTU5NGQ1MWY2NzFhMGMyZWU3Y2E5MjZjMGNkN2YzNzFjNmJiNjhjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODQ3YzY5NjQ5Y2MzNTFjMDk3MWQ2NmU4MjllMjYzNWRlNDQ2ZTc5YjUzNzFmMDUxOTNjYTllYzk3MTA0ZGUwZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmU4MzMzZTM5ZTJkZTAyYjE4OTIxNzdkOWI1MzM0ZjE0ZGQ4YjNiYjU5NDAwOGY4OGZjMGYxMDFhMDI0ZTE4MCJ9"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L248-L274",
+          "version": "repo-lines-v1:sha256:8b4e595a778d19f76151330e353906f4a01eb4a4f374e572e6095c17520ce5f5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZTM3MjVkYTAwMmI0NmVkOGI0ZGU4ODAwM2FkOTcxMGRjYWYxOGQ1N2M0NzAxZGMzYmVmZjBiMmM1Y2IxM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjMzk0Y2Q2YWI4Y2E1MTM0ZmY0MmIzZWM3OWRlYzJlYWVmNDJkZjA4NjEwZmU1YTM3YjI2YzYzYTY2ODcxYWQifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2035-L2049",
+          "version": "repo-lines-v1:sha256:32cbb234e21eead8dadce549bcd062fb5abab4d016f306212bcdd18484faf1e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3OTI1MzY1OGNlZWM0ZmUzNGE2Mjg2ZDhmZTBiODVkOTZiODk0NGZiZThhZjAxNWRhOTU1ZGM2NjI3NGI1OWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0MTA2MzdkOWM0ODJjZWNiOTdlYTc1ZmM1MDljNGE3NWNmOTFhNjdhYjA0OTZkZjc5YTIxNGM0ZDM3ODJkMDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiZDU4MzcxMTlmZjA1ODkwN2RmOGIzYWYyMDA5M2Y4MmRiNmM3Zjk5MmQyYzFiZjg0YjI1MGNhOTlhY2Y0YjAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fc9576c981b84b1ca98ef8ff337f9b70",
+      "statement": "UserTokenManager.accessToken() 的判定顺序是先看内存副本够不够新鲜（tokenFresh，默认提前 5 分钟判过期）→ 不够才续期 → 续不了才返回 needAuth，且 needAuth 带具体 reason（还没授权过 / 没拿到 refresh_token 已过期 / refresh_token 过期 / 授权已失效）；顺序反过来会让每次调用都白跑一次判断。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/oauth.ts#L273-L287",
+          "version": "repo-lines-v1:sha256:ee5f05ae8b4d1dfe3e302e685dbbe64ebe253505dfbb2881af169a6d131a5ade:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1Y2M3ZDI4YTVmYzQyNGU4ZjA5ZjY2OGRkYTY0MDIzNzllY2I3YWYwYzUxOWZlNmZhOTQ0Y2NkNmZmYTJmYTUifQ"
+        },
+        {
+          "resource": "repo://src/feishu/user-token.ts#L81-L111",
+          "version": "repo-lines-v1:sha256:8f541019905a5bdb799f01262df3c566f4fcca217455109b1ec464f12b16b425:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllMzY5YTg0MDY5ZGEyMjMwZGZlYjVkM2JkNzQwMDg5YjIyN2FjZTA4ODZjN2M0MTBhMTA5OThhZTI0MmQxYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2NGI1YWEzZGZmMmQ0ZmE0YzBmOWZmNmZiOWJlMzA4ODIwMjk1MGM0ZWE5OTA1ZWJmOGVkOTA0Y2MwYjQ0OTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ccae827ff3f04644b79966b074c64611",
+      "statement": "用户令牌续期用单飞（inflight Promise）：并发调用共用同一次续期请求。这是必需的而非优化，因为一轮工具循环里模型可能同时让多个文档工具发现令牌过期，而飞书每次续期都轮换 refresh_token，并发续期里后到的会用已作废的令牌而全部失败。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/user-token.ts#L105-L110",
+          "version": "repo-lines-v1:sha256:c84824a94ae69b0cd275e692899e018a9ca2704ea36f8739b64cb2b245ec8de1:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODdjYTI3OGY5NTc0OTAyNDUxYjFjY2IxOWE0OWY5MzBkN2M5Nzc4NjI5NzBkOTc0OWEzNTMwNTZlMTg2OTU5NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjc3YjA5MTQ3ZjU1ZTAyYjZhNDkwY2JjYzEzNmNhYzQwYzg5MzgxNjJiMTQ5MWUwOGE4NmZmNWIyOGE0YzE4YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2M4NmU4Yzc1NTJmZjg3ODcwNTE1NTdiNzFhOGMwZmIwYzhhMzk4YjBiMWY5Y2MzYmM5ZTg1MjMzZTFhYzc3MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWE5MjkzZmQ4MDU0YjZlNDcyNDgzNzNmMzlmNGRkNzc4MDAxMDVlYjc1ODM0ODY4NzI1NDI4NWNkMTI4MmI3OCJ9"
+        },
+        {
+          "resource": "repo://src/feishu/user-token.ts#L56-L64",
+          "version": "repo-lines-v1:sha256:52da166bce91e58cae0516f9d256c2a8784d448cbfae27189002e61a017d2d0d:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWZmMGYzYjFhM2I2MWRhOTUwYzM1ZGMzODYyYzQ1Njk3MjQ2OTBjYWZiY2Y1NmU3OGEzMmNlYjU4ODQzNWFlNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQxMGIxMmZiN2ZhNTU3OTk3OTEyNzE2MGU5MDYzNzExMGVmZmQ0MmQyYjMwMzIyMmJmY2YyNzZkZjM2ZjBkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTc1MTNiZTQ1MDZmZmRhYzA4YTFlYzM2M2UyNDNiMDNjODliNTFkYTlkOGFiYmZhZGYyYWM5ZDViYWUyZGRhYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDE2NmRmY2U0M2U5NmM4OTY0ZjY2ZDI1N2E2YzI4MWY5Mzc5OGZmNTBjM2IyNjRjNWQzY2VmNGIxNzljZDJhYiJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1332-L1343",
+          "version": "repo-lines-v1:sha256:7225d385fda76a514f9115455868d6abf9085a140e8e3f3c2a0ac104f5d875cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjOTYwYjA5ZTUzMDljNDFhZjE4NjEzYjg0NzUwMDQ0MWNiNTc5OTk2YWVlNmM2ZTI1MDU5OTlkNTk2YjFlNTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5YTAzODAyZWY0NDk5NjBkZDNlN2JiZDZjNzI4MWIxNjYyMmRiNDkxOThjZmYyOTdmYWJjNmRhNWY2ZjY5YmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA5ZTY3MmUyYTI1MWZmYTg5MTYwNzVhZjUzNWIwOTMwMzk5Njk4NWU2M2ZiNTU0OWMwZWZmM2ExNDczNjdjN2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e5d398cd9df346729261c25cb4b2aaf4",
+      "statement": "续期结果必须与旧记录合并（新值优先、旧值兜底）而不能整体覆盖：飞书续期轮换 refresh_token 但不保证响应每次都带新值，照响应覆盖一次没带就写成空串，而那是唯一的长效凭据，表现是「用着用着突然要重新授权」且极难归因。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/oauth.ts#L258-L271",
+          "version": "repo-lines-v1:sha256:7358fdcde48aae4fcdb83d7d90d84846fa5972fbd88577863e86a82b39bb6107:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViMGYzMzYyNjAwOGI0YTA1Y2JiOGM4Yjc3YmQ0OTc0YmFjODQyODJmMjkwOTI1NTNkYzE1YWI3MzJhOWI4ZDgifQ"
+        },
+        {
+          "resource": "repo://src/feishu/user-token.ts#L153-L168",
+          "version": "repo-lines-v1:sha256:e566549e559187a01889d24fe08c32c1e023ad68f9de69f4f650ef573c5c3b39:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1ZDRhZDJjYmFkODhkNjZmNTE4MDVmZTdmNWIwYzI0ZWM3M2U4NTQwMDdhMmNlM2E0MTMzMjg1MmU3OTQwMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFmYjRhMjA0ZDRhMWMzZGE4OGE0ZDQxOWI4NGU5YmMxYzA5YzhhZmM1NDA4OGZhZWIxZDkwOGRlMzhjYjRmMzQifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1311-L1330",
+          "version": "repo-lines-v1:sha256:dff2be590bdcc6bf5fc0f3bac40160f9d523982b0f062d095744bf59413864c4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4NTA2NWNhZTdkZjMzZDQyNWUxM2FiYjY3NTNkZGY0MTdhM2ZhMzExMDUxZjcwMzdlMTU3ZGM0ZWMxZmQzNWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5OWQ1MWQ3ZjdkZmExNzMxNzExN2U1YzU1ZjM1YmY5YmQwMmJkZDI1OTFjOTQ0NjA2MmE4N2I4ODQzYmM4NTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc4NjhhOWUwMGNjOTE0NGE4MTM1YTc0YjVlNTEwMWM1ZmViYWNhOWFjOWVkNWNhYmI3NDg2MmM2MzFlZGY5OWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cc11cca401774be8ae8788611de1b065",
+      "statement": "续期失败时的语义分两步：先重读一次令牌槽，若 refreshToken 已被别的实例换成新值就用新值再试一次（跨实例竞争）；仍失败则清掉本地坏记录（current = null + store.clear()）并返回 needAuth 附带原始错误，避免下次又拿同一份坏记录去撞同一堵墙。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/user-token.ts#L170-L196",
+          "version": "repo-lines-v1:sha256:f987afae41019128d69ec5596a594fb8b0d890e989956b16e698966e9cff755c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgyOTA2MWYxZjk1NDk1ZjEyMTVhYjkxYjE3ODZkNjQ1ZDJhYTdiYTY1MjVmODdmZWZhNzExNGJkZGQyYTYxNmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlZWVmZGQ1MTEzZDk5MDU2ZjFlMTlkZTFiN2Q1YmVkZTZlMGEzMDFmOWU4ZjdiZTRlYWQzZjhmOGRhODY2YzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1345-L1381",
+          "version": "repo-lines-v1:sha256:7ae3421af1b6b7ddb11429f446713d7bd0971db0d5564a594f93e18cb2e7e909:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjZmNkYWU3NzQwNzIxZGZmZjNhZjAyNTAxZDQwODE2MWI1YjMyNjA4M2Y3ZTlkOTU3NjM5NjNhMGIyZGIwZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA3MTg5OGEzOTgzZDY2ZjIzOWIxOTdkMmNhYmU4ZjgyMDlkNjc0ZWY0ZTMzZjUzYmM2N2NkOTIwOTZkYTZhMmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwYTg1MDY4ODg3YWUwMzcxOGU1YWE0NTkzZmNkNjAyMDBiYTY1YjcwOTI3ZWZjODI2YzczY2ZhZjU5MTg1NzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b95ee463117e42ed8b613ed6292c05a2",
+      "statement": "invalidate() 只把内存副本的 exp 标记为 0 强制下次续期，刻意不回写 KV：令牌可能被用户在飞书侧主动撤销而 exp 还没到，但 KV 里那份仍是有效旧值，万一续期失败且进程被驱逐，下一个实例读到的是能用的令牌而不是被标记坏的记录。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/user-token.ts#L113-L126",
+          "version": "repo-lines-v1:sha256:bcccef42e9b311409dc88454a3b14aa3a065df2a04de52dcfd5c5ec790445e73:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxM2Q3YTVkZDA5ZGNkNjg4YzJkZmIzMmQxZGI5N2JjMDM3NTBjNzM0N2M2MWZlMjgzNTZjMTEyMWE3MzUzY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjYjUxMWE2MjFjNjU5NjY0YTUzNWRmMmViZWQ1NTg2MWI3YzdlYTYzYTFjNmZhYTkyN2U4ODg4YmE3YjRhY2UifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1404-L1412",
+          "version": "repo-lines-v1:sha256:5936d2b6c5409ed645025a42cdd69c018fa697a8449e5bd29048e42b22bddb97:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzhiODkxZjkxMjc2MzdiZWViMzU0NjQ2MmUzMTgzMWY3N2U4NjhiNTdmOGYzZjY0NTgyMDBkMDUxYTE4YjI0MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGRhOTJjZTliNWNiYzNhMjNiNmJjNDZjZmRkOWJiNThjNzEwNTRmODAyODlhNzZiZDA4MzFiMjM2ZDgwOTM5YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjVlMjFhMWIwMjdhMzMxMzRkMWNiOWUzOTgzZjBhNjcyNzkyMDJhMzc4MzE3Zjg3YjQ3MzUxMDM2NmFhNjRhOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_11e50f4fdb004496934aa4a1fd981dcd",
+      "statement": "续期链路默认难以验到（提前 5 分钟判过期意味着要等近两小时），因此 skewMs 可覆盖（FEISHU_USER_TOKEN_SKEW_MS），把提前量拉到 2 小时可让一次调用就走到续期分支。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L472-L480",
+          "version": "repo-lines-v1:sha256:8b30534ab31247c338b5b8fac180d3826e9739618fa104c604b494559e395374:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjE2MTI5ZjYyYWU0NTVkOGM4NzlhZjFlZTZjOTBjNjMwNjViNGQ1MTc3MDE1NTBmY2Y4ZDBkNzg5ZTNlMzcyMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzNmNTJiZGI5YjEwZTZhYmViMjJkNzY2NzZlMjM4NjQ3OGQ4YmRhYzI5MTk2MjA2OTA2ODNlMzkwNDgzZWRmNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGJlMjZkYjNlYzNhMDA1MzlkMjQwMzY4OWQwMmYwNTM1ZTkzYzZlMzAzN2NlMDEzZTg5ZDFhODM2ZmM4ZTQzMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjVkMmRmYTJlOTQ0YmRjMGM1YzhhOTdhZTgyOWM5MjdhMzM1NWE3ZDZiZTQzMjlkNWU1NjkzOTdmZGVlM2Y3NiJ9"
+        },
+        {
+          "resource": "repo://src/feishu/oauth.ts#L273-L287",
+          "version": "repo-lines-v1:sha256:ee5f05ae8b4d1dfe3e302e685dbbe64ebe253505dfbb2881af169a6d131a5ade:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1Y2M3ZDI4YTVmYzQyNGU4ZjA5ZjY2OGRkYTY0MDIzNzllY2I3YWYwYzUxOWZlNmZhOTQ0Y2NkNmZmYTJmYTUifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1414-L1420",
+          "version": "repo-lines-v1:sha256:579c4a6afedda4290450c142c0346fa6d6ce1fc58e77c837ef0fe5eb71feef11:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTA4YzMzZjVkY2VjZTAyM2UwNTk5MWEyNDc3ZGQxYzgzMjg0NTE0Mzk4ZjhhZDUxNzJkMzU4ZjlhZGM4MGJjYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMThiMjFiZDUzNTE2YTMyZDIyZjE4YWQ3OThhZGZkYjAwMDEyMDliYzUwNzg2MGU0ZTY5M2FlOTY5MmIyMTQxYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTg3ODg3YWFmMjE3N2Q3YTEyMWY4NGIxMmVkNDg0NGU3YTI1OGRhMWZjZjljOWE2ZGM0NTk5MWYxNjI5ZGZiOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_03c12654749a4a41aaabfead4970856b",
+      "statement": "云文档工具的身份分发有三个函数：callDoc（应用身份优先、用户身份兜底，两边都失败给合并错误附可执行提示）、callUser（只用用户身份，遇 99991663/99991664 先 invalidate 再重试一次）、callUserOnly（只用用户身份、不兜底，供新建文档）。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/docs.ts#L188-L274",
+          "version": "repo-lines-v1:sha256:04f969088cd63bbb27ab8edc0a8112d847a3c8ff8abd235a857e349763268ef9:eyJzZWxlY3RlZExpbmVDb3VudCI6ODcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdkMWQxYWRmNmY0ODlkZjBkOWM5NzM2YTk5YjllZGRiNzUwMTdhOGJkYmNiMmMzZGM3Yzg5M2VlMWIwYzEwNTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjMzk0Y2Q2YWI4Y2E1MTM0ZmY0MmIzZWM3OWRlYzJlYWVmNDJkZjA4NjEwZmU1YTM3YjI2YzYzYTY2ODcxYWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9288a7065cd44160b24ae76a51672ab3",
+      "statement": "callDoc 不按错误码白名单过滤「该不该兜底」，因为 docx/bitable/sheets/wiki 的权限错误码各一套、白名单迟早漏；代价是模型自己写错参数时会多打一次注定失败的请求。两级都失败时返回的错误带上应用身份与用户身份各自的原始错误，让模型知道两条路都试过了，不会自己再重试一遍。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/docs.ts#L248-L274",
+          "version": "repo-lines-v1:sha256:8b4e595a778d19f76151330e353906f4a01eb4a4f374e572e6095c17520ce5f5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZTM3MjVkYTAwMmI0NmVkOGI0ZGU4ODAwM2FkOTcxMGRjYWYxOGQ1N2M0NzAxZGMzYmVmZjBiMmM1Y2IxM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjMzk0Y2Q2YWI4Y2E1MTM0ZmY0MmIzZWM3OWRlYzJlYWVmNDJkZjA4NjEwZmU1YTM3YjI2YzYzYTY2ODcxYWQifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L2012-L2033",
+          "version": "repo-lines-v1:sha256:36844da0547c23b6bac715262739970b2eedd1501816813e90b404df1b8ce198:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzMzczNmU1N2E0YWQzYWE5NjRlZGViYTdhODY3Y2U5N2NmZjQwM2U5N2MxNDkxMjFhZGI4Njk3NTdkMjNiMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjYzg4ZTljYjRmMDVjNTJlNDJhMDdmYzgwMzNjNjlmZmNlMjk2Y2IxOTI1NGFkMjYyNzBkZmJiOGZjYWVhNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyOTBjOTViNDY3OWRmY2EwOGViNmU3MzRhY2E0ZGQ3YWM3ZmVlZDVkNWY5MGJhNGIxNGM2ODY2NmMxNjU1MGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_07c0094c904643f4b1ffca10d2ced5dd",
+      "statement": "feishuCallAs 用调用方指定的 bearer 发请求，与 feishuCall 只差「token 从哪来」，但刻意不做刷新重试：用户令牌续期要换 refresh_token 并落盘新值，埋在通用 helper 里调用方就看不见那次写回，续期归 docs.ts 的 callUser 管。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/api.ts#L127-L161",
+          "version": "repo-lines-v1:sha256:a2c388628e923764375535428dc2355a6fee428a08e4a10c45ce3766966de8b0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ2OWY3ZGU2NTk2MjExYjRhYmZhNjBhMGNhMWJjM2E3ZDRkMjY5YTdmY2JiZjVmYmFkOTE2MTkzZDI2MmU0NWEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L188-L211",
+          "version": "repo-lines-v1:sha256:4f4168e533278c459256665579249fd7b380a3231fd2eafacb9a7f713da0b8e5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdkMWQxYWRmNmY0ODlkZjBkOWM5NzM2YTk5YjllZGRiNzUwMTdhOGJkYmNiMmMzZGM3Yzg5M2VlMWIwYzEwNTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzZjIzMjI4NjdmNmVhZTE0NmFhMGVlYTlmMjY2ZDU1NDhkZmUyY2JhMTlhMGIxNTZhOGY3NDViYTA1NTFmMmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cc48eda9391b4f94923a48b5c36166c7",
+      "statement": "新建文档（feishu_docx_create）只用用户身份、拒绝退回应用身份：应用身份建出来的文档归应用云空间、用户打开只有只读（菜单是「申请编辑权限」、删除回「无权限操作」、打字打不进），而且应用没有删除 scope、用户没有编辑权，那种文档两边都清不掉。用户身份建的文档落在用户自己名下、可编辑可删可分享；代价是没 /login 的人用不了，这是有意的取舍。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/docs.ts#L1-L17",
+          "version": "repo-lines-v1:sha256:a8017e60629416069dc6bba5ae7cf2789038a464091e079a3cb2eca43d65b43b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5MzZiMGE0ZTMwMjY0OTczZDliMjZmMGFhMTNkMDAxYjE0NDY4NjYwMjQxOWY1M2MzMDNjNmYxNTFjNWU0YWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlZTMyYTRlYzc4ZDI4ZDYxYTYxYTQyYTRhODI0ZGY1YjlmY2Y3NWEyNzUxYjg3ZjhjZmU2MTJjNmJmZWE3ODUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwZDI3N2VjYWIyNDA4ZDRjOGRjZjA3OGU3YzM5MWQzOWYyMDZiNTkwMTAwZWRlZTlmN2Y2ZDUzY2IwN2EwZmIifQ"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L213-L246",
+          "version": "repo-lines-v1:sha256:e9a55da65118de2da2bbabd3d824c82d1f0e98230c82538a85b918d742785ef4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZTM3MjVkYTAwMmI0NmVkOGI0ZGU4ODAwM2FkOTcxMGRjYWYxOGQ1N2M0NzAxZGMzYmVmZjBiMmM1Y2IxM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQzODliNmU2OTYwODIwM2U0MGFmZjk2NmY5OWUzNTM0YmJjOTMyMzlmNzZmMGFkYTU4ODg3ZmFiOTNlODQyZGIifQ"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L874-L896",
+          "version": "repo-lines-v1:sha256:6e7e562916b89eab6e5fa35f4f35ecf138e78c0be735b5990682a8b69dadef9d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0MDA0NDAzM2EyMWM4ZjRlOGRkZmNhZDgwY2ZjN2M0NGRiNGJlMmJlNjRmMzAzY2Y5OWQyM2EyMWYyZjZhMGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhYjNmODAzOTVmYzVlYjNkNTRkNTJlNWJlZTZjYWJlNzQ3NDgwYTQxNTFjZGEwNjRiMmY1ZDZhMDViZWRjNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQyNzViNDM4YjUzOTRjMzhiMDg0OGJmZTc1NTFjODUxZDFjZDAxMGI1NjUwNzQ4ZTQ2ZWQwZjdhOTE2NWY3NjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiNDlkNjA2NjZjNjIwMGU0ZDdmMDM0YTVjMGMwZTgyZTk0YmYzNjRiMTRkNmU2MWU2MWI0OGVhMjg4M2UxNGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c2f153e3892c4e1fa7ee75652607dd63",
+      "statement": "「新建文档不兜底到应用身份」是硬要求并由测试钉住，不是风格选择：一条测试断言建文档全程不取租户令牌、建与追加两跳都带用户令牌；另一条断言未授权时报错、无 docUrl、且一次都没取租户令牌、一次都没打创建端点。这两条身份测试是后补的，因为此前的创建测试按 URL 路由桩、区分不出用了哪个身份，身份改回应用身份也不会变红。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L1680-L1704",
+          "version": "repo-lines-v1:sha256:b7e0af0f7d65f47a612f7c602ee45f02efa6ea06e3b3fdc6e15fd6968cdc7522:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxNDM0ZDdiNGE1NTkzNDU0MzBmYjg2MDJkOGQ5ZDEyOWE5MzMzYWViZGRjNzViNWIzNDFkMDcxNzk4MGY0MTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc5NWYzYTY5ZDk0YTEzYzU2ODY0MmE4MjljZGUyMmU4NjA0ZjFkNjQzM2Q2ZWEyMDkyNGRjYmE2NGY4NmE5NWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ0MTE3NmUwYzM3YTA0Y2Y5YTQ1YTQ0Yjc4NzI4ZGM4OTdmM2U1OWQyYWY5OGJiYTNmYzVlMmJhMDQ2OTkxZjEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1706-L1746",
+          "version": "repo-lines-v1:sha256:95b0088580edd59d9ee05708f7e8a9b28ce5bcb9539f7f083788d0c8b35fdb98:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhMzhkMzZhNTNlMjhkODdjYzFlZmI1NTUzMjE5NTE3ZDhhNDFhN2UwYzE0NDZmMTRjYjE3MmZiODgzNGFkMTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3MTc1YmIxMmZkNjRiYmM5MDgwNjk3NDQ0ZjQxNzI1YWYwMGE1Zjg0ZDUzYzIwZDlkNDU2MjU3YTNlZDVlZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1NzgxOGEyYmZlNjhmZmUzN2M1YThiZDE1ZWM4NTNjN2FiODhiODNhNjIzMGRjMmRjNGYwMjUwODAzNzEwOWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_97255b699ec5456187693a18548df0b6",
+      "statement": "新建文档的创建与随后的正文追加必须用同一个身份（两处都传 callUserOnly），因为新建的文档没共享给应用、用应用身份追加是注定失败的一跳；正文追加失败时不回滚，如实返回 contentError 并指出链接有效、可再用 feishu_docx_write 补写。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/docs.ts#L123-L131",
+          "version": "repo-lines-v1:sha256:1b6ee403a8c9ccbb9ca89f90ff11e1bfff49a2a4b3c1edfc5c7df1783df4714e:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjVhMzJjMzk4ZTU3ZTIyYzkwMTc5YTU2NWUzMzYyZmE5ZjViZWJhZDBkZTdmNmQyYTRmYWUwZjQ5ZWZkYmUzZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzA3YzJkNjNlNjY5NGNiYjZkNTgxZWZkZWRkYzgxODExMDE1MjVlOGFlMzhkMWZjZDQ0ZTdmMTFiYzkzZTUxMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDVkODdkMDA3ZTc0OWMwNjdjZmJhYmQwMjI2MTgwMzlhNTVlMjc1ZGQzNWYyY2FiOGYyNjE5NmUyNjAwZDFhZiJ9"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L360-L405",
+          "version": "repo-lines-v1:sha256:19e72390b7cf9c4d7fa4ae2e027b55e6fa64209ca02f537f199fa3f432a40f14:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlMGFiOGRhMzY4ZGMwMmRkM2E0NWU5YjVlODQ4M2I0ZGM2MmQzN2NlZGE3OTkyYzlmOTYwOTM1MjI2Yjg5Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUzODlmY2U3YTk1MzdhZjMyZmEzZDU4YTNjODM4ZTJiZGZkMDBhODE2ZjgwZjZjZjY5YWE5N2RmMzQ4N2ZiZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzYWY5OGE3YjdhY2ZlYmM3OTcyNDliNGZlYzg1YjdmMTkwYjM3ZTU0MDEyODgyMWJkMzFjMjQ0ZTJmOTRlZjkifQ"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L940-L959",
+          "version": "repo-lines-v1:sha256:18b4375896fac1ac78d81d38b1ea10bbc5a448d5d29551e5f4197ad4f55c0613:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1OTZkZDg1NzM3NTY1YTdkOTEzNGJiZGU2YjUzMGM0NGEyZjlhZDA2ZDVlYjFhYWI0MmFlZmJiOTIwNzA1YTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiZDdkNDE5OWZjYWE3OGNiNGQzNGYwNjUwMDZmZWZmZGNmY2VkMzEzNGExZjdjZjc4MDZiYjQ2NmIzZGM0MTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyYTk1OTkyMmJlOTRiNGRkN2MzNzNkYWI4MWFlMzIzNWEyYjk5MmEwMTkyYjI5ZmQ2NjAwMzQxZmMzMWM0YTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dc91c66675084278af2c594863b79c01",
+      "statement": "/status 报的云文档授权状态是按人的：statusText 用 deps.openId 调 authStateText(tokens, openId)，输出 openId 前缀、访问令牌到期时间与是否持有刷新令牌；/logout 调 forget() 并按「本来有没有」给出不同回执。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L695-L710",
+          "version": "repo-lines-v1:sha256:ff34edb16cf14fc188021c7e12140e1474b2445292688baf704fd98fc09e6044:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzYmRiZWI2NDUwYTcwMDZhOGE2ZTlmZmFhMjQ5NWQ1NjFlMjAyZWJkMTA1NmIxNDQxMTQwYjEwZmE0ZTdmZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmMGNkYjk3MmE3YmZiN2VkMjQ2ZjlmZjY3MjM4NWU1NWY0OTY4ZmMxMTA0M2RjNWI2ODRkNTFkZmEzMWRiY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliMzAzMjEzMGE3M2NjM2Y1ZDEzYmQ5N2QyYzVhNDM2Y2RmYzA2NzM4ODQ0YjU5MzgxYjYyNGQ5ZDBjNDhkYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhjZDViMjExMTc4ZTczNTdlOGE1YmFlNzJjNDEzYzU5MmQ4NzA3YzM0NTNiMzdjZTI1YTY3NjUyZDEyYjIwNWMifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L748-L754",
+          "version": "repo-lines-v1:sha256:ae9d77ea3279686bfb5e17a0b761b81f3af7aa5453573518ed2b8674d724dad7:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWFjMjVjMmZiYjdlOWU5ZGQ4ODcxYTQ1MGJlNDYzODY0MjE5YmQ4ZTk4OTZmZThiOGNiYjk1ZGIwMWY3ZDIyZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYwY2RiOTcyYTdiZmI3ZWQyNDZmOWZmNjcyMzg1ZTU1ZjQ5NjhmYzExMDQzZGM1YjY4NGQ1MWRmYTMxZGJjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWFhOTQ3MGNmZmM2Nzg4ZjZjZWJlMjk1ZDc2NDIxN2MwYzI4MGYwZTE0YmY0ODA0MzQyMWVlMzVmZTE3YjllNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmZlMTc3OTA4ZmZkMTZjMzU1MjI4N2Y2YWI0NmMwMGRiZmZkYmYyZDNkMjg5MGM1MTU5MzQ3Y2RkZmMyNjJjYyJ9"
+        },
+        {
+          "resource": "repo://src/feishu/docs.ts#L967-L976",
+          "version": "repo-lines-v1:sha256:da7fd5ae459386d353a5b09a323559e769cc218715883156993ab6f20221336e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3YTI1ZWIxMDUyNjMzOTg5YTgxYTJhZTczMmYyNTUzYzAzMDU5MWFjODUxZDk3ZTcwYjIyNjI0YzVmYTJiZTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBlMTY1NTcwNGRlNGVkNDc0NmFjNjYxYjY1N2Y3NjI1ZWQxNDQwODkxMjIyMDdlYzk0YjgwMWJkN2VlYTRlZmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_72c938fb3ffc49b0a6b689820133841b",
+      "statement": "授权链接不由模型转述而是由宿主生成、由 turn 原样发出（loginUrl）：模型复述 URL 会截断、加空格或写错字符，而授权链接错一个字符就是死路；且命令回执走 sendText 发纯文本消息，飞书纯文本不渲染 Markdown，所以回执文案里不能用加粗或反引号。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L712-L746",
+          "version": "repo-lines-v1:sha256:e7499f5075d2a46ceb3fdf26e82a3e6e99678ed558fa9fbe8e8526f8c7b5ba7f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyM2EyMjdjYWViMzZjZmMyZTMyNjBjOGYxYTQwMWUxMjdjOTRiN2VlZDE3M2U3ZjZmZTkzYmJmYmE3MTVmNjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmMGNkYjk3MmE3YmZiN2VkMjQ2ZjlmZjY3MjM4NWU1NWY0OTY4ZmMxMTA0M2RjNWI2ODRkNTFkZmEzMWRiY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhN2ZlZGFiZmQ4NmVmMmE1ZDBjZDk2Yjk5YTUwYWNkOTZmOWY3Y2M3MTQ0YWY4YTBlOWRmNjNmNzIxNTMxNDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3ZDY0YWJhYmM4MjI5ZDEwNDgzZjViM2UxZWFiMzE4ODU3Njc0MGQzYmYyYTU1NmU0N2NmNThhODI1NDViYzYifQ"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L140-L146",
+          "version": "repo-lines-v1:sha256:c440cd9bc677b2fffb95281ca33d847ad6922913d1064e929b872c4b3b74a40a:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWIwZDU5NWFkMThkNzFjYTlhNjY3NWMzMTQzODlkZGZmNjZhYzc0MTg2MTYyYjFlYzIwN2FmNjVkYTU5OWI0MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDgyNzhlNzlhOTcwZDhlZDA2NGNkYzEyOGIxZWM0MDgxNjcxODkwMmQ3MWFlN2E1NGJkNTc2ZTk1ZWNiOGViNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODQzNDJlMzc4ZGM2OGMyYjgxMzBlZDFjOWM4MWY1NTQ2YzQ2YTYxZTU0MWFhNjhiNzAwY2Q4YmI2NzliMWQ0MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWU5MDllZDEwYWY2ZDlmOGQ2MTYxNDMyNWQ1YzU2MzYwODg3NjVjOTRjMzQwMGRmYTA3MmU1Y2I0YTkzYjUyYSJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

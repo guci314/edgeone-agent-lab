@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:8bd3a7c0f354fa90d7238830781ccf62867f05a02a009a1936a7d67a9f80fc2b",
+  "claims": [
+    {
+      "id": "claim_c77a126961954343a118bb5bca99059f",
+      "statement": "平台 session 不暴露压缩钩子，因此会话压缩只能自己组合 getItems → summarize → clearSession → addItems 四步；平台实现里 MAX_LIMIT = 100 与 SDK 不传 limit 共同导致 getItems() 恒返回最近 100 条，所以 /compact 的语义是「把最近 100 条压成摘要」而不是「把整段对话压成摘要」。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L342-L359",
+          "version": "repo-lines-v1:sha256:2fb6487022a9958b738698602ec9bebec800b938cae428e2e873e6dfd404eec3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwZWQxOTFmY2I1MTc4YWYzNmNiOTI4NzliYjEzNjM5ODEyNjIzNDkzOWYwNjQ3NjdmZjhiMmFmZDY5MDk5ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg0YzJiMGJkOTBkZjg5ZGZkZTgxN2U2MDc1ODE2YmVlMmI1OThjMmM1NzBlOWU0OGY3MDdkZjliZWQ2NDcwY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE0NTIyYTdkZWI0ZjE2MjY5NzJhZTk2MTVmOGRmNTY2OGVkNzE5OTA3MGY4MGI1ZWJhYTQ0MjFiZjI1ZWU3N2QifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L403-L425",
+          "version": "repo-lines-v1:sha256:31a8bf22f363cf9ddce80915ce294dfd4d56adeafa945598d6e1af068f396c66:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmMzNlNTg5NDcxZWQzY2YwNzJiYzlkZjdhODhjNDhkYjYzMDJiOWY0Y2NiNWNhYTdkYWE3ZTJmOWYxNGI4ZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzOTQ5ZGFmNTgwZjg2ZDUzMmJlMjdhYWJiYjc2NDcyOTViZTBkYzVlM2QyZTllM2UzN2I5N2JkMjZjOGQwZjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRmM2E1MDYzMzBiMGU1NDBiZjM1ZDYwZGM2ZjZlNTNmZDBkNmE0ZjllNGM3NGIyOTI0NGQ0YzMyZmNjMTkxZjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxNDQwZmRhZjUxZWQwMTMyYjAyOWZiZGZjNjc3YzA2NzZjMjNlYTU1YzhhOGNiNjBkZGIyM2FlY2ZlNjJlYjcifQ"
+        },
+        {
+          "resource": "repo://src/feishu/compact.ts#L1-L14",
+          "version": "repo-lines-v1:sha256:f32482df3674ddf7a6c251ec31c7fa74a2b9e733be3307c41dc8dda28867b9b9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwZWE3MWFkYjdkNzNkZjhlNjAyZjY4MjBiMDMxNjdiMWVjNmVkYjVhMTE4NWUwMzcwYzE1YzIzZmU4NmM0MzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhNTQyZWJhZmI3NjQzMmNkZDQ2OGU2MGUzNDUyOGI0YmI1Y2Y3Yjg5MTJjNmY5NzdjNDgwNzI5YWRmNzJhNjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhNmQ0MGI1YmY5ZjNkM2U4M2U2MDcwNjc1MjNjNWNlZDQzMDFjZTMzMWY3NDY1ZmY3YjI4ZWI0M2JhZmRjNWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f94f878250d74d928f07f02d752bdb13",
+      "statement": "手动 /compact（host.compact）与自动压缩共用同一个 runCompact 实现，两处各写一遍会导致安全约束漂移，而漏写一条就是「抹掉整段对话记忆」级别的事故。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L383-L426",
+          "version": "repo-lines-v1:sha256:a611b4e0e58f7916410a41ece15811de10c69464b49b9eb934b12b80979c4295:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZhNTVjMDc5ZmUyZWMyNzI3ZWVhMjEzYTExMWM3ZmUxNjUzY2Q0ZWUzZjgyOGNhN2NkZDU4ZjdiNzM1ZmU4Y2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUwM2ZlZTM3NDM5ZmYzZGNhOWVmNjA3NjRkMDA4ODQ2MWYyZDMwY2JmZjM4YTQzMmNmNGEwYmVmZWUzNjY2YjIifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L756-L761",
+          "version": "repo-lines-v1:sha256:7091cc7177f5ff700cb1e12aa20483625639cd0d77c7042657b57c9f3eae159d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjA0NzE4NWI2MWM4MGIxY2IyN2M3YmU1NTFmMDAxZTMxOWM4NDljMzU0Y2NkMTYxNTU3OWE3ZmU3NWZiNGMzZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYwY2RiOTcyYTdiZmI3ZWQyNDZmOWZmNjcyMzg1ZTU1ZjQ5NjhmYzExMDQzZGM1YjY4NGQ1MWRmYTMxZGJjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGFhMWZkMzQ2MzVkNzNhYjNhYjQ0ZmNiZmJhYmRjYzBiYzkxMTk1ZDc5YTZjOTgwYWFhZjRjYjYxNDlhNDYzYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGJlYzI3MDViYTVkNTcwZDg0OTY3ZGQwNmFmN2ZiZDc5YzUyYzgyMmEzOTc4NzgzOWU4YjIxMzM1OTQ0MjNmYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ee5cc9ef23bb4022911b0689c45f6b44",
+      "statement": "runCompact 有两条安全约束：摘要为空时什么都不动直接返回 done:false（先清空再发现没东西写回等于抹掉全部记忆）；以及必须先 getItems 读完历史再 clearSession（顺序反了同样会把整段记忆抹掉），写回的只有一条摘要项，触发动作本身不留痕。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L408-L425",
+          "version": "repo-lines-v1:sha256:f82392a7fb5f121f2299af039c4c8bca85d91927f49df36eb59a01e477d9616e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3ZGNkMjA2MWRmMzEzNTJiZGE3YWRmNjNmZjY2ZjVmMmQ5MDhlZTlmOWIxYmYzNTQ4YTg0ZDhlYjczMjlkNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzOTQ5ZGFmNTgwZjg2ZDUzMmJlMjdhYWJiYjc2NDcyOTViZTBkYzVlM2QyZTllM2UzN2I5N2JkMjZjOGQwZjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhYzhmMDNhZTI4ZjNiZjJjNDhkZDZlZGVlYWEwMzFmMGI1NDhlY2I3NTdlYjg3NGY1NmM3NjI4ODUzYTlhMTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxNDQwZmRhZjUxZWQwMTMyYjAyOWZiZGZjNjc3YzA2NzZjMjNlYTU1YzhhOGNiNjBkZGIyM2FlY2ZlNjJlYjcifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L410-L417",
+          "version": "repo-lines-v1:sha256:3ab5848e56e2ac1f36a44adb33db663ddbd634ebb36a58a7d0483e5cc691eebf:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTRlMjRlOGY5ZTJlNDlkOGYzZDYxOTI5NmM0OGQ3NGI1M2Y1NDc5YTUwZjQwNzU3NzFiZTllNTJjODA2MWRjOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjYxMjgyOTJhZTQ1OGUyNjhhMDdkMWQ3MzJlNDg3NGZiMDhkOTMyNjYyZTVkYzAyZWJjMTU5NDY5YzVjZjQyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDUwMzE0ZjUyZTVmMmRlOGIxM2VlOTUzYTQ4MjE1OTgzN2UwZDU3ODc4ZGQ2Y2JhMGE4Y2IxNDA0NDQ0MDY2YiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e35029aff52c4c9195a988484f735907",
+      "statement": "MIN_ITEMS_TO_COMPACT = 3 是压缩门槛：少于 3 项时摘要不会比原文短、压了是负收益；这个门槛顺带让 /compact 幂等（压完只剩一条摘要项，再发一次会被挡在门槛上）。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/compact.ts#L16-L24",
+          "version": "repo-lines-v1:sha256:f8db1336f2ad181328904db45929583dc55bd34bff4f5aac7a9fa26d20d12de6:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmU5NTBhYjJlMjJlYTA5OGQ3MWYyMWUyYmE0MWU2ODc1M2E3YjkwYzI4NWJmZDRhZWQ4YjliMGU4YzcxNzJkMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDk2OWNlNGY1ZTEyNWEzOWU4ZjU4NjdjOTk5ZDViOGE0NGFiZWI0YTEyOTMwOWYxMzVlMDAwYjExNmMxM2Y1OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzc0YTY1ZGY0MWFjMWUxN2YyYjk5N2NiM2ZjMGFkMDM2YjgxMTk3YTA3NWQ2Yjc2MzVlNTU5MGQ3MTlkOWE5NyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_797ec1c5c20544b5936c1851c797d852",
+      "statement": "renderTranscript 把历史项渲染成纯文本：message 按 roleLabel 加「用户/助手/系统」前缀（单条上限 MAX_MESSAGE_CHARS 4000 字）、function_call 与 function_call_result 各渲染成一行（上限 MAX_TOOL_CHARS 600 字）、reasoning 项刻意丢弃、认不出的项直接丢掉；内容块数组也收（图片/文件/语音/拒绝渲染成占位），且超长字符串按头尾保留截断。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/compact.ts#L90-L199",
+          "version": "repo-lines-v1:sha256:c7539d30f4d3b9c4d5d698d5c28b1bb13ab1afea4990f7511d142e6779fa274e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlMzE4NTNhZDFlZTc3YjAxMDdjMDQyZDc1MWE2NWYwNjA1ZGE2YWI3MTliZDcwMDViZmMyNzlkYzUxNzkyZGIxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3Mzc0YjY4NzYyMWNhNjlmODZjMGU0OWI0NDg5MDRlMzc3NmYzYzA1NzFkOGJiZWZkZmFhY2E5NTVmNWRmYTlmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI3OGUzZjNkODRjZWVkZWI0ZjNkOWM1YzMzNTlmZDRkM2Y2ZmFlNjE1YTU2Y2E1ZGMyY2JlYTBmMDcxZTVjMTY5In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_295cc8d20b114fde91d55fc7819f3180",
+      "statement": "clampTranscript 在整段 transcript 超过 MAX_TRANSCRIPT_CHARS（12 万字）时保留头 HEAD_CHARS（3 万字）与尾部并插入省略提示，且头尾都留是因为会话开头通常承载用户第一次讲清的「要干什么、有什么约束」，只留尾部会丢掉后续追问所依赖的那个出发点。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/compact.ts#L201-L217",
+          "version": "repo-lines-v1:sha256:8bc29af8447ec23546bb64f55540955df4caf2e9c1cafa70b03320fade253d0c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ2MWM5NGRjYTRlMTM5NzhhZmQ0YTExMDAyNjA0NjMxYjQ5ZDdjMWM4ODc4YThhOTQ4NjA5MTU4N2EzYmExYmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/feishu/compact.ts#L29-L48",
+          "version": "repo-lines-v1:sha256:c5fd29dd1ecb345f260182b58196e9865d93c8d6127d32c4f0d68154d9047add:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5NzJhMzZhYTc2ODFjYTAxYzMzMTA4NDRhYTY3YjUzZmRkMTZhNmFlMGMxMTZiYmQ4MDcyNDhlZmNhMDFiZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5OTc4ZmU1ZGFhZDlhOGNlZTNhZGU1MDIwOGI3MzBmMmY5NjM0YjM4ZTc2NjNhY2Y5MDg4NjQ1NzZjNDZmZjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3Mzk5N2MyYmEyNTY4N2U5ZTIzM2MzMzViM2M1Y2I0ZWY0ZWUxYmQ5NzU0ZjI2MmU2ZDBmZmQxZTRiMWMxM2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxMWE0YTMwY2Q1NTBhNGY5YzljNWNiOTUyNGFlYjA2N2I5YTk3ZjY1NWRkZmNlZDA0MTZlZDM5YTNhZmZjMWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eac8c6277b704f3cac2ed187dcc06aa6",
+      "statement": "自动压缩判据 shouldCompact 只看 renderTranscript(items) 是否包含 CLAMP_MARKER（「中间省略约」）——即渲染结果会不会被截断；它刻意不写成 length > MAX_TRANSCRIPT_CHARS（正确性压在那约 31 字提示长度上，改文案就静默失效），也刻意不用条数（平台窗口本就锁死 100 条，条数触发只会白压一次）。CLAMP_MARKER 由 clampTranscript 组文案、shouldCompact 判截断，两处必须共用同一常量，拆开会让判据永远为 false 且不报错。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/compact.ts#L100-L121",
+          "version": "repo-lines-v1:sha256:b5f7a3d83cbb70b683edfdbd9b0199d1a040d19ff017c8b32efbaeadf498435a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlYzQzMzJhN2EzMTVjYzI5NTJkMTllYWVkNjNhNDgyYmZmNmE1MzJmNjMwMTJiM2ExOTRiNTVjOTA2MTQ5NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc1OTQ3YzBkMjgxNjYxZjU3ZTBhZTg2YjkyNDIxMmZjYTcyNzViNmUzYWJmZDNjY2YwNzdlMGM1OTYxY2RmMGEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/compact.ts#L209-L216",
+          "version": "repo-lines-v1:sha256:db3832124851a0d99649dfeff01c5ae90b839b009808ee43d5a661182f839444:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTU2MmFmM2JhNjc1NTViNWU2MjRiNjAwZjRjOWQ1NjM3NGUwNjRhOWM4YzljYjM2YjRjZGEyNDU1YWU1OGYyZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTdlZDVjNDIzNDExN2U5OTBmMDc5MDhmZjI0YjM2ZThhZWJhNzBiMDYxOTU5YzhhMjExYzA5ZGVmZGZiZjAyYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWJkN2U0ZWM2MTExNjI2NmJhNjJmNmJkOTMxOWYyNzgyYmMzMjc3OGU3OGZmNTM3YWEwYWNjMjY4OGRlMDQwYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/compact.ts#L41-L48",
+          "version": "repo-lines-v1:sha256:0b5965aad213c212376c114ce3089f8cd2097a475f5fdda5be4a8b4818a84299:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTk5NzhmZTVkYWFkOWE4Y2VlM2FkZTUwMjA4YjczMGYyZjk2MzRiMzhlNzY2M2FjZjkwODg2NDU3NmM0NmZmOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzFiNDkyNjU1ZDMzNThiMDZkYjM4ZDY2OGE5NjI1NzJlNmFhZWM3YmY5OGJiMTEyZDBjZjk5NDU5NjU2MGRlMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDExYTRhMzBjZDU1MGE0ZjljOWM1Y2I5NTI0YWViMDY3YjlhOTdmNjU1ZGRmY2VkMDQxNmVkMzlhM2FmZmMxYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_50cfccd011ad42b19cb94fdbc4a7ab95",
+      "statement": "摘要请求刻意不走 run(agent, …)：Agent run 会把这一回合本身写进 session，而压缩要求「读到全量历史 → 清空 → 只写回摘要」，中间插进别的项顺序就乱；summarize 直接打一次 client.chat.completions.create（复用宿主已建的模型客户端），不接触 session，也不给工具。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L310-L329",
+          "version": "repo-lines-v1:sha256:80e0cd8807c23440bff01921046d8813bb11e84d9b01a8ebe3653ef1bd625bbd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExMTAwMzU1NTk4ODdiZmFiMmI2MWFiZTkyNmI5MjdmZjgzYTAwOTljOTA1MDNkMDJjODg5ZjAxZTk0ZjVlM2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0YjFjZjk4OThmZjdhMjZhZDg5MTUxZDI0NzMxNTgxNDAxNTYzOTBiOTE1MGYxYjNkYjJmN2Y2MTdjNTYwYzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE5N2I0NTVlNjVmZDE4NzA4ODczYjVhMTEwOTNkOTg2MjQ4NDA5NGZkNDBkN2Q5ZmJjYTVjNTcxZmEyYmJmMzAifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L361-L381",
+          "version": "repo-lines-v1:sha256:a9ef250eac2a77d1bc0031f2b5e6910108723e4e5fc29803dccbcb11f8369d36:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI1ZTM5Y2JlOGQ3Y2IyYjg2MmJjYzBhMWEyYWMxNmExNTczZjI5ZmIzYWMwY2RlNDVhNzVlZTNjMjQwMmZiMTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhiZGVhYTVhZTEwMDAwMjNiN2VlNjQ4NGFkOTUyZDJjZTNhMzU3MTU4ZjZhYzE2MTk4MWM1YjMwZDYzYjI5NjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_236ad1e76f7e43ddbc6aab85c7ec9eaa",
+      "statement": "摘要写回的形状是 user role 加固定前缀 SUMMARY_PREFIX（「以下是此前对话的压缩摘要：」），用 user 而非 assistant 是为了让模型把它当「用户这一侧带进来的上下文」，而不是自己刚说过的话而顺着往下写。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/compact.ts#L26-L27",
+          "version": "repo-lines-v1:sha256:9990d92f86b10af0153955417666047b6d6dc10651a4d84302eda7e285779c77:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWIwZjZjMjRmNDM5MjViZjY1ZjEwMTg4ODdmN2M1MDI0ODJiYjgyY2E5ZTAwNjJjMjdjZTNlZDgyYzVkMTNmMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjI2NmQzNzYwYjFjMGU0ZGI3ZTA0M2M5OTI2MWViMzkyMjgzZmRjOTY4MjFmZjY5YzI3NzliMzlmZjZlOWE0MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjZiODI2MGY0MjI2YzcyZDAzMjM0YTJmN2NkODhkNTE3YmNlZjU5NWUwNjI4MWViNWIwOWVlMDg4MjQ3ZTIxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDI5N2RmOTQ2ODViZThiOWIzMDM1MzUzNDgzZDE2ZDNlZTE4YzFhNTIxZTdmMDk0NDU4NTE5MGY4MzYxNGI0MCJ9"
+        },
+        {
+          "resource": "repo://src/feishu/compact.ts#L69-L83",
+          "version": "repo-lines-v1:sha256:3fe8cd2cb3ad0061ab46ce76ec590042bd8de356b3f303de0c5a04d09773190f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlMjM5MWU4NjFlZTBmMmI3MGVhZDhhNjJmMjhlNjEyZDBmODkzYzI1M2M4MWFkZjZjZTlhNDM1MmYyZDMwYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjYzVkNzUzOGVkZDEyNzNhMzgzZjUyMmFjNzliNGM2OTUxNTY2MmIzM2ZhNThhMzQ4NTBkMzkxMWVhZDFmZjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4c63cee2ab2c4c8ea4392766413adc14",
+      "statement": "SUMMARY_SYSTEM_PROMPT 要求摘要保留四类信息（引用过的来源原样保留、问题与关键结论含数字口径、用户表达的偏好或决定、还没做完的事）、记不清写「未确认」而不编、控制在 800 字以内；对应地摘要请求输出上限设为 COMPACT_MAX_TOKENS = 2048（不设则默认上限很低会把摘要砍断）。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L181-L187",
+          "version": "repo-lines-v1:sha256:581f4fc5e8d9fd11ffd77264294333ef3d426ee0e105b5799214dff1e294d612:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDBkOGVkOTY2MmQxMTdmNWZlZjFmY2FiNzFlZDg4MDNiOWZlYjI5YjMxNzE1N2JlYzgwNjZiODVkODg1ODliYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjg5ZDY5MjNkN2IxZGM2ZjUwZWVhNjAwMTc2YjE1NDY4MzRkMDJmMDJmMzVkYzA4NjYxMzdlYjNjZTgzYTNkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmZiYWEzZWJiNjUwZjZiNGFkNDM3ZDA3YTg2OTVlODMzZWM1YzVjZWVmOGE1MjY3YjcyZjQyYmE3MTYwZTc1YiJ9"
+        },
+        {
+          "resource": "repo://src/feishu/compact.ts#L50-L62",
+          "version": "repo-lines-v1:sha256:5746cc42787d34325cfe7d2cfe6923eca78b10a499e77dce4f0ca8fcbb410bec:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxMWMzZThhZDQ3OTc4ZjljMTI3ZjIyNGI0NGFmNTgxOTQyNGE1NDdiMjJiMmQ3ZDQ0MTY5OTdiMDExMzU4MWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU0N2MyODU1OWM3NGE2MjQ5M2MxMmI2MmRlZWVmZmM0YmFiYWI1ZTRkNTkwOTk4NmVkM2U4MzhiYjllNTNlZjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJiNDAwYTVlNGU4YWViMDc5ZGRmMmVlYWUyZDg4YzJhYzg5Y2YzYmE1ZmQwYzQzNjUzNTBmNGY1OTgxZjU4ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFiZWVjZDI4MWY2NGJlY2UxNGYyOGFmNjhjZWVhMmY2MjU4MzA0OTczYWE3OTlkYzE3NjliZjc3NDhhZjI3NzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ac48981d397a47f7867a0ac8ecb94c97",
+      "statement": "自动压缩挂在 host.ask() 的回合末尾：它不在同步的 sessionInputCallback 里、也不在回合开头，而在 streamer.finish 之前，这样提示能跟着答案进同一张卡片，且答案已流式显示完；这一跳刻意 await 而不走「后台不 await」那条路，因为那条只实测过模型回合，压缩是又一跳未验证的异步。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L428-L433",
+          "version": "repo-lines-v1:sha256:c5009f596408589aa47035c407f2b5079cbe2f410267b496c8af87330d264d49:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYyYTJmOTk2ZjA4ZTY4MGJkMjkyMTM1YTZmYTQ5NzhiZGEyNmU2MDJkODRmMzNjYjFkNTk0Nzc1ZDQzMDRiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWU3MTEyN2Y3ZjVmMTcxN2I5NmU3ZTk3NjkwYTdkMTgxYTUwNzIzN2ZjYWQxODg0MGJiYjA5MzQwMjJhOTIwYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmM4NWYxZWE4MjRmNDE0NmI3ZDYwNWRkZjRkMTE0NGQ1NGQ3ZTc2ZWFhNGYwMzJjNTdjMjA3ODIyZmY3MDMyZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzkxODZjOWE4YTExMzM5MDhmMDc1MGVlOTI2NmJjYjMxODdjYjk0MzdkMzM4NWRjYmZlMDY0ODM4ZjNkY2NmNiJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L667-L688",
+          "version": "repo-lines-v1:sha256:670d4552ddcc9d20ec7258addc24382304f816eacd91df64e611fcc22a14a858:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2MDE3MjZkMjAyNzRhM2M0MGQ0OWE0Y2NmN2IxYmYwMGQ0YzY4ZGIwOTdmODM1MGRiZTRlMDk4MWZiZmY3YjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4Yzc3NzcyMjg3OGY4NTRmNjg5OTY1M2Q0NzNmMzNlNjc2ZDBkMzc0N2QzNDcwMzBjMjIwZWQ1YzIzYzc5MmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc4MWY2NmUzM2U2NDRhNWE5NTdjYTZhNDIxNjAzZjVkNDBjYWRlZjZlNzkyMzYxNDIwMDU5NjExNjkxYjRlZmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ2ODg0YjUzZjljYjRiOTZmMjJmNjZkYzEzOWZhZDBmMzZhMGVlODg1ZjA4YTFhMjYwZGE5ZjkwMzdmNGQ3ZmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2d84cd3ac1734442b88c67215f6925f4",
+      "statement": "自动压缩用当下的 getItems() 历史判，而不是 sessionInputCallback 里那份本回合开始前的快照，因为这一轮问答本身可能又加了内容。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L437-L443",
+          "version": "repo-lines-v1:sha256:4be9dcf3b47236e047920a6e0e73e552f596c726ea0847967411ff1f04aaa34b:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTFkZjg3YTQ3MzE2YzcwOGM1NTAyMDk4ZTlhZjZjNDQ1MzRlYjgwYmVhZGNmNjA2MzAyOGVmY2E4NTkzN2FiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUzZWJjZTc5MmE4YWM2ZTk2YTljYjVlZDY2Y2E5YjkxNzViNzc1ZTYxNmYyOGEyZjhlOTRmZTVjYjBiMmQzNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzkxODZjOWE4YTExMzM5MDhmMDc1MGVlOTI2NmJjYjMxODdjYjk0MzdkMzM4NWRjYmZlMDY0ODM4ZjNkY2NmNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDJlMjM5MzJlNGE4OGRjZDZkNWM1MTJhNjM0ZmZlZjM1MzQxYmQ0YTIwM2NjYjFlNjBhMTFlYTEzMTY4NDk0OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_fe0f6af947ac420ea24471f592a3653b",
+      "statement": "自动压缩的所有异常都被吞掉：判据成立但压不成只记一笔 auto-compact-skipped 诊断并返回空串（不打扰用户），抛异常则记 auto-compact-failed 并带上原始消息；成功的提示随答案进同一张卡片或并进纯文本 —— 失败绝不能影响这一轮的回答。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L434-L459",
+          "version": "repo-lines-v1:sha256:c03e2e4309e87eea8eb45246016ed1bcf4d58feee0aeeafd5bb9e05cb9e47ca4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmZDQwMjVkZjkyMzBiMDA4OWM5YjU2ZmUwYzBlZWFkMzUxMTY4YTVkOTUyZDlmZDczODQ2ODE1M2E5OTc5MzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE0ZjQxYjFhMzk3OGFlNDFjMDU2OWZmMzQ3M2I3MTAyOTc0NjE4N2JhM2VmNmVkOTI2MWNjOWZjNzE2OTY4NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1NDg1NDZiNWI0YTE2MTk3MzQzYjM1NDExYWZiNTE2NjlmYTA0NmQzNmExMDMwYjEyY2QxOWEzYTgzNjM3NTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0dc6da9712c64c639f96d06564fd938d",
+      "statement": "让「自动压缩到底有没有在工作」可观测的是 diagCounters 里的 compactWanted（判据判定该压的次数）与 autoCompactions（压缩成功的次数，失败不计），因为这条链路上有两处会静默失效（判据恒 false 或压缩抛错被吞），只看聊天记录分不清「没到该压的时候」和「坏了」；两个都涨代表判据与压缩都工作，只有前者涨多半说明摘要返回空。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_diag.ts#L106-L112",
+          "version": "repo-lines-v1:sha256:e43295e75f971b9b304b223277924575e21e34e3f6ac849717506953f5e308cc:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmQzNWUzZjU0MzA5MGUxNDBiMDRkYWYwYzgzNzQ5YmYyNzhiMTkyNzVmYWQyMDczZTJiZGQwMDllMWQxNzcwNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTlkMjhjYmY3MjcxYjcyYTQ3ZTYxOGM1MmFjMTJhN2I3M2ZhMWVlZDlhM2M1MzZjNGU4OTFiYTMyMDhjZjZiOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTFkZmVkNTJjZmUyODA5MjBjNzc5YTBlNzczMDU5YThhZDdhNzlmNjUzZTk0MzEyY2ZjYzZlOTg5MzA5NTRmMCJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_diag.ts#L76-L104",
+          "version": "repo-lines-v1:sha256:33f33981184b358c926a56f411ed5b7f996ba8acc5ff7ff32ef45ca8aa9f8fb9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0YTliZGJkYTE1MmI0NjhlMmVhY2U5N2UwOTlmZjliMmFiMzcxMGRiNGQ1ZTU4OGNmNjhhZmJiZjU4YjA5MDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzNDVkNDZkOTViNmRjZmVhZjdiMzQ0ZGIzYjI5NDNlMDdkZjYxNWNmMjE1OGE0NjE3ZGJjZDlkOWZkNmU3YzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d1824a855e454c1aa63841f6c8279b9b",
+      "statement": "会话历史消毒 sanitizeHistory 维护「已被 assistant 声明、待 tool 结果消费」的 tool_call_id 集合：认领不到的 tool 消息算孤儿并丢弃、既无文本也无 tool_calls 的空 assistant 丢弃，其余原样保留，且保持原有顺序只做删除；它修的是窗口从 tool_calls 对中间切开后留下的非法开头导致会话被永久 400 毒死的问题。丢弃孤儿 tool 会损失一点上下文，但换来请求合法。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/session-sanitize.ts#L1-L105",
+          "version": "repo-lines-v1:sha256:0940f16301d508795334758588afa0d6053ea7bffe8b401fba9abaa36758be0a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkYmY1YzMwMGYyY2ZmNmQxNjA3YTBjZWU2YmRkMDM3OGRiODY1MzczNjQ1MTI0Zjc3YWE2ZDQxN2FjYTJhMmIyIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlMDMzN2NhZmZkOGQwNmQzYjRhODM3M2YzZjBkZGVhNjRkNzAyMTQ4MTBjN2FjM2Y2ODFkNmIzOWQ2YzAyYTI3In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_649d37bb150f4318bfb7503e4d114be5",
+      "statement": "sanitizeAndAppend 是给 run() 的 sessionInputCallback 用的：先消毒历史再拼上本轮输入（历史在前、本轮在后，与 SDK 默认行为一致），并且只在真的丢了东西时才回调 onDrop（避免正常回合也写 KV），回调里把计数累加进 diagCounters 并落一笔 history-sanitized 诊断。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L617-L633",
+          "version": "repo-lines-v1:sha256:b51511d5352d7e75296ecdc16877d9fe29395eadad161e49728be904f78308a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2Y2RiOTlkZjJkNjY4ZjliNjJkYzRjNWJjY2IxZmY5OWE3NTg1MzU1OGUyYzU5MGUwNmRkOGExODFkOWIxMWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxMWUxZWQ4MGQyYTI1NDZkMDg5YTY2YjI2NDE1ZDBhMmM1ZTljYmI5MDg2NmZlZWZhMzJkNWNmZTljNjU3OTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY5ZGQ5NWVhMGZkMzc4NjBkMjc1YWExODRkODA2N2Q1OWViYWY3MjI5NTgxNGRhNTNlNzhiMDUwMjUxZDIxZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhOGU2OTMyYzMwNTU5MTI2NTIzNGE5N2QwZGYyNWU3YWM1MzQzZjAyYjc4MTE1YmMwY2FkYTI5ZjNkOWExYmEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/session-sanitize.ts#L107-L123",
+          "version": "repo-lines-v1:sha256:d36560a16259d12edf2aeb1ea1a0f18ee336c9bf30d1dc79b3f50394022b2a1a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwOTM1NTljOTU1NmNiZGNmNzE4OTM1M2I3OGIwOWNhMmQ2Y2E0MWI1YjBlNjU2NGQ5MGRiMGExYTViZWNmY2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5f6abfdd730349f9940b67ddac91fcf2",
+      "statement": "sessionInputCallback 与 diagCounters 存在的理由同源：该钩子是 SDK 的可选参数，名字写错或版本不认时会静默不生效，症状只是「偶尔还是 400」，所以给它一个可观察副作用（每调用一次 sessionInputCalls 就 +1）—— 静默失效的钩子和坏掉的钩子看起来一模一样。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_diag.ts#L76-L85",
+          "version": "repo-lines-v1:sha256:32d9ef186659a000e522bd8b3658e613f6ad32c5fb4d10dd4bfd6e3896fae0d8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0YTliZGJkYTE1MmI0NjhlMmVhY2U5N2UwOTlmZjliMmFiMzcxMGRiNGQ1ZTU4OGNmNjhhZmJiZjU4YjA5MDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3ZGE3ZWY0ZTQxMjA4NDFmODNmZTE4NWMxNzI2MmM2MDVhMDhhZTc1MThiNTE1NTViZDFmMWZjODQxMjIzZTkifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L606-L620",
+          "version": "repo-lines-v1:sha256:f2aaaebd2dff7fafb84f2f79036de9cffc0078322b839de895aaf07fb8d98965:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5NTZjZGIxY2ZiNWMzZjk3YzFjMTkxYWQxNWJhZGE3MDkxN2VmYTAxYzM3ZTNkODc2NzliZDllMDBhNjY0YWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2OGRlYzhhMDJiMWM2MTA2N2NhNGQwNDAwNTE0NGY0YWU3ZGYyNGJmM2RjODlkMTMyZGM0MjY3NDRhNDRmOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlY2ZjMzY2NTk4Y2YwYmMzNTQzOTBiMDU0YjliM2NiY2NlZGI1NjlkMzZiZjk3ZjU0YmY3NWU5YWJkNWVkZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4MmNiYWM4MDliMzYxMGMyNzhhNmI3ZmY2MjZhNzI3YTNjOTIyMjU1NjgwNTYwOGI1MWZhNjNjNDZkNDViYzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_16106a5e9d4244238595e5d4eaee89c0",
+      "statement": "会话压缩的纯函数在 test/smoke.ts 的 G 节被直接钉住：shouldCompact 的三个正当性断言（没超限不压超限才压、看的是「有没有被截断」而不是比长度、不拿条数当判据），并单独断言 CLAMP_MARKER「中间省略约」真的出现在截断输出里 —— 谁改省略文案会在这里被拦住，而不是让自动压缩从此永不触发还一声不吭。",
+      "evidence": [
+        {
+          "resource": "repo://test/smoke.ts#L1041-L1076",
+          "version": "repo-lines-v1:sha256:c8adcc6aa6cc360075e1912a5dd29672ff46425e00341611e7742e90e2b7f454:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4OWQ2ZDQ1MmY3OTI0NjcwNTBiZDgxN2NlOTE0ODVlMWQ0M2YxNzJkNGMyZjU0NDhlMTZiMDA5ZDMyY2U1OTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVkNTYxOWQ5MTdmZjRhNzkwNmZkZDM5ZmE4OGM1OWNmN2EzZGJjZjA1MTJhNTdiOWJiNDY4YWMwZDQzM2VmYWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzZTllM2M5ZWUyMTA4YjJkNTUzNTZhYWFjNzU1NGZkOTE2NWJjOTI3ZGEyMDJiNjA2OTM2YTUyMjg4ZjFjNjQifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L1089-L1096",
+          "version": "repo-lines-v1:sha256:d7d4b715c6728f0d7d80acee022e179a0a2cd56b4a37a3db5a4d17609e22bce0:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDZhYmRiYjZiYjYyMGU3ZTAxZDQ3ODVmY2JhMmNiM2RmZGNiMmFmNzM0YTNmOTc4MDA1MjIxNWEyNjUwMzk4MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDE4MGY2ODM3OGJjNGE5ODllOGZhOWM3MzE4ZDk0NjQ4ZGY3ZTg3NmI0NDc0OTM4MGExOWI2OGJjYmFhY2RkNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWNkOWRlZDliMDUwYjEzYzA4NTljZTAyZDBkMjcyYzllYjI2NzI5MmU2OTM0YTgyYmQ1M2U4Mzg4YTA2ZDNlMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2df4a09612ad463bb0b7bbbd78e7f761",
+      "statement": "生产上自动压缩的触发只能真跑验证：tools/verify-autocompact.mjs 用假 chat_id 加独立 conversation id 投递撑上下文的合成回合（每轮约 8000 渲染字，判据线 12 万字，约 15 轮越过），那一轮因发不出去回 500，所以判据改成读 ?probe=last 的 counters，autoCompactions > 0 即成功；脚本必须先 ?probe=last&op=clear 清零，否则读到实例上残留的旧值构成假阳性。",
+      "evidence": [
+        {
+          "resource": "repo://tools/verify-autocompact.mjs#L1-L135",
+          "version": "repo-lines-v1:sha256:a77778d273618e8b5abffec8f249d2a5eb442b0659e0b50baf1f3d0990e87c00:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4MGU5MTk5M2M2MTE1Y2U0MjA1ZGVhYjY5M2RmMWY3MTYxNjc3OWM1NWQ0MmJjZTFkN2Y0ZWQyZTg1Njc1ZmZlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJlNWI0NDA1Y2Y1ZTMwZTYzY2U2N2QwMmNiMGIyNjZiNTFjNWJhN2NkYWM3N2Y1NTYxZWM3MzliODM5NWM0YzUwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MSwiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwOTY1MDQ4M2VkMjFhNmE5Mjc5ZWVhNTQwZDY1N2YzZWNiMjU3YmVjOWE5YmMxNmFkOWZjNzA0OGIwZDRmN2UyIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_6e5f7bc1098847c8b123bdc1c7040321",
+      "statement": "生产上那 100 条的会话窗口是平台侧静默施加的、脚本验不到；能验的只有 shouldCompact 这个纯函数判据（冒烟测试 G 节）与「触发确实会发生」（verify:autocompact）。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L381-L407",
+          "version": "repo-lines-v1:sha256:45f2b0a2c50a35e8b1cddba88568545c4c49d6cb00d3991aa941f2ae1478dc4b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2NTk1ZjRlZTVmZjYzZDUwOTUwNDE5ZGMzNDQxNDUxMzg1MWRjOTczNmZkMTdhNGY3YmZhOTMwYjI2MWI2ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlZDUzN2Q2NTlkNTVmYWZlMmMyNTE1M2RlM2ExZmI4YmM4NDg0ZjgxY2MyZDA5OTdhZjEyZmFjNTk4NzU3ZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgifQ"
+        },
+        {
+          "resource": "repo://tools/verify-autocompact.mjs#L1-L24",
+          "version": "repo-lines-v1:sha256:a52b62462e1f61eac0689ae221bb0377dee504f7aa089b2a4698e9bd72ac04ec:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwZTkxOTkzYzYxMTVjZTQyMDVkZWFiNjkzZGYxZjcxNjE2Nzc5YzU1ZDQyYmNlMWQ3ZjRlZDJlODU2NzVmZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2ZGM4MjQyN2M5NTFhODc3ZGEyNTFkYzg3NDhlMzAxZDNlYmY3MzhkNzI5NjczZWYwOTczNjJjMGUwYzcwZWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlZDQ1MTI5OWQ0MTVmNTBmNmIxOWU0MzAzMTE1ODM5YTgzNGIxY2RkYjEwMTU0NmZmZmRiOTFhZjg0YmNjMDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4b83ffdc6c424d86b6fe2538fff2b8a0",
+      "statement": "命令层把 /compact（中文别名 /压缩）分派到 host.compact 并用 safeReply 兜底异常，元命令不调用 host.ask（不留痕）；test/smoke.ts 的 C 节与 F 节分别钉住解析与分派这两点。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/commands.ts#L52-L54",
+          "version": "repo-lines-v1:sha256:76eac35d4ae6dc6b4e21d86d29caf033aa60d4c6115862cab2689cf716b8f221:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGFhODY1NGQzYjEyOWUzYmNlNGY3NGM3YTAxN2YxNWQzMGU3ODVhMDlhZWMzMGRhMjFhZTAxMTZmYzVmOWEzZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjg3ZDVmMjE0MWU0MTk3OGFiYmRiNjQzOTcxMTBlOTc1OGNhN2ExODk2NTA2NWFmMjc0YTFmMDgzODVkOTU5OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTZiNjBiZGYwNTQ1OTI1Zjc4MzI2NGU4OGY5ZmI0YTU1ZjMwYTlhZDAzZWFlNDI4YzAxMTM5OWVkZWU3NWFhMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOThhZDQzMzgwY2U5MDc4M2MwMDdkYjhlZjdmZGY1MjUxMDllMTAxMTRhZWIzMmZiOWE3ODU2NzMwZWE4OTk2YiJ9"
+        },
+        {
+          "resource": "repo://src/feishu/turn.ts#L124-L125",
+          "version": "repo-lines-v1:sha256:aea310e124af4e254876acf2f289663eebd42f47b7c39c347fb7ab7e1103248c:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWE0OTkxM2VjNzRhZGI3YWRjZjE4YWEyZGY0YWFlODQ1YzVkNGQyYjczMDEzZTJiYWQwYzJmNjVmMDE3OTVjNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjU0YzNiOGNjN2U2Y2ZjYWM5NjZiZTMwMmVlNzQ3ZjM4NDVmZGZkYTUwMGY4OTU5MzM5NzRmOWZiMDM1ODdkNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjJmNjIxODkzODQyZTgzOWM2MmFiYWVmZDk5OTZiYmY2ZjZlZDllZGNjMTgzNmE2YjAxYzJkODAwZWU4NWNiNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjUyMjBiNDFmZmRmNWY0YjNlMWQ5MzkzOTVlNWIzYzI5ZWFlZTg1ZWRmOGJhYWIzYTVmNTQ0YjNkOTZiZmM4NyJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L917-L959",
+          "version": "repo-lines-v1:sha256:30f0a349a3c44051e4d576d0deea6b17dd2f6b141f41f10216ebc13c211a053a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3MmQwZTVhMDEzOWI5ZTA5Y2Q1Nzg1MTIxYTc3YTBiNzcxMjZiODk1MGQ3N2FmMzk5ZmRlMTRmNGYxNmZjMjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0Njg0Mjc1MjYzYjE4YmMzYzE2M2YxMjFmMTdiNjY4YzZjOTZiMGQxYmMwMDNlOTRlNTIwN2Q1OTZmOWMxMmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3ZDU1YWFkMTRjNzM4NmQwODE3NmYwNTk3ZmQyMDQ1MmUwY2UxYjlmNjYwZmM4ODNiMmYxMDczZWY2OTI1ZjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI3NzlkMTE4ZDZlM2NiZjQ1MDUzOTc0OGRlZTdhNDMwN2FjYmU2NDQ2Y2JhMjk3ZjI3NjBmYTVkMGJiYTFiYzIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

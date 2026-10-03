@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:90f63cb719c4884fa16bbd1cc6f069b2658766234127c365267ee964fabfb855",
+  "claims": [
+    {
+      "id": "claim_4918f4673ae04c029963984c099e4c5e",
+      "statement": "宿主 ask() 每轮消息现建一个 Agent（buildAgent()），用 OpenAIChatCompletionsModel 而非默认 Responses API（OpenCode Go 只兼容 Chat Completions，用错模型类得到 404），modelSettings.maxTokens 显式设为 8_192，并以 maxTurns=24 调 run(agent, text, {stream:true, session, sessionInputCallback})。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L166-L179",
+          "version": "repo-lines-v1:sha256:227a2910903428a8985e58d8bee76e0c02cae29bcf1ececd010c8f5a9b89c415:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMGIzYWM2N2RjOTM2ZGE5MmM5ZjYzYTM5MDk5OGE5MjFkYTQyZGU3MmZkOWI5MDQ0MmU1ZGE4NmZhZWRhMDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyYzdhYmE3YmIzNWMwYWY4Yzk1OTdhMTk5NzcxZDg3ZTZlMTg2NGFlZDQzMWVhOTdhYjdjN2UwYzI2OTZkNWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQzNDRhNTI3NTZkN2JmZDNlMDI2ZGU3NGM3MGNkNmU5NTFmYjQ4NzQzMTE3NDE2NzY2NTYwZThmMzM1ZTE1NzIifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L331-L340",
+          "version": "repo-lines-v1:sha256:c0a51fa5d6ecdc6a4309a97edaedb4a10d220ff4b63e78fb50dc09a401289d13:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIxNzQwZTk5YWIwYTMxNjc5NzhhM2NmY2E2MGZjYTAwNDFmOWJmYzJkNWMzNDk0NjYwZmFiOTdhNjk0ZGI5NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyYTJjYjI1YTEyMmI0NDIyMWE2MjM0ZWM2NjBhN2I1ZmI3ZjliZGU3YjNiOWUyYjNjNTU5YTBkOTZmYWM3MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxNjQ4YmMyYWEyODlkNmM2YzcwZmQ2ZjIxMmY1OGQwMDU5YmYzMjUzMWU0YTQ1M2RlNzc2NjMyOTZmZDE1MzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI3ZjAxYjAyNGI0ZDk3NTcwZjkzNDZmM2JjYzMxYTkxNzAxOWJhODE3M2JiZDg5ODk0YTU1MGFhNzI3OWY3OWUifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L543-L563",
+          "version": "repo-lines-v1:sha256:3b3913d9ca0b36e982b4da65d5b064863e6bc0b8f12a297b7294589a232b866b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0MTBjOGVlNDMxZmZiZDA1MzljOTczMTVmMmU3YTdiMzk0Y2U0NDZkYmUwMDJlN2IyZjEyNTMxNmM0ZjI2MGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiZTFiZjBmYTdjY2Y3NmMyMjFkOTg3NmZlMjg4MWFkY2EyZDY2OTljN2Y1ZGJjN2QxY2IzMTMwMTk0NTkyMmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwMmIzMDFjMjc3MjZkNzE4YmIzN2M5YTRmMDA2NDhlM2RiY2MxODE4NGY1NDZiNDJmMjZjZjAxNDZkYmUzZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJmNzI1ODgxYzE4YmE1NDkyMWUzODFhZTQzZTg3M2YwODIwZDAzNGE5OTExNzY1NTRkMmQ5OWRlYTMzMzkyMTEifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L602-L634",
+          "version": "repo-lines-v1:sha256:5cf2b3529b26a0b9ee973d3c5f288c40c008a966e0c77ed35322258c94176e0f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhNGRhYjQ5MGVjOTkzMjQyMjNlYmZlOWJiOTgxMGMyYzJlNmFjYTQ4NjlkYjg2ZjE2ZDUzMDVlYjA0NmI5YTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5YzEzNTkwNjY1NjMyM2QxYzVlYTQxNjU0ZWU2NmFmYjU4NWFjZGNmYWVhY2ExMjFkNWUzMGJmMTkzZWVkZDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYyM2NmY2YzMTFjNzhmM2VkYzVkZTlmY2UzMjM1OWMyYmJmOGJlMmEwMjA1YzExZTlmOWM4NjJmYjhlMWU2ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlNDFlODAyM2M4NmVkNTM2ZTRlN2Y2NzRmMTQ1YTBkMDE3ZjdlYzkzNTZlZGM1MTMyNjQ4Y2RlNjVlYTNiMGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_887d48cf618647808f2e61946a0c7490",
+      "statement": "Agent.instructions 在接得上跨会话记忆时传异步函数（SDK 在每次模型调用都重新求值一次），因此记忆文本被做成一轮一次的快照 memorySnapshot，否则同一轮内 remember_fact 与 recall_facts 会互相打脸、模型会当众撤回正确答案；接不上记忆时退回静态字符串，避免提示词出现「你有长期记忆」这种骗人的话。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L509-L560",
+          "version": "repo-lines-v1:sha256:661b82fa1eda68092afe8df83e916d639d4adc2f78bdccd821c52981776ad4bf:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI3NDA1NmU1ZWM4ZGQwMDZjYTc3Mjk0OWE3MGZhOTFjYzhlZjU4MDU2YjFlZmEwMjg0N2QxMTkyZGU0ZWFhZmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3NTBkMGVhMWExM2YxNzdkYmYxOGMwMjA1MjQ5YmQ0YTMwMmNlMGY0YmQ4YjNiZDhjOTE3ZWVlMTFlYTQ0ZjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlNzljYzM1MThiZDFiYzQwNWFlNmViN2I4MjY4OWI4NzdkYTk2NWQzY2QxNDdkNDJiYjgyODQ3ZjE4OTA0YjAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3ab33d6e143b4c4f845b0fb5a23d0476",
+      "statement": "run() 传入 sessionInputCallback 钩子，每轮用 sanitizeAndAppend 过滤历史以防止窗口切在 assistant-tool_calls/tool 结果对中间时留下孤儿 tool 消息（协议非法，网关稳定 400，只有 /clear 能救）；该钩子是可选的、名字写错会静默失效，所以用 diagCounters.sessionInputCalls 计数让它可观测。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_diag.ts#L76-L104",
+          "version": "repo-lines-v1:sha256:33f33981184b358c926a56f411ed5b7f996ba8acc5ff7ff32ef45ca8aa9f8fb9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0YTliZGJkYTE1MmI0NjhlMmVhY2U5N2UwOTlmZjliMmFiMzcxMGRiNGQ1ZTU4OGNmNjhhZmJiZjU4YjA5MDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzNDVkNDZkOTViNmRjZmVhZjdiMzQ0ZGIzYjI5NDNlMDdkZjYxNWNmMjE1OGE0NjE3ZGJjZDlkOWZkNmU3YzUifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L603-L633",
+          "version": "repo-lines-v1:sha256:b1e862b039468e5c92099a5429440fe5edaead43bb4f081990aacab4fc9df131:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlNTU4MjkxN2IxZThkMzBlYjAwNGM3OTU1YzljNzVjNmYyZDRmMjFiNWI1YzUzNTQ0M2YwODI2ZDg3NDMzMDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxMWUxZWQ4MGQyYTI1NDZkMDg5YTY2YjI2NDE1ZDBhMmM1ZTljYmI5MDg2NmZlZWZhMzJkNWNmZTljNjU3OTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY4NzA2N2NiYWY4NzM1ODFkYjRiZjU3NDQyZjUxYjAwZTAzZDczN2VmYzM4OWQyYzdlYTkyM2EwODk1MjY3MWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhOGU2OTMyYzMwNTU5MTI2NTIzNGE5N2QwZGYyNWU3YWM1MzQzZjAyYjc4MTE1YmMwY2FkYTI5ZjNkOWExYmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_17c1e45c389b4e8eb4a146ddd4f900ed",
+      "statement": "FeishuStreamer 的设计根因是一条硬约束：streamText 的 onChunk 回调会暂停整个流直到回调 promise 完成，所以 push/pushReasoning/pushToolCall/pushToolResult/pushNote 全部是同步 void 方法、只往内存 buffer 追加，真正出网交给 start() 里 FLUSH_MS=250 的 setInterval 循环。搞反了会把模型输出按网络 RTT 拖慢。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/streamer.ts#L1-L21",
+          "version": "repo-lines-v1:sha256:d8e07af01fd656a1fed1993a0ade7c3d860b15fffeb735747022aa2599337507:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNTQ3ZDkwNGVlM2Y5ZWU3YTJjNmUyOTM5NmEyZDc5Y2U1YWMzNGQ3NWVlYjdmMjE1ZTU3MzViMmM1NDQyMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3NGZlYTc1YmI0MGVlOWMyZjU1ZmQzOGVkNWJmZjM5NjRiZDYzNTQ4MzgwNDExMDEyZTU4MGY5NjU4YTkzMTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ2M2I1NTY3YzBkMDkyZmU0OWRjY2M4NDJmNGMxZTRlZDg3ZjA2NTUzZTBjMTA3Njk4MTI4YzNlYzdhMDljY2UifQ"
+        },
+        {
+          "resource": "repo://src/feishu/streamer.ts#L154-L169",
+          "version": "repo-lines-v1:sha256:a0c53f2119f3c4cb18753cabbb3d1b1d99f640267703ac8002cd2914f12ee9d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzNDczODk3ZWUxYmE0YjU4ZjY1NjNhZDhlMDc1MGUyOWQ4MDRmNTQ0Mjk0OWYzYzVjNjU0YThhNzk4YzBmOGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/streamer.ts#L46-L70",
+          "version": "repo-lines-v1:sha256:042cd25027bd55dc9a1a66c9b1e6c9bea9f3429de6c44411e4923d7c071ba4ae:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkZmIyNDg5ZmY5NWRiNWI5YTc3MzljMGQ4NjQyMjgwMzk5MDcxNTNiOWQxM2FhZTNiYmEwMjI1MjlkZjQxMTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiMjkzMjViMjRmZDA1YzRlMDMwMzAzMTljYzE3YzZiNzkzYzc3YmQ1MTU2ZjkyODI4YzNhMWI3NDhmYzFkYzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcyYWQ4ZTE0MmJiYjQ2MjE5NGI5YWMwYTgzMDgyZDdiMGZhNmIwMWY3NmU0YjhlYzE3NzdiMWI0Yjc3ZDFiYjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_adbca0147b0940c89e2f2f0202a1ab45",
+      "statement": "飞书卡片的呈现效果取决于新文本是否以旧文本为前缀：一致才继续打字机，前缀一变平台整段直接上屏。所以 streamer 只做追加、绝不重写前缀，思考/工具/答案按到达顺序排成一串，靠 reasoningOpen/answerOpen/sawReasoning 标记插分隔线；pushReasoning 每轮都重新起段以避免多步循环里第二轮思考粘在上一段末尾。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/card.ts#L1-L12",
+          "version": "repo-lines-v1:sha256:dec836e74273b7386e875387723a31d9e1da05b0759cddef0b68fa2d00f6ed0e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4NjIwNGIyNjBjYWVlYjE4Mjk5NjQ0Njg3YjIyZDBmNjJjOTY3MDMxZmU3NGNiYzIxY2NkYjY5YzhmZDc0MjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjYzhlNWZlYzI1NmZhZGQzZTBlNzkwMjZkMzc3OWIzNDE0MDQ0OGExYmU2YzIzMzM0NzJlNTVhMzA4NzE2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhZjlhNWI3NDM0YTZlMGM0YzQyM2JiNzAxNDg0OWVjNTE1OWVhYjhmMGVjYzg2MzRhMTc5ZTE1MGY4NTNjNzAifQ"
+        },
+        {
+          "resource": "repo://src/feishu/streamer.ts#L30-L103",
+          "version": "repo-lines-v1:sha256:61ea30f221fb14706e20c8d6424aea2101a4465eca55a00ab2d3d5ef15927371:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmNGNjMDhkNTcxNjk2MDNiMzgyZDJkZjQwYmUyZGVkMTBhZjU5OWEyYTE4MjVkYTQyZWY5ODU4YmRhNDU5MmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhlODY5ZWE4N2M4MDRhMDJkYTlmYjg5MDRiYTA4YTM3NTg5YTA3Njk4MWE5OTcxMzU2ZTVhNTlmY2UxYTY5NDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3NmNjNzY2YTEzYTFmMmE4ZTlkOGE3ZWEzYjU1ZjViNzFlNjMyYmZiNDBkMGZiNmY4ODkzMjBiMGFkNmI0NzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d5d7644e03fc4f08ac1e8ca9fb7bc474",
+      "statement": "卡片正文分段的具体形态：push() 只在前面已有内容时插 '\\n\\n---\\n\\n' 分隔线，pushToolCall 只记工具名（写 '\\n\\n🔧 `name`'），pushToolResult 只给一行 '✅/❌ summary'，pushNote 用独立格式而刻意不复用 pushToolResult（借用它会让用户误以为刚才调了工具）。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_tools.ts#L105-L179",
+          "version": "repo-lines-v1:sha256:699cd35b833a026c9d489d18e58e00417e003de337b65b8e0400e2dc75f08c2a:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3NjA1NjY0NzhiYTNhODE3MDIzNTA0MzBmNTQ1NjkwYTUxNDYzMjg0NGUyYjQzODM1NWZjYTAzNDU4MWM5ZDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/streamer.ts#L62-L113",
+          "version": "repo-lines-v1:sha256:05273bac07afbef70d488a578e5d8e3af4aeea096c2bb6f69471afe3b21ccc33:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjYzEyMGI1NTczNGUxMmQxYmIyMTIwZGU1YzY3YjFhYjM3MDM5ZjQ1MDA1YTVkOGMzNjgwM2EwN2M5NmM1MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxN2M5NjU2MDZjOTNlNmRjN2VlYTI0NWQ5ZDJhNDZjYTIzNWFhMjYxZDJkNTIyOWQ0OTAwM2UwMDZjM2FmMTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4YjY5MzY3ODc0NmI4NmM4YjEzMjM5MGIzMDAwZDZkYjRlYWE4MjMwZmFmZDIyOTAzNjFiMWY3ZjJkOWI4ZTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_01dc5dcb846d44e48c5e0e11a0407dc1",
+      "statement": "pushCardText 与 closeStreaming 共用同一个严格递增的 sequence 计数器（关流用下一个序号而非从 1 重开），因为平台靠它丢弃乱序旧版本、且要求「对同一张卡片操作时 sequence 严格递增」，从 1 重开会被拒（实测 99992402 field validation failed）。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/card.ts#L76-L123",
+          "version": "repo-lines-v1:sha256:de7d4c63388483aa7ca4b1b126cd5a8053b6aa65551660f1e9b6f394c01a5cc8:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ZWYwMWJjMDhkYmMzYjYzZTRlNzVlYTNkMjZhNWI5NDE4OTE4NzdlMjdhZDg5MTMyOWM4NDExZDdkOGRjNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/streamer.ts#L144-L151",
+          "version": "repo-lines-v1:sha256:b9cc0aaa9115454b89dd63c17947a2866ed8c3c62193ed429487bbbb0cfce49a:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTFkZjg3YTQ3MzE2YzcwOGM1NTAyMDk4ZTlhZjZjNDQ1MzRlYjgwYmVhZGNmNjA2MzAyOGVmY2E4NTkzN2FiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTU0OTVjNjU1MjdlMjI3MTE5MjhiODNmN2Y0MzFiMWVhYjBlOWFiY2Q1MWUwYjE3OTFjMGNhODdjOTJlYjM3YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTBjMjc2ZmEwZjRmNjI2ZDUzNzhlZDU2YTlmNzdmODhlNTBmNGZlZWQyYjI1YmM2NGVkMDRmZWFlY2RhNzIzZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba2bcd7014a64d3cb6f85bc40ee60dd5",
+      "statement": "start() 建卡片实体、作为消息发出、起定时器，任一步抛错（如后台没开 cardkit:card:write 权限）都返回 false，调用方据此退回「攒完整段再发一条纯文本」——流式是体验，不是正确性。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L592-L599",
+          "version": "repo-lines-v1:sha256:f0349e1c181c211f138fbf7bea738119d62b66c1f8033c3a9a5b43ae1fd98748:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDk1ZmEwZjExMTdiNWVhNDA0MzQxNDBkZGUxYTM0MGM3MjBkZGJmMzI2MjEyZTE5MTgzOGQ0YjE1NmQzMTZiYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjY5NDAxNzU4YWJmMTgxYmY2ZjA4NDRiOTY4ODQyNDc0YTIwODZlN2Y3YTc4YTAzY2FhNTU3OTY1NmM3NDhiNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjg3MDY3Y2JhZjg3MzU4MWRiNGJmNTc0NDJmNTFiMDBlMDNkNzM3ZWZjMzg5ZDJjN2VhOTIzYTA4OTUyNjcxYyJ9"
+        },
+        {
+          "resource": "repo://src/feishu/streamer.ts#L42-L59",
+          "version": "repo-lines-v1:sha256:d45656b728656e964c7116d3ef3972d4079e8304203f6d1c746d4a82286b3c8d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNjYzc3MzI1ZjQ2NTA2NzQyYTQwYWYwZjgwZTIyYjg4MDI2NDljNzdjNzFiNmM3OWMwZjg4NDc2MTI1YTI1MGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlmOWExODA4MjNkOWQ1MjdjZDQ1NWY1YzM0ZTgyOGVkMmM2NThkMGY5MGE2MmY2YWUyYzExYzY0YzhlNzliNzEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_06c9b285278e4c6b891d8f9193570024",
+      "statement": "finish(fallbackText?) 有两道讲究：fallbackText 是保险——增量一个都没收到时卡片会永远停在「…」而调用方因 streamed=true 不再补发文本，用完整答案兜底最坏也只是没有打字效果；关流失败被吞掉（不影响已看到的内容），但必须关，否则卡片一直停在「生成中」、会话列表预览永远显示摘要、交互组件不可用。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/card.ts#L98-L107",
+          "version": "repo-lines-v1:sha256:9e364f1426e42ea13572bc808b9d2318574e7a8217069fe7ea2194219f7ca478:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5NGZjMGMxNzNkMWVjM2ZjNTAxZDdkZmE5Mjg1NTAxYzUyN2NmYjQ3MTI1ODNkYTNjYzM2MTgwNTY2YjRiZTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3MDM0NTg4NzgxZDkxN2RmNmQ0MDFlYjMwMDFmM2NmYzg3YTcxMzViNWU0OTk5MjFmZjFkMzc0NTNhYzU4YjMifQ"
+        },
+        {
+          "resource": "repo://src/feishu/streamer.ts#L121-L152",
+          "version": "repo-lines-v1:sha256:1ba1b42eb640b37869327c7fd0fd5dfc9a1263a417d630ee20608801ad9e7930:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmMmEyZjk5NmYwOGU2ODBiZDI5MjEzNWE2ZmE0OTc4YmRhMjZlNjAyZDg0ZjMzY2IxZDU5NDc3NWQ0MzA0YjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxMzU4MDg0Nzc4ODJiZmU3MDY2NWVlZWRiZmVhYjU3MzJmYjRjZjAyOTYxZjJlNGJhYWU1N2Q0NTQ5MzY1OGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzMDZkZjBlNTU5ZWFjMDVlN2NjODk5MTZiZDM2ODdiNGFjOTE5OWM0ODA1MzVkZDdjMmY4NmEyMGU5ZjNmOTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8b7f5b35f8584a75b096c520b82d235d",
+      "statement": "applyEvent() 把 Agents SDK 的两层流事件映射到卡片动作：raw_model_stream_event 经 answerDelta（data.type === 'output_text_delta'）与 reasoningDelta（response.reasoning_summary_text.delta / response.reasoning_text.delta / reasoning_content_delta）分出答案与思考增量；run_item_stream_event 按 name 分出 tool_called（推工具名）与 tool_output（推 toolFailed/summarizeToolOutput 压成的一行）。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L816-L890",
+          "version": "repo-lines-v1:sha256:88ef3f1134edbaa16e1e1f80977e16f59c4c4e73c3dd7e9af416fe5a34dd211e:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxODMyODRkOWQwNTdhNjMwMzhjYWY1NmNhOWM4MmU0NDA0MzUyYmVmYWFkZGIyOWY1MjczOGIxNzYwYjFkODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzMDEzYTU3ZTI2NTUxYzQ2MDM2NDgzYjA3YjMyYjNhZmYyZDg3MmRmOWM3ZDJiMzYyM2QzMzg0Yjg1NTA5ZDYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_aff40e9bfa0a4b729b70aabde2517f69",
+      "statement": "这四个事件名里只有 output_text_delta 与 tool_called 有官方模板佐证，工具结果与思考增量是按同一套规律推的、仓库明确标为「仍未核」的未知数；猜错的失败模式被限制在「卡片上少几行（只有答案，没有 🤔/🔧/✅ 串）」，不影响答案正确性，因为最终答案优先取 result.finalOutput。验证面是本地 /agent-metrics 面板里 raw_model_stream_event 的 data.type 取值，对不上就改 answerDelta()/reasoningDelta()。",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L27-L30",
+          "version": "repo-lines-v1:sha256:95d3039e7206db288377f5d8c000ea4490e08ecc5742fc5c5a4733d18ffceae7:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWQ3ODA4Y2Q5ZmUwMjA4NjdiZjE1ZDI2NWQxMTkwMGViODMxOWEwYmUxOTM5YzQ1NmEwYjY1NDQwOTkyNzNlYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjE3MGE5NjExMTQ4YjljNDkwNWI1ODlmMGE2OWIwODM0ZmQ2Y2JjMzM3Mzc1MGE0ZGZjNzk4MDhkMDA2YjEzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODRkZGY1MWNmNzk0OTI2OTRjNDVjZTgwMjcyMDI0YmE0MTM5ZDI2ODlmNDIxZTAxOWMyMGM0MWE4Y2YyNDIyNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2RlYjJkODBiYzA2ZmIxMzVjMTkxNmRiYmFhMmQ2ZGEyZGJmYWJhMTUyMDUwMTFjYWUwN2M5N2I2ZGViZDUxMCJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L645-L650",
+          "version": "repo-lines-v1:sha256:da4cf4735b1e1e7d2ec84ef2400d94537821da0a9f173662a04cd22d2f358c75:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjA5YzkyMDI2OWY3MmY2MGExZGU0Y2U4ZjVjNWY1MmIyMzYxNjU4YTQwOTM2NGVmNDUxMDBmODZkNmRhNTU4NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDQyZTI2NjllNDJlMTFjYjIwYjgyMmU1OWQ1OWYxODZlNzMzMjI2M2FhZjI1Yjc5ODBiZGU0NjUyNGJjOWY2YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDY1MmFlYjY5OTA1MTQyMTlmZTcyYzE0MjQ4NmE0NDU4ZTUyZjNhMjA1YWMyMmIxODI0NzNjMGE0NWNjNThlZSJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L816-L890",
+          "version": "repo-lines-v1:sha256:88ef3f1134edbaa16e1e1f80977e16f59c4c4e73c3dd7e9af416fe5a34dd211e:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxODMyODRkOWQwNTdhNjMwMzhjYWY1NmNhOWM4MmU0NDA0MzUyYmVmYWFkZGIyOWY1MjczOGIxNzYwYjFkODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzMDEzYTU3ZTI2NTUxYzQ2MDM2NDgzYjA3YjMyYjNhZmYyZDg3MmRmOWM3ZDJiMzYyM2QzMzg0Yjg1NTA5ZDYifQ"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L544-L564",
+          "version": "repo-lines-v1:sha256:6bcd2f0c74ab535aa7a767d813261149f8981a38e38c775616880b2522ab3fbb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMDNjMTFhODYyMDRlMGFiZGU0NWM3NWM2NTMxOWE5MTczZjM3NjNmMDgyMDlhOGVhMzRmNGU2OTM3NjA2ZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjODRkMjhmZTQ4NTAyZjNhNDcxMjliNGEyNGVkMjA2ZWU3MjcxZjU4NDg0ZDBiZTBmNjBiMjA0YzVmNjU2NTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjczZjEwZGQ4NjFiNTllZDYxMTI3YWMzMmMzZDdjYTRkYzA0YTI2YTlhZjVjNjY2YzdkZGYzNDIzYWY3ZmE4YTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L214-L236",
+          "version": "repo-lines-v1:sha256:5076e2ebd46d50cd56cd3bd4c80cbd4bd6b8e5df015e0050c9841c3db3fc9879:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxNmRlNDRjNGUyMDg5OTEzYjlmMzVmYzFiMjA3YzBmMGExZTdjNjNjODZkNmZhNjRjN2Y1Yzk0NmM0YzJiOTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlYjU2YWU1YTUzZjM1N2M5YzU1MDY3MjI1YzFiMzYzZDQ4ZTcxNDk1YzJlOGNhYmM5OWNlYjBiNjFhMGRiYjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_08212bc95f13404894615cf1fcc1b666",
+      "statement": "最终答案优先取 SDK 的 finalOutput（pickFinalText 从字符串或对象的 text 字段取），拿不到才退回自攒的增量——两者不一致时以 SDK 为准，因为增量事件名一旦对不上（比如换模型厂商）攒出来的就是空的。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L645-L650",
+          "version": "repo-lines-v1:sha256:da4cf4735b1e1e7d2ec84ef2400d94537821da0a9f173662a04cd22d2f358c75:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjA5YzkyMDI2OWY3MmY2MGExZGU0Y2U4ZjVjNWY1MmIyMzYxNjU4YTQwOTM2NGVmNDUxMDBmODZkNmRhNTU4NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDQyZTI2NjllNDJlMTFjYjIwYjgyMmU1OWQ1OWYxODZlNzMzMjI2M2FhZjI1Yjc5ODBiZGU0NjUyNGJjOWY2YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDY1MmFlYjY5OTA1MTQyMTlmZTcyYzE0MjQ4NmE0NDU4ZTUyZjNhMjA1YWMyMmIxODI0NzNjMGE0NWNjNThlZSJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L892-L905",
+          "version": "repo-lines-v1:sha256:e449863b09a554987be2f16b681abb7257ca3f0fe0ff9319fa903102f19ca493:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkZTQxYTY4NTZkMTgwMWRhOWExNmRkMmI1MTExMzRhOTEwMTVlMmQ2MzU1ZTFlNzRjYjZlZDAyOTlmYjcyOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_38caf9337f8a4218a3a5ac8cb7dd868a",
+      "statement": "ask() 的失败路径刻意做成两份互斥的上报以防双重上报：有卡片时调用 streamer.fail() 把原因写进卡片并返回 {streamed: true}（不抛，否则 turn.ts 的 catch 会再发一条纯文本，用户同时收到卡片和文本两份「失败」）；没有卡片时必须抛，交给 turn.ts 的 catch 发唯一的那条纯文本，宿主自己绝不发。_host.ts 有意不 import sendText。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L25-L28",
+          "version": "repo-lines-v1:sha256:fb72725acf90785a7194e2c391e6eaec1f27fe14157cada53b704493cc3e7cde:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmZhMDg1OTVjNTExNDE4NzM3NDQ2ZmU0OGY1YmY0YjAxOGQyNGUxMTEwNTM0MWU3NzVjZjE3YzA4Y2ZhZDJjNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjRlYmM1YTVhMDU5MzU5ODc5YTY0ZmMxYzg4OThiYTkwYzU1OGNjNmRiZTFhNDc2Y2U1YzQzM2NlMmNiYjc3YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTQ2MjRiNWU1ODdkMTcwY2VlYzZiYzc1NzM5Yjg3YjFlY2VhNDc3ZjQxMTU3MGUzNGIyNzkzMTkyYmEwNjEzNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTU0ZDQwNWIzOTllYWQ4ZDM3ZDI1MDg1NGM5YjM1MzIwNGU1MTQ2ODViNzEwYWUxM2RjN2U4MTVkNWIxM2IwMCJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/_host.ts#L651-L665",
+          "version": "repo-lines-v1:sha256:c492094c06fec8c82d85e1ff8cc03ad0c8a24bf2acf0fecc51278d1285eab6cf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNGViYzI2NTA3ZGVjZjAwODEyNTcxY2QwZThjZjQyZTcwYzRlNjg2ZmViMmJjZDYwNjYxNzcwOTg5NGM0ZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5MzY2MDcwNTJmMTNhMTExNmQwMzJiZmY3Mzc3ZTk2NmJmNGNiM2I4OGU1MjNkMjBmYzNiNGMyZmYxYmM2N2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3MWIxNTI3YTI4MDQyMmZiYjUwNGEwMzYyM2ZmNmQ3Yzg2NDI5ZjNjMmRiMjhiYWU0MGE4MDEyOTM1YjU5MDkifQ"
+        },
+        {
+          "resource": "repo://src/feishu/streamer.ts#L115-L119",
+          "version": "repo-lines-v1:sha256:8b5268d8e886c37b26bb009fca1567d14b91dac577d832facdf668c8ec1ca691:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmEwZTZjNDA4YmQ1NWNlZDk4NmY0YzE0MDM0MTM5OGM1NjczZTdkOWUxNDFiMWViY2QyNjU3ZmI2NDBkNTY2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzdkYTY5ZTg5ZDU0MWM1MTk3NjQyMGVhYWUzNmI5MTEzZjBkNDk4MWFjNjYyY2MzNDM1YzJhNTEyNjM4M2UyNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRjMGYwYzVjMTVlYzkxNDI4ZjVmYzQxNzlmYzQzMmViOGU4MWYzY2RmM2RiNzlkNTBkOTc4MWZmM2UwMGFmZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7251b9d59d3a48fda648e57695462b36",
+      "statement": "turn.ts 侧对称地守住同一不变量：host.ask 返回 streamed=true 时不再补发文本（同一段回答的两份），但把文本记进 sent，因为流式卡片正文通过 im/v1/messages 读不到（对 card_id 型卡片只回占位），不记就没法自动核对；这条有测试「提问：streamed=true 时不再补发文本（否则会重复）」守着。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/turn.ts#L155-L181",
+          "version": "repo-lines-v1:sha256:da5672e2387271ab9b233c86be5af5bcad6bda6da9c436aa9b84f86529490dac:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1ZmRiMTIyNzNmY2E3N2FiMDNhNzA1NDFhNzY5N2U0YTYzMzgwNTcwNTBmNTdjY2Y5MzI0YmI5ZTdlMDUwYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyMzViYjE0ZTMzZTc0MzNkOGUyMWI5YTNmZGE3N2IwOTU4ZmNiMmZjNDgwZTE3OWRlNjUyNzFhODNlZGY3ZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1YzI0MGY0ZjllYmI4ODFiYzM4ZWVjMTE4NDAxZTRiM2M4MWNmZjQwMGZkNGViYTJjMTkxYTcyZDg4ZGFiMTcifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L903-L908",
+          "version": "repo-lines-v1:sha256:dcec8086c6d42907935bd377727896f562ce784115aca1e1cd1ee78d83b47f23:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDMxNjdiMGRiNjYyMzIzMzVhMTU3YmRiNjNlZGNhMWY4NDJkNTE1MmU3NTc1NGQxMTAwZDBmOTU2OTk3MjUwMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDQ3MTJhMGFmYTE1ZDZlNDhkNGEwOWVlMWM5YzkyNjlmMTM3Mjk3NjZiMGY3OWM4MDEwMDNmZDNjZDQ3YjQ5ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDcwYmVkNTNkMjEzZDUxMTQ4NDQ5ZWViOTgxMTQ0YTQzMDQyOTIxOGM0ZmIwMDJmMmIwZDFkZTY1MDUxYzJlZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_924b83ad6cd948a1afc1c08d623b60be",
+      "statement": "一轮收尾里 autoCompactNote() 必须在 streamer.finish(answer) 之前 await：不放 sessionInputCallback（那是同步回调而摘要要调模型）、不放回合开头（会让回答白等压缩）、在 finish 之前才能让提示跟着答案进同一张卡片；这一跳不走「后台不 await」那条未验证的路。有卡片时提示走 pushNote，没有卡片时并进同一条纯文本。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L667-L688",
+          "version": "repo-lines-v1:sha256:670d4552ddcc9d20ec7258addc24382304f816eacd91df64e611fcc22a14a858:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2MDE3MjZkMjAyNzRhM2M0MGQ0OWE0Y2NmN2IxYmYwMGQ0YzY4ZGIwOTdmODM1MGRiZTRlMDk4MWZiZmY3YjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4Yzc3NzcyMjg3OGY4NTRmNjg5OTY1M2Q0NzNmMzNlNjc2ZDBkMzc0N2QzNDcwMzBjMjIwZWQ1YzIzYzc5MmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc4MWY2NmUzM2U2NDRhNWE5NTdjYTZhNDIxNjAzZjVkNDBjYWRlZjZlNzkyMzYxNDIwMDU5NjExNjkxYjRlZmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ2ODg0YjUzZjljYjRiOTZmMjJmNjZkYzEzOWZhZDBmMzZhMGVlODg1ZjA4YTFhMjYwZGE5ZjkwMzdmNGQ3ZmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ce866f79439c4ee3b9b974e61f728c0a",
+      "statement": "流式链路的配置面：FLUSH_MS=250 是出网节奏，MAX_TURNS=24 是工具循环轮数上限，MAX_OUTPUT_TOKENS=8_192 是输出上限，cardkit:card:write 权限是可选的（没配即退回纯文本）；createStreamingCard 显式指定 streaming_config（print_frequency_ms 50 / print_step 2 / print_strategy fast）而不信默认值，推内容必须指向 ANSWER_ELEMENT_ID='answer' 组件。",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L166-L179",
+          "version": "repo-lines-v1:sha256:227a2910903428a8985e58d8bee76e0c02cae29bcf1ececd010c8f5a9b89c415:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMGIzYWM2N2RjOTM2ZGE5MmM5ZjYzYTM5MDk5OGE5MjFkYTQyZGU3MmZkOWI5MDQ0MmU1ZGE4NmZhZWRhMDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyYzdhYmE3YmIzNWMwYWY4Yzk1OTdhMTk5NzcxZDg3ZTZlMTg2NGFlZDQzMWVhOTdhYjdjN2UwYzI2OTZkNWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQzNDRhNTI3NTZkN2JmZDNlMDI2ZGU3NGM3MGNkNmU5NTFmYjQ4NzQzMTE3NDE2NzY2NTYwZThmMzM1ZTE1NzIifQ"
+        },
+        {
+          "resource": "repo://src/feishu/card.ts#L17-L60",
+          "version": "repo-lines-v1:sha256:8a1ee9d8750bc51aa99ffa187ef754be579a5d518e9278e7e650fd7b6287a9f6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjMzMwZDU4YmI2NWNkYWZiMzUxNDA4ZWIzNDY4ODhmOGQ2NGM0NDE1MmM0ZGYxYzIyNWFmYjc2N2M3YzdjY2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ2MzUxMjNhOTM0Zjk3OWRmZDAwMmZmNzNmZGVlZjU1ZjA1NjNiN2I5MDllNmRlMGRmY2EwNWNmYjU0ODU1ZTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQzYWUyZWRlMWExMTc3NDMxMzU1OGUyNWNmNTFjM2ViZWRmY2UwZDgwNTE4MDFhNDIyMmM2MWY5MjFjZGE3YmIifQ"
+        },
+        {
+          "resource": "repo://src/feishu/streamer.ts#L18-L19",
+          "version": "repo-lines-v1:sha256:24ac30cfb9309ec56bf86016805048baf0e7ed6577a299822a5a00a21e942b35:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTc0NjYyOTg0YWI1ZDhiOTBjZjdlNjAwMjBlNGQzNDA0ODgxMDcyNDA3YTU0OWExYjQ3YWVjOTFmYTFkNjIzZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWY2OWI0ZTNmNDRiMDViNWI5YTA4Y2NkOGNkNTRlYjk1MjhhNDg1NGFjM2Q0MmY5OTJiNGI0YjMyYTUzNTAzYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTY1YjYzMTUzYzcwYTZhMmUwYmY0Y2ZjMmVkM2M0ODM4MjY1ZWRkNWQ4NmFhZjViMzU2MDczMmYwN2IwNWVmMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzhhMzYxMGM3MTVjYWQ5OWM2NzczMjllNTBmMzQ0MWFmY2FkOTcyMTMzYjY3M2IwNWJlYjg1MTk3ZjQxZDE2MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_90f7dbd3ee524b76bcbd35cd073b3524",
+      "statement": "FeishuStreamer 本身没有被单测覆盖，其正确性依赖人工观察卡片以及「事件名对不上只影响卡片行数」的隔离设计；test/smoke.ts 只覆盖 turn.ts 一层（streamed=true 不补发、模型失败必发提示）。",
+      "evidence": [
+        {
+          "resource": "repo://src/feishu/streamer.ts#L121-L126",
+          "version": "repo-lines-v1:sha256:06cf56c27781a4d8a4d9153113959a46cf91345f8f6a209609ce6059addb836e:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYyYTJmOTk2ZjA4ZTY4MGJkMjkyMTM1YTZmYTQ5NzhiZGEyNmU2MDJkODRmMzNjYjFkNTk0Nzc1ZDQzMDRiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWU3MTEyN2Y3ZjVmMTcxN2I5NmU3ZTk3NjkwYTdkMTgxYTUwNzIzN2ZjYWQxODg0MGJiYjA5MzQwMjJhOTIwYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTEzNTgwODQ3Nzg4MmJmZTcwNjY1ZWVlZGJmZWFiNTczMmZiNGNmMDI5NjFmMmU0YmFhZTU3ZDQ1NDkzNjU4YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGM2Njc2MDExMjg1ZDNkZjI1NTk3Nzk4ODEwNGRlMDEzNWRmMzQ3MjhlMjU2ODEwZGUzNmRhM2E2ZjJiZGM0MCJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L889-L915",
+          "version": "repo-lines-v1:sha256:2b2246e87401d49fae8435515c36acfffafee78bb41a471923d51ac93e124dd3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwNDFkODc3NjgwMTY2NzZlMTFiMjVmZmJkZWU1Njk2MGZhODAzZGE1Njk0NGJmN2QyZmUxYTcxYTM4ZDViZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU5NGNmNmI1MzNhNDc3NWJlNDU1YThiNDQ2OWQyZWQzYmU5MzA0MGRhOGNlMmI0MjA4YTFmZDU5MDM4ZWNkNWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0ZWU0NTE5ODk1OWYwNzA5NzFjNThlOThkNDdiNzIyZDI2YTMzZDhmNmQ1Y2Y3YjUwYjBlYTE2OWZhMmM1ZDMifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

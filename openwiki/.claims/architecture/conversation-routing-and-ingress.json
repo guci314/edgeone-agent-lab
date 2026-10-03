@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:e3645a2396baa0ae3cfd56bda4914f1797ff09c7a76f69691843286d29434894",
+  "claims": [
+    {
+      "id": "claim_5b2d66bac9db47d9a0ab8c260f96bcf9",
+      "statement": "EdgeOne requires the Makers-Conversation-Id header on every agents/* call (missing or malformed → 400), while Feishu's event push is initiated by Feishu's servers and cannot be given a custom header; this is the hard constraint that forces the two-stage architecture (a forwarding layer plus the agent route) and prevents agents/feishu from being the Feishu callback URL directly.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L3-L14",
+          "version": "repo-lines-v1:sha256:40405e1582e4f56ff78ebda0ac81f058c96cc030c9a426866a02f89e18db53a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0ZDc2YTI4ZjhkNTRjYTNhMmNmMDViNmFmMmM3OGMwMjBlYjFiYTUyNTQ0MTljN2JiNjYzM2Q1MDYzMGM2NTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkZWQxZjUwOWMwMmFmNmZmMDcwZGY5NjU4ZTA5ZmJjYmMyYTVlNThhMGJmNDJmNDhmMmRkZGM4M2I4YThlMmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3YmY1YWYxMDk3ODMxYzg1ZDg4OGI5YWFiNmE5YjcxYmZlZTI1MGM0NjgyNzU0NzNmNzZhODI1ZGU0N2E4YTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkMjU3OTc0NDE4ZjM2YjY2OTQyYWE0YjQxMmM5NGY0OGIyZjhkMmJlMzU4NTA2ZWRiM2U2ZjI3NTNhNjVmNjEifQ"
+        },
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L21-L25",
+          "version": "repo-lines-v1:sha256:c96fdb82ba9e4a8cb201c290376a6fee24f4cc12a44c2f18ea28a23c591a82d9:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGFiMWYwOTgzMjFlZjQwYzUxODliNTYzMWU2MDVjNDgwZGQ3ZTllN2VkYTdhYWI3ZGYzMDJiMmJhOGQxOGQxOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzVjODhlZWIwMWJlOWI3MDUyYjdkY2E0ZjRkMTU2MmRmYTcxNzQzYzE5OTYxOTNhNjI3ZTE2ZWY5NzQ2NDJjOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmIwYTdkNTFkNWIwMjRjZTAyMmRkZTBhNmMzNDVkYTA1NGJkZDk0OWViMDIzMDliNmYyMjg5NGNkMDA0MWUxNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWI1YjdiMTFjNDU0ODAyMTkwMzM4M2Y1MDI5ZWJkZGQwZmZlMTFmNjI2ZTBkODA1YjNhNzk3MzQ2MjU3MjUwOSJ9"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L40-L56",
+          "version": "repo-lines-v1:sha256:72921cd4e002c3a72461b027482b38881148c45b6326398e28caf62db58667df:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0NmExOGZjZGRiZDUwMjM2OTMyM2MwNGMwZTI0NjJjYWE3MTU0OTNiZGM1NjZmMTJlN2Q5M2I4NDZlMDM3ZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhZDc1OTQ1ZGFlZmYwY2ViMDQ4OGE3YWJjNjQ3ZGQ0NTcwZGQwZTFhMzY5ZDhlYjIwMWM2NzY4NTUyOGFiOWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllOWU3MzE4MjM1ZDM0NTI4NDQwNjI5ODE2Yjk2MmYwODI0YTA1YzgzZTI5MmMxMTcwNjZkYmE1OTY1NmE4YmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_439606f764a54bea933dfd8a1c82fdf9",
+      "statement": "The conversation id is computed deterministically as `fs-` + the first 32 hex characters of SHA-256(chatId), yielding a constant 35 characters; the naive port `fs-${chatId}` would be 38 characters because a real Feishu chat_id is `oc_` plus 32 hex characters (35), exceeding the platform's 6–36 character limit and allowed charset `0-9 a-z A-Z - _ .`, which fails with 400 for every real conversation while short local test ids pass.",
+      "evidence": [
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L51-L71",
+          "version": "repo-lines-v1:sha256:476a1d0ac87e4e139550394bf1ca539e7d6a75b3e3397aa2f3468e14fa5fac8a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZjZWY0Y2ZhOWVlZjliMDE3Y2UzNGE0YzdmNWIyOGVkODA3MTE5NWE5ZTAxZTczOTVhYTA2YTZjMWRlNDk2MWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjMmVhMzgwYjczYzVjYzYzNmJkMjZlODQzN2I0ODY4MTZjNWE3YzcwYjQ0ZWJjOTRhOTQ4ZWFlNDVjYWM3ZGEifQ"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L58-L77",
+          "version": "repo-lines-v1:sha256:710e4df7c6ecd7ee7e2bc5937d68a9ffcb576afda8187ce38fafef367017ae4c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBiM2JhMGQ2NDQwMmNkNjMxOTFmMjcyODk5ZTVkMTMyZTgzN2FhNmU3NGVmZjUxMzdhYzI4ZTljNWE4NDY3YzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlNzFhOThlYjYxOTcwMzkzMmQzODM0NzFmYzY5ODJjODQ5YTYzMzlkN2RkMTM2ODNiM2M3NGYyM2VkYTZkOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI4M2RkY2Q4MTYwNmZkNTBiZjIyMTQyMzllNjMxNmY4YzM3MzMxYzQ2OWM1NTYyMTAzNjA5NDg1N2M1ZjQwNGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxNTBkNmJkNmE5YjYzYjc1NTQ3ODFhZWQ0OTg0NzJmZGIwY2YzYTAzNGUyYWFlNjY3NDMyZWVlNzc5NjVhZmEifQ"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L505-L518",
+          "version": "repo-lines-v1:sha256:9fa1755acff2e0f000f7f25de4677098480bcf6816dc3a0b51323703ef779867:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Nzc4OGQ5OGRiNjhkNjAwMWJkNGI0N2E0MzhmYzJmZmM2NmFlN2FkZThhMDAzYjk5OGFhNmU1YTlkZDRmYTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU2NWI0NmUxZjczNjc4ODEyN2YwYzY1MTU1YmUyMDkxNjJlOTE4MDg5ZDFjMjZkYjVlMzcyMTk0MjY5YjFiMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdlYWQ2NmZhNTQ0MWRmNmU5NWIwNmRlMTQxZDZjY2I3YjAwODY0NTg3ZjlkZmMxZTJmYjc1NmI3NDAwZDgwYmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_842e5dccf48e40219310056e1f015347",
+      "statement": "The chat_id→conversation_id hash must remain deterministic because the platform binds sticky routing, store namespace ownership and sandbox instance ownership to the conversation id; a random or time-varying id would break all three (memory and sandbox mix across sessions). The platform also exposes context.store.state as a JSON KV scoped per conversation_id, whose physical keys are state/<conversation_id>/<key>.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L31-L35",
+          "version": "repo-lines-v1:sha256:c833bfa978b82626c8a75d52a4da3621af2c0feeefcf34702126c3e208d26be2:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTAwYTMxNmEzNjZmM2EyZDM0ZmMzYjhmNzRmMmE3MGFjMTY5YjA2MDQ1MjUwNGMzNjBiMWE3ZWE4ODhhMmY2ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGY4NDgwODM3ZWE0NTNkNDc3YmQzOWE1Y2E3MWE3ZmYyZDRhZGI0ZjY3YWVlMDhiNDE0NGY4MDc5ZTUyMGRhYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTI0Y2QxNGZkYWZlNzgwNDkwODQ2NWM3YzIzZWZhODg0Y2VlOTI5M2E2MDFhZThkOTlkOGI3MzYxNWQwODYxZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDY0ZTdkZDY3ZjljYTU0MThmNjQ2ZDg1YTQxOGMxMGNkNDIyYmI5MzU0ZGNjMGRhMWE4OTRlZmM5NzM3MmI4MyJ9"
+        },
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L62-L64",
+          "version": "repo-lines-v1:sha256:f411d46ee6abe0941c833857c98b9d1f5e3e1c23cc9be1654c3a4c312aa4e94b:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc3OWQzYjZiYzlmMDUwYWExMGY4NDY4ZTE5ZDExNGJiMjdhNzU1ZTllYmUwZmU1M2JmOWM0OTI5NjYyOTdmNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDNhMTdhMmMyMmVmNzZkNGNjZWZlMmVjZmMwZDEzZmYwNGE2ZWY4ZTVhZTFmOGJjZDRkZWU4MWI3ZmY2ZWQxOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGZmNmY5YzJmMDRlZDg5NTU1YTNkNjJlYmI2NWIyYmFmNjdkMmY0Nzk1YTk3MDQ1MjY4MTI3NDRmNjc4ZmRhNCJ9"
+        },
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L76-L77",
+          "version": "repo-lines-v1:sha256:03fe545d2d9f910423a7a88786b8512dac202b4c29af91bb999c277e3bfa2ddd:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmEzNGM2ODgyZGY5ZDQ1ZDEyODBiMTg4YTY5OTlhYTM5MzEyMTg0MDEzM2MwY2YzMTNmNGM2Yjk0Zjg0NzQ2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGU3MWE5OGViNjE5NzAzOTMyZDM4MzQ3MWZjNjk4MmM4NDlhNjMzOWQ3ZGQxMzY4M2IzYzc0ZjIzZWRhNmQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGU0NDNmYmY1Yzc1ZGE0OGViZmE1YTYwZDUzZWVmYTdjOWIzODQwM2I2ZDFjZjExMDVjM2UzMDE2MzllN2Y0ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjE1MGQ2YmQ2YTliNjNiNzU1NDc4MWFlZDQ5ODQ3MmZkYjBjZjNhMDM0ZTJhYWU2Njc0MzJlZWU3Nzk2NWFmYSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/store.ts#L7-L11",
+          "version": "repo-lines-v1:sha256:a0c4b4846212e1f431e07a33eb31f9fc3e3aba1262224493262b3e2ed460a2b6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI3NjhiYWI1NzNjNGQ2Y2Y5NmVjMGVkNjRiOTEyMTZmYmJmMjI2NmI5MmUxMmI3OGJjZTEzMWY4MDQ4MjQ1MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTkxZTQ4ZTM3NjUzOTMxNjAyM2YxNzRhZGU0Nzc3MjhlYmQ5OGVmM2EzMzYyYzE1ZTRjYzAxYmU3NWZhNzUwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjFmOTg2MDIyODRhZWQ5MWMwOTI4Y2U0YWVhYTYyYTc1NGU1YzAyOTBiNmQ3ODRhOWNhYjU1MzY3OGFlMDU0MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2M3NDVjMzYwODgzOTJlMDQyNjUyNzBmNGI4MDY0ZjZkODYzNGZlNWY5MTk0MTllNDE5MmIzNWM1YTY0OTA5YiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8d6821c905504decaff6d09e39797825",
+      "statement": "The same conversation-id algorithm is duplicated in several independent implementations — cloud-functions/feishu-webhook/index.ts, bridge/index.mjs, the external CF Worker relay src/feishu/edgeone-relay.ts in the cf-agent-lab repository, and the verification scripts tools/ask-bot.mjs and tools/verify-memory.mjs — so changing it without syncing all copies produces the hardest-to-diagnose symptom: cross-session memory bleed or one group landing on different instances. src/feishu/oauth.ts deliberately stores only chatId in the signed OAuth state and lets the forwarding layer compute the id, rather than duplicating the computed value.",
+      "evidence": [
+        {
+          "resource": "repo://bridge/index.mjs#L51-L59",
+          "version": "repo-lines-v1:sha256:cf42520008590c89951770ea12389660c5f87ca6a67ae65108bfb7975aba45f0:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI1ODBlOTY0ZjgzYTQ3M2Y0M2Q0NDM4NDYyOTQ5ZDY4YjU2MDBmZGE3ODdmMTYzNzQ1ZDAwZGU4OWNiZjM2YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTg5MmE5OTRiODYxNTE3YTEwOGMwMWNmZmU2MTU2NTY2OWY0ODUwNGQ0YmFiNDljYjY4MGE4ZmFhMWMyYWJlMCJ9"
+        },
+        {
+          "resource": "repo://src/feishu/oauth.ts#L84-L92",
+          "version": "repo-lines-v1:sha256:761565c9615cc2d4aab634dab2c293752c477b93f2a08746f304b0dc57dca739:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGYyYTJmOTk2ZjA4ZTY4MGJkMjkyMTM1YTZmYTQ5NzhiZGEyNmU2MDJkODRmMzNjYjFkNTk0Nzc1ZDQzMDRiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmNmODRhN2MxZTE5ZjlkOWVhYTkxYjcwMzMwODNlOGQwMTFiZGI2YWYwMzg5YmFmNDVlOTRjYzQ4NGIyOTMxNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDI4YTIwNGZlNDkwOWQxMzRkODllZTYxNzQzZWIyOGUwNDZhZjg3ZmI5ZjVhNDJmN2E1ZWQyOTU4NzQ3MGE4MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTVlMjU3YzlhNjM3YTc0YWMzMmVmMWQ2MjBmYTI1ZGVkYTk2ODY1MjZkODg5YzA4YmFjM2VmZGM0ZjU3MGQyNyJ9"
+        },
+        {
+          "resource": "repo://tools/ask-bot.mjs#L139-L139",
+          "version": "repo-lines-v1:sha256:5df63586dbba58d16f3f27ddbee24534a00abe7b8e33176a0ba635bcf30614da:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRmNjM1ODZkYmJhNThkMTZmM2YyN2RkYmVlMjQ1MzRhMDBhYmU3YjhlMzMxNzZhMGJhNjM1YmNmMzA2MTRkYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRmNjM1ODZkYmJhNThkMTZmM2YyN2RkYmVlMjQ1MzRhMDBhYmU3YjhlMzMxNzZhMGJhNjM1YmNmMzA2MTRkYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTMyZWRiNzdlY2Y4YjFkN2Y5ZjBhNzI0MzBlM2I5NmIxMzViZDFjOTM1M2Q5NGUwMzkzOWY2M2ZkYzI4MmU0YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjhiODk0YjU0MWU4ODFhNmJmOGM4ZjE2NjE2ODcwYjc4ZDY4YTg1ZTg3MjlkY2ZmOTZkYzRmYmVmZWUyNDI4ZCJ9"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L161-L161",
+          "version": "repo-lines-v1:sha256:8924b693aff5f3183cdb3a42b891c952aa72d584496af436f63ade402ccd5069:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODkyNGI2OTNhZmY1ZjMxODNjZGIzYTQyYjg5MWM5NTJhYTcyZDU4NDQ5NmFmNDM2ZjYzYWRlNDAyY2NkNTA2OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODkyNGI2OTNhZmY1ZjMxODNjZGIzYTQyYjg5MWM5NTJhYTcyZDU4NDQ5NmFmNDM2ZjYzYWRlNDAyY2NkNTA2OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGZmMzNkODZjNmI2MDMwYTAzNmY1YjI0NmE1NDYzOTE3MzkyY2EzMjVlY2U0ZDMwZjBmY2E3MTYzMTc1MDIyNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTUyMjA5YjgwYTlkZGNkNTBmZjgyYTZiZWQ1OGFmNmU1NTZmNzJlM2Q1YmZhZjEzNGYyYWFlMzQ2ZTc4ZjYyNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_77a16a8507dc4b458fccd3984d1170fb",
+      "statement": "The webhook validates the incoming chat_id against CHAT_ID_RE = /^oc_[A-Za-z0-9_-]{1,64}$/ before hashing, because a signature-valid but synthetically constructed payload could otherwise mint unbounded conversation instances, each with its own memory and store namespace.",
+      "evidence": [
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L188-L188",
+          "version": "repo-lines-v1:sha256:db49f51ea736b1fc9c160d17f538418a09bf286baf281d8abbb662d6785acf76:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGI0OWY1MWVhNzM2YjFmYzljMTYwZDE3ZjUzODQxOGEwOWJmMjg2YmFmMjgxZDhhYmJiNjYyZDY3ODVhY2Y3NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGI0OWY1MWVhNzM2YjFmYzljMTYwZDE3ZjUzODQxOGEwOWJmMjg2YmFmMjgxZDhhYmJiNjYyZDY3ODVhY2Y3NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzM2ZjZiMWIyM2M1YzExOTg1MGMyOWQ5ODI3NmQ3MmMwOTFkZTc5OTdmZTEyYTcxMTQ2OTMzNzJlMGVjNGQyNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWVkMjY3YjkyM2FmYmY3OGNlNzVjMmYyOTc1NTliNWVmN2U2MjU1NzAxMzAwMDQ3ZTVhOTIxY2Y1NzZlN2Q3NCJ9"
+        },
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L43-L47",
+          "version": "repo-lines-v1:sha256:2d2359ad1eca06e801e1887a2563cb2b3a594754d6cca8712d85612b4c8c206a:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGExOTFiZjVkZTJjODlmNDA5ODFkN2Y2NTVjMTI3OTFkMzE0ZWQ4MDNhM2U2MTk5MjI2NWJmZjMwODdjYTRlMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmVlMmQzYmVhMzI5YTU2YjU3YmQ4MjNjNmY3ZmYzNmFiYjM2YjAyYWFmMWVmZWVmMGFhZjgyNDFkNGNjOTFkNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGZmODI5NjhkMzViNTEwOWNkNTAxMTBmOWY3YTYyZmE4NzA5MTNkMDJlYjM2ZTQxODIyMmUzYzM2YWM2ZjRjYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmNlZjRjZmE5ZWVmOWIwMTdjZTM0YTRjN2Y1YjI4ZWQ4MDcxMTk1YTllMDFlNzM5NWFhMDZhNmMxZGU0OTYxZiJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L556-L562",
+          "version": "repo-lines-v1:sha256:8d662118ba7358f04391f899e78c48e3f5faff7fcc7e7ce9965bc5b536ca735c:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWQ0OGNlMGZiZGM5MWI2YTNmYTg0MGQwMGEyYTNlZThiNTM4OThiZDRkNGI4NmU2NDg1ODUyMGRjYjQ5ZGY3NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzJlMzMxNWRmYWU5ZDVhNzAxOTk2YjRjYTgxMzU1OGJlZGYxMzJkYjFiZjQwNTQ4ZGZkMGJiZDYxOTM3YTBmZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDg4ZWIwYzNkNzRjZmI5ZmFkMjkxZTAzODYwOTViYjQ3ZTI1YzIwZDI4ZjNlZDE4NDg3MmQ0MGYzYWFiNjMyYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f73925051daf4db19d3e909643e4919d",
+      "statement": "Three interchangeable ingress implementations exist and must all produce the same conversation id and the same forwarded event fields: the stateless cloud-functions/feishu-webhook (Feishu webhook push, since a cloud function's internal fetch to its own project's agents route is rejected by the platform), the local bridge/index.mjs long-connection process (currently deprecated but kept as a fallback), and the external CF Worker relay at agent.yujizi.org which is the currently active path (v3). The shared contract is: identical hashing, Makers-Conversation-Id header, x-internal-token, body fields messageId/chatId/chatType/openId/text, sender_type=app self-loop filtering, and text-only extraction.",
+      "evidence": [
+        {
+          "resource": "repo://bridge/index.mjs#L3-L22",
+          "version": "repo-lines-v1:sha256:5e7ecad272e18bd89876a34c7847cca0bad0a52eb1b6011ce5dd8889ff19bf83:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ4NzI1ZTkxMTY5MmMxYmNhMGRjOGI3OTAwMzE4YTg5Mzc4NmQ1OTY3YzBlMjgyMWUwN2MxNGNmYzlmYWQ1YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwMWVhZDkzNmEyMjgxZDUzZGNjMDY0YjdlMmEyYWIwZDUzYjkyZWYzZWY3YjM0YjY2ODY3MzAwNzg5NWM4NjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkYTdlODNmZDFiODg1OTA0OGVlMWMxNGIyZGM2ZTRlNzY0NzgxZmM0NTBmNWQwYjE1MGE3OTZhZWU2NTdhNmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhmYjVlMGY2OGQ2NTk0YmFmNmIyMGI3NjVlOGNmZTE0ZmYzYzZhYzUwNGRmYmU3NDIwNzc4ZGFmZGI4Y2JlOWQifQ"
+        },
+        {
+          "resource": "repo://bridge/index.mjs#L70-L89",
+          "version": "repo-lines-v1:sha256:c53bb118befc06efa563ab92b6cff3e8601c9fc437e986ec40c0a0811ea24797:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkOGE3MWNjOTY5OWNiNjM3NjE1NjQ2NWM0YjUzYWU4ZGQyZTQ1NTM3NDlmNTViODUzMzg4Zjc3ZWM0NTQ5ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MTA4Y2Q3NTg3M2YwM2Q0ZGU5NDk3Y2QzMTc1NjE2MDlhODExZmMyNTM2YjY4NGI5ZWIwZTA5OGU4MDFmMDAifQ"
+        },
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L191-L216",
+          "version": "repo-lines-v1:sha256:9044ea6c422ee0d314a83c3b07d6f3a3d50136c81c5befd7c2c0b1ad699e9c6d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2NDA5NDNjMzY2NWU1NzI0M2RmYjI3ZDVmNzIyZjAxNDRkMDM0YWU0YWZjOGMyYzZiOGFlZDAzNTRiZTU0MmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZDExY2FmNDNlOTdlZjM2OWU2YmVlZDFhMjY4YmQwNTgzOGYyOWI5ZGQyNTRiZjY5YmE2NDg4NDE0NzIzNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyNTY3OTk4MDIyODIxZWFhN2I3ODlmNjU5YzVmMDZhNTA1MTczYzhlZmYwZjgwYmQ2ZWZlYTUwNjZkN2VmNjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5OTU5NWU0YThjZDQ1MGE0NjhmMzRjMDA5NmMxYzcxN2QxMzJkMDU4ZGJlYTE2NzY5NDM2ZmVmY2I3NTNmNWMifQ"
+        },
+        {
+          "resource": "repo://docs/02-%E9%A3%9E%E4%B9%A6%E9%85%8D%E7%BD%AE.md#L9-L31",
+          "version": "repo-lines-v1:sha256:aae0ed0ebb1b17f6d7041f7041fe81d80a0b8cc828b3e610ddeff357ee156ded:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyZDhkMjQ1NjM0MjFjZWE0NTUwMzNmMDRiYzc0ODhmMTA1YjM3NGUyZTZlN2U1MWEyMWFlN2YzYzIxYjk5MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllY2U5MTA2MTFmYmU4YTY1ODM5ODVlN2Q1OTFiMmVmNGUxZjFkNDYwYjVhNmQ1ODU3NmE2Y2RkMGM4NDRlOTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2ZGQ1MzE0ZjhiY2NmYTNhODMwYWI5OWQ3MTcyNDhkNWE1MGY1YzI4NWM0Mzg3OTBhMDg3NzhhNzAzNDk1MjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a0b85169edc84424b665aa3e45ab0b61",
+      "statement": "The bridge's conversation-id contract differs from the deployed webhook's in one respect: bridge/index.mjs sends INTERNAL_TOKEN in both the x-internal-token header and the body's token field, while cloud-functions/feishu-webhook/index.ts sends only the header. This dual-send is a deliberate fallback because the agents runtime's context.request.headers is not a standard Headers instance (typeof headers.get is undefined), which previously made every forwarded request return 401 with a misleading 'token mismatch' message.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L973-L997",
+          "version": "repo-lines-v1:sha256:bea3713f17e854f0c9b4c371728267301847da53f8135ddf4c6b32c71d0215a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmODkzNGZhOWQ5MjRiNjVhMWRjODMyNjFlNjFmYjZiNzY3NTdmMWI0NTQ1YTZlYTQ2NGZmMTFjNGQwMDUzY2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlN2JlOTNlMzI0NWI4ZmViOGFlN2I4NmVmMGUyOGIzYjM0Y2U2YTI4YTczNTY0NDdiODkxZmE5MWM4ZDAwOGIifQ"
+        },
+        {
+          "resource": "repo://bridge/README.md#L106-L114",
+          "version": "repo-lines-v1:sha256:450654c8c3cbf8c59f4855f6f5b9411e67f394f20d9f34c7a193b1ef20017132:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY1ODY3MTQ4OGE2YzQzNTQyYmRlNjNjYmQ2OGI4NWFjMjQ4YmY1ZDJjYzJiMTdmYTUyMTUxODNhZGI1NTg3ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQ4OTM5YzJmOTk0MDdhY2ViNzNiMzJkZGQ5NzJmYmEzNjBkNmQxZDg5ZDMzM2FhZjBjYWNhZWVjYzZkODc4OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDNmZmNjNDk4OGQyYTEyZjliMWM2M2EwNmNiZjA0NGY2YzRlZmJlZmU1ZmY0OTczNzA1MDFkNzE1MzQzZWNkMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODgyOTM2MmJhYTRhMmJmYzJlMzI2YzkyZTI5MmRkNWM0Mjg3ZDVlMjJhODkxNDQwODU3MmM4ZjI5MjJjNDEwZCJ9"
+        },
+        {
+          "resource": "repo://bridge/index.mjs#L72-L86",
+          "version": "repo-lines-v1:sha256:e0b64d993e755f6742cda0f3eb880c190e2acc7dc7554b4ac74d564a834b888f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzZDUyNTE2NGMxY2ViMGEwMzg1OWNhMTg0ZWI3YmNlNzk1MWU4OGY3OWMzMWZjMTdlOTViMjY4NDE0MzczYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2NTZjNTMyYzJlNDMxODg0MGYzZWU1MDgxYmU5YzM3ZDNlMzIzNTU0MDdlMTQ2NDhlZWE5OWRmMzhhYzNjNDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjNGY3ZjMyNTRiZmI2MGZiNzNiMjIxODQwNTQ4MDg2N2M0NDJjYzcyNTNlNjk4YjA0OGZlMTZiNzdmYTQxZmEifQ"
+        },
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L197-L206",
+          "version": "repo-lines-v1:sha256:e9a7665f076e795d864db84a4310f68ba1f8ad41a4f964d8c9568d5f532b49dd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0MDlkN2M3Y2U0NjM5MjE1NWRiZGJjNThhODFiODMzNjA1NzA3YjljOGM2N2ZjZTE0YmFlMzA2MjFmMWMzOTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzNzNiMzhjMjg1ZWZkMzk0ZDFlNTczYjcyMjRmNzJhOGI3ZWJiNDMyMWMyYTMyNDZmMzBiMDNmYTUwMjJmZjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcwNGVhNzRhYmI5ZDIyYTk2MThiNGFjZWM1YmEwODUxNDA5YTdhY2ZhOGY4Y2Q4NDhlYTE1OWRhMDBiMzIyYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzNDg4ZjczZGVhNzBjODBmYWZkNmJjOGYyZWUxZWQ4MDVjMmFjZGY1NGU3NjYyMjkzOWMzNjJlZWUwYzczNjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5274d783980f42628f7284068eeade1d",
+      "statement": "agents/feishu accepts two inbound shapes on the same route: normal message events (dedupe → rate limit → dispatch) and the cloud-document OAuth callback identified by body.op === \"oauth\", which is handled before the dedupe/rate-limit claim and returns synchronously because the relay's browser is waiting for that response to render the result page — applying the user-message dedupe logic to a retried OAuth callback would silently drop the second attempt.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L109-L120",
+          "version": "repo-lines-v1:sha256:a3b1a0ce35e4fd481463288bba9e9c88c9fdbff80ed221a0e5df6b1cfd90e139:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5MmRiYWYzYjI4NWIyMmI5ZWZmOWM3ZTRiYjMzNWJhOTY2NjRlMjlmOGMxMzRiMjA3MzlhZjJlNGI4YTRjMTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjMGVkZDlmNGMzYjY3NThhOGU5NDczYTY0ZTdhNjMzNDEyMTEyYzA2MmJmZjZkMjIxZGMzNTkxMjNmNmFlNGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkYjNlN2NkMGMzYTYyMzA0NzY2ODE2MWQxMDRlOTlkODYyMDljYTNlNzc1NGEyNWIxMTlhNDkwNzg3ODA0MjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyNTgzZjhjODRmNTE0YmIzNGQ2MTExNjgyODU1OGZiNjhhZGZlZmU1MDZkOWY0MDU1ZjBiOTFhYzU5MDk0ODkifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/index.ts#L115-L117",
+          "version": "repo-lines-v1:sha256:194d5a0cb8ec116b0504811972f31440d08bae61f9c3fef4836789860d9e0608:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZThiMjA2ODk2OGVlOTcwNDFhMTJjNTE5OGQzNzFiNTM2NmE0NzQ4M2U5NDQ5YjZiYTY5NDczZGFmN2UzMDIyNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzRmNTg0ODRjODg0OGMxN2NjOWMxMDY3Nzk0NDEyN2YyMGZiNTk2ZTU2NWI4MTc5Y2Q3NmIzMTYzNzE3OWQyZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDg2YzdjMTdhMjY1MWY5MWI1OWRiOTBhMDFkODgyMGU5NGU4MjUwOGQ4NzgzNTBhYmNhYmFiODQwMDFhMWYyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_19d9e1cd58d941d5a04c2829183dcc67",
+      "statement": "The OAuth callback trusts identity only from the HMAC-signed state (chatId/openId), not from same-named body fields, because the body is assembled by the forwarding layer while the state was signed by this repo when /login was issued; the signing secret is INTERNAL_TOKEN, which the relay shares as EO_INTERNAL_TOKEN, so both sides can verify without distributing an extra key.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/_host.ts#L716-L727",
+          "version": "repo-lines-v1:sha256:e7b61dba59e79ce13537dcf7cb2839814e1ce4e1742a69a9e7b92cc8d8000446:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5ODNmZmM0YWM3MzUyMjJjNzg4MGIyNzUwYjk4MTIzYzI2NzZlZjFjZTA3YmIyZWRiNWY2NTBjZmQyNzMzMDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlZjY5MDA3YTdlNzVjY2RiMmMxOWVmYTlkOTVjNDNiZjc4N2YzM2EyYjljODI2NWM0YTVjZTY0MmZlNmRiZWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1NGZkYzBmNGI0MDhiODAzMDE2NDRiOTQyZjRhMjAzMjZhNmUxMGE5YjRjMTc2YmZiYmE2MWIxZTQwMTY4MGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmMzNmMWQ0Y2Q4MTg0ZWM2NDMyM2QwMmJjYWFkYzYzOWM5YjA0MjFjNDY3ZGZhYWZlMzA3ZTEyNzdjNzlmOTQifQ"
+        },
+        {
+          "resource": "repo://agents/feishu/index.ts#L202-L206",
+          "version": "repo-lines-v1:sha256:8cabf72be8b9127b501c580ff1cc63da97ec5ff95eff9758fbf16182b0ef29a9:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWFhYTc3MjVmYjk0YjcyMjJlMDMzZTU1YmIyZWFhNTAwODRhNGRmMjczNzVkYjMzMDBmNGQyM2RkNmJhM2MxYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGY2OWQxMTVlYmY4OGE0YzFjZDJhM2RlNzkyYWQ2NjYzZTQ1MWFkNTg1NTgyYzAzMTExZmM1MzJiYTYwODY3NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjdjZjAwMDY2MjhlZjEwMmJkYzE5YjkwNzQwNjhjYTNjMzYwMDU2MWIyYjhiNjJkMTRiOTYwZDU5NThiZTc2YyJ9"
+        },
+        {
+          "resource": "repo://agents/feishu/index.ts#L212-L221",
+          "version": "repo-lines-v1:sha256:fae847c4357baf4ed6fd37070c59af330ae272e1aaf811e590f58ff51a658cd6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5MzczMDAwYjExMGM3YTQ2ZGU5OTYzMGQwYzdmOWM1NGYyMjFlNDg0ZjcxYmMyY2VmMWM3ZmQyNjYxOTg2N2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2ZGRhYjJkNzJlNzA5Mzk3YmZmNTk4ZjkzMjU0MTFiM2ZhOTEwY2E1NmFiYmQxYjE1ZTQxNGZkZmEyNzlhOWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwZWJkODQ5NjgzMDBjMDRlMWYyMmFlYzgzNmY5MGZhNmUwYTUyYTNkMzI3MDZjYTkwZDk0YjBjODEzODM5NTkifQ"
+        },
+        {
+          "resource": "repo://src/feishu/oauth.ts#L135-L146",
+          "version": "repo-lines-v1:sha256:213a37c61d6f89c1c0f666afec062acef06b2c89713cfa6bdb1e39c7fc77e780:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2OTlmYjFmMmUwOGM1YTQ3MTFkYTBmNTYyMzI1OWMxY2U3NWE5MzI2NWQ2NWEzZTNmZmQzNzRiMzdkY2VjZWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxZDZmYzMwMWRmNDU1Mjk5MDAwM2JhNDAxYjE1MmRjY2RhNzE5M2ZkMjQ3OTE5N2NmODBkNzk2MTZmM2I4ZDQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b857fee2c13c46409a067e86d45f2f94",
+      "statement": "The agents route enforces a fail-closed internal-token gate: if INTERNAL_TOKEN is not configured the route returns 503 with instructions rather than serving, since the deployed agents route is publicly reachable and could otherwise be used to burn model quota; a mismatching token returns 401.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L77-L99",
+          "version": "repo-lines-v1:sha256:008416a11811933f9f8aa01e5be383232838aa17e4f367a1e55a87f5193b614e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZDk5ZDJkOTI5NzFmNjJhODkxODQ3NTVhMGY2YTU5YjFlOTUzMjk2N2U4MWEyM2M4M2M3YWMyYjZmYmFkNjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkZGQ4OGM0YmI5MWRlMWE2YmRiNzVmMWU5Yjg2NzU3NGNhZTAwY2IwOTBlNDA3MzYwNzg1NzJmMmRkYzliYmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlOGU2M2RiM2Q0MWYxNzI4ZjA0ZGE0MGE1NWJhZjMzNjM0NmJhZTVjYjczZjE0OGE2ZjIyMGU2MjhmYjI2Y2EifQ"
+        },
+        {
+          "resource": "repo://cloud-functions/feishu-webhook/index.ts#L100-L109",
+          "version": "repo-lines-v1:sha256:aaa0ee7fbd660345a9bf7d993825ac34c291492fbc72e24dc12f05474f8d105e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4ZWRlYzI0Y2MxMDFhN2I0MGJmMzM5NTQ5OGQ1ODI3OGE2ZTNmYmViMTYxNDA5ZjUwNzQ4YzQzZTU4NWQ4MzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ5NmJmNDE4NTQ2NzdlNjVmMGNiYzY1NDVkM2E1MDQyOTI3MTFmZWFmOGFiNzFlMGI5ZTIzNjU4ZTQxYjA2OTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE3MGI2ZDhhNjJkNzJjNDA0MGFlMGU0ZGIwN2E0MDE5YjhmNWI0ZDE3YjY5N2IwOWYyZDczNjIzNzNkY2M3YTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_810e21833bad4b1a876fe3e25ad14f77",
+      "statement": "The conversation-id length/charset trap and the sticky-routing invariant are pinned by four bare-Node smoke tests in section E: the id is 6–36 characters with a legal charset and a leading fs- (with an explicit assertion that `fs-${REAL_CHAT_ID}` is 38 characters and over the limit), the same chat always maps to the same id, different chats map to different ids, and the forwarding request carries the internal token.",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L96-L101",
+          "version": "repo-lines-v1:sha256:5d0764f111b2a5d92ece34cf04ed081aed1224a1c3d89aff999cd2c5fbf23640:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2M1MDBiNzllMjIyYzc2MTUwMTBiMzMxZjQwMDA2ZWI4YTBjZmFkMjE3OGRlNzVlMWQ3NTcyZGFlNjZmZDFmYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmQxMGVlYmZiODI5ZTFjOGRiN2IyZjQ3ODA1YTk1MWQxOTcxZmJkNGIwNjk4MmZkNDA5YjU0OTAwNzQxY2ZjMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDJhMmM5ZDNmZThmMzFjMjg4OTY2OTFlNWE2NDJiZWNlMzhlMTdmOWRjNTE2MzM3ZTIyYzVhNjNkNzQ2MWE2MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTQxNjkxOGM0MGJhYzBkZTgzNWJmMmI3ZTA4OWUyNzk4OWFhZDdjOTNkZWRhMDNhODI0ZjkzYmIxYWE4OWZlNCJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L505-L545",
+          "version": "repo-lines-v1:sha256:e549ee09f1b9d237ffa189c2afdce303f5eecc7cc893e1777d6a68b1a876c1b7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Nzc4OGQ5OGRiNjhkNjAwMWJkNGI0N2E0MzhmYzJmZmM2NmFlN2FkZThhMDAzYjk5OGFhNmU1YTlkZDRmYTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU2NWI0NmUxZjczNjc4ODEyN2YwYzY1MTU1YmUyMDkxNjJlOTE4MDg5ZDFjMjZkYjVlMzcyMTk0MjY5YjFiMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlOWRhMzc4Mzk0YmVhMzM2NDkwOWE1MTNiMmVhY2Y0YTZlZGUzMmZmMzViYzAwZTAyMThhNTAxMjE0YzMyZWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2dc012cea4f2470f831cc2d6dbc0b316",
+      "statement": "The conversation-id invariant is only automatically tested on the webhook path; bridge/index.mjs and the external CF relay have no corresponding automated assertions, so they are unprotected copies that require manual cross-checking when the algorithm changes.",
+      "evidence": [
+        {
+          "resource": "repo://bridge/index.mjs#L51-L59",
+          "version": "repo-lines-v1:sha256:cf42520008590c89951770ea12389660c5f87ca6a67ae65108bfb7975aba45f0:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI1ODBlOTY0ZjgzYTQ3M2Y0M2Q0NDM4NDYyOTQ5ZDY4YjU2MDBmZGE3ODdmMTYzNzQ1ZDAwZGU4OWNiZjM2YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTg5MmE5OTRiODYxNTE3YTEwOGMwMWNmZmU2MTU2NTY2OWY0ODUwNGQ0YmFiNDljYjY4MGE4ZmFhMWMyYWJlMCJ9"
+        },
+        {
+          "resource": "repo://test/smoke.ts#L443-L545",
+          "version": "repo-lines-v1:sha256:2f7b8859559e334c89c0b549a9cfa8d6833b522e9b65df12627b4bba5722eef2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1MzAxOGQxMTBjYjBiMmQ5NmZjZjNiNWU0ZjdmYjQwZTUyODM2NDU2Y2Q2NTJiN2UxYmUzNGYxZTExNzU4ZTIxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIzYTNlNDZmOTQyNzZiNmY2ZjRlZDFmMDJhZjc4YmVmNmEyZWUxYzQzOWRkNTU4NGI5NzM5NDgzMTMyMTRkMmI3IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjMjc3MDc4YjdkZWVkNjE0NGZhMTQ1MDY1NmEzMGZiYzY3NGM4ZTMxYzc0YTNhMzIxNDMxNWY4MDM0NjJhYWVkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyZTlkYTM3ODM5NGJlYTMzNjQ5MDlhNTEzYjJlYWNmNGE2ZWRlMzJmZjM1YmMwMGUwMjE4YTUwMTIxNGMzMmVlIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_c9a8e5c65b0141428ae292c577df875f",
+      "statement": "End-to-end verification treats the request header, not chat_id, as the session key: tools/verify-memory.mjs derives four different conversation ids from one real chat_id and asserts they are mutually distinct, which is what proves that session identity is Makers-Conversation-Id; tools/ask-bot.mjs and verify-autocompact.mjs use a fake chat_id with an independent conversation id and read replies from the ?mode=sync HTTP response, so verification never sends a message into a real human chat.",
+      "evidence": [
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L343-L352",
+          "version": "repo-lines-v1:sha256:3729bc7442dad8c66aa393cdee70aae94e4b3dfc2db160941982c7dbbab1c188:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5ZTY1MjZjMDRmM2JhMGQwNDhiNjAxMTI4MGFiZjgyOGE2YmVjMDEzYmIyZmFmZTc5NDIyZWRkNzU4MWU2ODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5OGI5NzQ4ZjA3N2E0YjFhMTFmZjkwOTI4ZmVhZmI2MThlZjhmOWY2NTRhNmIzZTZlMTBmZDk5ZWY5NjE2NWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllMWM4Njg5YTUzZTYwNDA4YzBjNDc5YjgxNGE5Y2NhYTNmYTM2MjJhNjJkM2EwZDg3ZTM4NTljMTAwY2Q2MDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUxYjY4NDkyYmIzNGM1ZTViNDhmZTFjNDU0ZTlhMWNjNjM4NTg3ZDIyYWUzOTVmOGJhNzc1NDJlZWEwMmVhNzUifQ"
+        },
+        {
+          "resource": "repo://tools/ask-bot.mjs#L138-L159",
+          "version": "repo-lines-v1:sha256:66bd7e426e235719e32392bd46daae73cd8f3450680c23189e21b54d0f5742f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2ZGVmZWNmNjM3NDQ4Y2NjYjc2NWExODQ0MjZjMWI4M2ZjYjI1NWNiMTI0NjZkMGUxZDljYTFhOGM4NzhmODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2M2M4YWZmY2RjOTM4MjlmMTJmZmI0ZTA2NWMxY2IyMWFiYTMxMjUxMTFjY2U4ZTI2OWQ1NjM2YjVjNmRmMzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2MjkwYWZkZDg1YzA0MjRlZTgwYjU3MGZlOTk1MzcyODkwZWY5NzM2MTE2OWFiMGM1ZWFkNDUyMTA0ZTc2YTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4ZmRlNjM5MjQ4NmQ3YWE1ZGVlMGY3NGI4MzBkMWM2NGU2OWIxMzg4OTUxMGQ5OTI5YzlkNjU0OGM2OTIyMTkifQ"
+        },
+        {
+          "resource": "repo://tools/verify-memory.mjs#L155-L212",
+          "version": "repo-lines-v1:sha256:36859583799c3cbc0ff618ad4adb9c49fd2cfbf0f4d3f00febfd9ca6b52bdb79:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0MThkYjBjOWJjODczZWMxZjM1YWE1YjYxNzY1ZTlhNzBlOTFkNjdlOGVkNjNlNTc0ZTFjNjA2M2YxNmEzNjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxNTgxZDFkYWRkYWQ1Y2QzOTJkMGEyZThkNjMzN2EzNjI1NjFjNWRmMDAyZWNjYzlhZGY5ODM3OGI2YTY0YWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY1NTJmNjQ3ZDAyZTk5MGQxMTMzNjFhY2M0MzBhZTgxOGYyMWJkMjkyZTBlYWRlMzM0YjYxMDU4NzkxNGMwNDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg4MDdiYWVhOTgzZGRkOTk0NjA4ZjMxMmY0MmVhOGJkYzM3OTIxZmE0OGFjZjlkYWUzNDMzZjZkZjY3ZGNlYTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8094e91e6f3048c4b3c770540ddc862c",
+      "statement": "Probe diagnostics depend on the conversation id: ?probe=start and ?probe=check both need the same Makers-Conversation-Id because the marker lives in conversation state, ?probe=last must read the conversation KV to see another instance's diagnostics because its in-memory ring buffer is per-instance, and ?probe=store's cross-session test requires writing under one conversation id and reading under a different one. Probes are GET and edge-cached, so verifying after a code change requires a URL cache-buster.",
+      "evidence": [
+        {
+          "resource": "repo://agents/feishu/index.ts#L379-L389",
+          "version": "repo-lines-v1:sha256:a92793765f37c9f4bcda85cc33ebf22150bd7efe44e100d234aaa00ccd936536:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1MTIzZTA0YmFhNDY5YTY3YmNjOGU5ODRiNWNiNDQ2MmM2YjcwN2FlMWQ1ZjFmMTE2MGM2YmE2NDYwYTQzMDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2NDFkMDdjNDlkNmQxNDEyOWJlN2Y4ODVkYjZjZWEzM2ZmZWI2N2UwOTAwMWJiOTEwMjU4Y2VjMWU3NzNmY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk2ZDEzOWM3ZGI1YzcwZTQ1YTg2YzRhYWMxMzA2NDI2YTEzZWYyNjRiYjJkNjljODE2MGYyNTExMzg5YTY3OWMifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L114-L127",
+          "version": "repo-lines-v1:sha256:814f8d9a6a599b76e31d9fdc9000a1d2b11001d287d310b7a00c4281d8c433dc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhNTQyMTA3ODA4OTEyNzVkMzc4NjE1NWNlOGQyZjc3YWNkNGI2MTRjNzIyOTg4MTA5ZDc3Y2RlYTc0MzRhYjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxM2U5ZDkzMzE0NmIzYmNlNDdmNjdmYjcxZjZmOGJhOGUyZTI4ZjQyNjBlYzJlZWIxYWE1YmQxMGQyOWUzOTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNiZjQ4YjVkMmZlYWZhZjU5ZGJhZTkyZjc2OGI0MzhiZThlMGQ4OTE4YWRjZjgxOTVkYmJkZjE5NjkxMDMwOWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxYjlhMzk5ZjIyMzM1NjFhYTBhZDJlY2Y5MWFkOTBmODhmNGJiZDg3MzA4OTIyMjJiMmZmMmYxNDQ4ZGM4NDYifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L457-L462",
+          "version": "repo-lines-v1:sha256:e6ec232a49141aa7fa8dca9915b0d8e92e29b8654b2d9dd4d30a00a360a6c811:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGUxYmJhOGM1ZTQ0MDgxMzNjZTFiNThmMmFlZDM2ODAzZDNjY2JkNWYzNjBmYTY1NWNlNmMxN2M1OWM3ZTY1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZiOGVlZDMxODBiNTQ2ZjYxZWY2YzM1MDE3NDcxYTMyZTQzYjQwNjAxMTMzMGRiYTAxM2QwMDU3YmY5MDFmMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODc0ZTEwYjkyZWVlMDgxMDc0NGQzNjk1YjRmZGIzYWJkMGQyNTcwOGExM2RlZTM4ZjM5MWY4OGRmNDE4NDRlYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTJiNWEyZjYyYWM3YmE2ZTZkY2EzMTQ3YmIyYjVmYzQ3MDExY2RmMTI0MmIyM2ZkMmU2N2Q3NTc3NTcwNjliYiJ9"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L498-L508",
+          "version": "repo-lines-v1:sha256:cfc32672f550cd159fa4c90bc2184e8b06b5a3e4c0c5ca15ab5199dd72c4c729:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5ZTM4NDNiNGMwYzI0YzhlOGJlZDczNzQ2MDUxYjM3Zjc0NGRhZjQyYjI3YjIxYWYwNDA2OTU0YmYxNzg1ZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdiNTU1YTZlMDZmZmZjNGIyYTliNWYyNGNiNjc2MmMyNGI4OWE5ZGVlY2JiNDk4ZmQ4YjI5OGNkNTkzM2M4MTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2ODg1NDMwMDdlNzcwZWQ3YTdmY2I3MDIyMDYwYjAxYWUwNmY3ZTA2OTVmYjY3YjczOWFlOTQzNTY3NjJmODgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d65825255ac545dc8c3c38a2765230c2",
+      "statement": "The dedupe/rate-limit store is only correct while a single instance handles a given conversation at a time, which the platform's sticky routing provides; it is not a distributed lock, so if one conversation_id is ever routed to two instances dedupe fails and the same message is answered twice. Restoring a stronger guarantee means swapping StateKv (3 methods: get/set/delete) for an external MySQL/PG with a unique(message_id) index.",
+      "evidence": [
+        {
+          "resource": "repo://docs/01-%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A7%BB%E6%A4%8D%E6%98%A0%E5%B0%84.md#L142-L150",
+          "version": "repo-lines-v1:sha256:a899a9088c705a53a058c8f89875a1fb05b5d5f3d81dd475b9829b3c95bb6775:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmEzNmQ5ZmQ3M2IxMzMwMDMzYTdmNTRmOTNkODI4YzgzMjU4MTkxOWQ2MmEyYTcwMTU2OGRiMmFkYTFhZGRjMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDU3N2E1OGI0YTVhZTZkZmRhNDY1MzRhOTE0NTYxMzEyNTg2NjE5ZGM0MzlhYmRhNjAzMmNiMDJlMGM1ZTdlNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjAzYjU0ODFlMzIyMzQ1OTM0MThhNTFlMGY5YjM2OTcyZTIzOGIyOTNiZWU2ZWQ5NTI2MGZlMWU5OWM1ZDIxMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmFmNDM2YjYwYWVlOWIzNzg2NjNjYjExMGU3Nzk1NWIwNjA1ZjYxMjE2NDZmOGU1MWQxYTM4MjY5YmUxZDc3OSJ9"
+        },
+        {
+          "resource": "repo://src/feishu/store.ts#L13-L29",
+          "version": "repo-lines-v1:sha256:9bf81accddd86ac7344b6aa38544cc82c197f589928e99d72a17e1b4e46aedcf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlMTIwNzc1OTAwOTYxMGIyZTE4NmIwMGM3OGNlYmEyNTFiODdkZGYwOTZlYTYxZGY4YzhlY2E5NWNkOTQ3OTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhOTdmYTYyMGM4MGI4MzdkZWYwNjNjMDI0MzM1ZDVhNDIyM2U1YjkwZDg1MTBhYzEwZmJlZWE3MTdkOTBmYmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhZGE5Mjc2ZjIyNTJkZTc4ODg0OWNmYjk4MDVmMzIyNTJkZDkwZDI0ZGE5M2E1Y2FmMWQyZjkxODliMDRhZjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1ZDc2NmRhYTI0ZTc1NDQ2MGVkZGY4MTM3ZDdmMzFkMTIzZTZhZjYxYTQ2ODIwMzc5NGI3YTU4MTIxZWM2YTEifQ"
+        },
+        {
+          "resource": "repo://src/feishu/store.ts#L62-L70",
+          "version": "repo-lines-v1:sha256:2b3a0f7345878b8b59e835220dd643bb13c4211bb91ab20327676648c3ab6066:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTk1OTliYWViMWI4ZDM3MDU2Y2U2NWM5ZDc3Yjk3ZGQ4YWE2NTExMzE2OWVhZGY0NGQzNjUxOTI3ZjgwYjBiNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWE0NWYxNzEyM2Y3YWUzZTIzNzUyNDc4OTExOGVlYmMxYjlhYjFhNTkyM2RiNjgwYmU5OWViZmU3MDUxN2YxNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_218d16f3cff04c2a9bc28530eed4dadc",
+      "statement": "blue",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L10-L38",
+          "version": "repo-lines-v1:sha256:9b67db9554c0b0152feb9d1cb929b61c08706c01edebd4663977696bfd242692:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2OTc1OTM3NTc1ZjVlNTU2ODFmZjIyY2RmNThjYWVmYjEwYzI1NWJhYWM4MDdhMjYyODJkNTdlOTcwMWMyMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGY1OWUxZWU0MzRhOGFlZDI1ZTliOGVkNmRmNGQ4OThlYWU2YmRjMjhkYzZiMTM1YjNkYzg2ZDQ2MDMxMzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiNjcxYzIyZjYzYzlhNzQ5NjIyNzUxODVmYTI1YTU3NWE5N2JhNmYyMGEyYjgxZjIzYmM1ZWQzYjViMjdjMTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhY2Y0NGEwMDdlNmIzZjk4NTIwOGUyMTIwNGIxOWFlMWQ0NjcxNmZlZGFhM2IwYzliODcyMmY0MTc4OTAxMjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3cf6b23eef7644d8a63138b4be40cb5b",
+      "statement": "Placeholder",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L10-L38",
+          "version": "repo-lines-v1:sha256:9b67db9554c0b0152feb9d1cb929b61c08706c01edebd4663977696bfd242692:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2OTc1OTM3NTc1ZjVlNTU2ODFmZjIyY2RmNThjYWVmYjEwYzI1NWJhYWM4MDdhMjYyODJkNTdlOTcwMWMyMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGY1OWUxZWU0MzRhOGFlZDI1ZTliOGVkNmRmNGQ4OThlYWU2YmRjMjhkYzZiMTM1YjNkYzg2ZDQ2MDMxMzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiNjcxYzIyZjYzYzlhNzQ5NjIyNzUxODVmYTI1YTU3NWE5N2JhNmYyMGEyYjgxZjIzYmM1ZWQzYjViMjdjMTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhY2Y0NGEwMDdlNmIzZjk4NTIwOGUyMTIwNGIxOWFlMWQ0NjcxNmZlZGFhM2IwYzliODcyMmY0MTc4OTAxMjUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

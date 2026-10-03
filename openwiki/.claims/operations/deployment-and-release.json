@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:277075c2e95a40295a193c66ef2bcdb723cb9631f02d787bee990c5922c145bc",
+  "claims": [
+    {
+      "id": "claim_190a8bc1fef8412c9912c3fc5a900b3a",
+      "statement": "发布路径是 push main 触发的 GitHub Actions 工作流（`.github/workflows/deploy.yml`），另有 `workflow_dispatch` 手动入口；`npm run typecheck`（tsc --noEmit）与 `npm test`（裸 Node 跑的冒烟测试）在部署之前执行，任一失败即中止，因此冒烟测试与类型检查是防止不安全自动改动的真实上台门禁。",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L15-L47",
+          "version": "repo-lines-v1:sha256:9a19ee76e780958a00aae1bd3ecd674311cb0c71ec37fa112b73b9b490b182ff:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5NmRjNDgxNDlmNWE4M2QxZWQ2ZGJiMzliYmM3ZTJiOTAyYWEzZDM0ZDZiZDVhZTRiMjkxYjY4ZGYwY2E3OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2MjFiOTgzMmU5Mzc1YzljYmE5MzcwMDk3MDk3NGI0MTk0ZjRiMDQ1ZmQ4NzQ1MzIyYzg5MjQ3YWU2N2M3OTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEyYzNiZDFhZTkxZjE5ZjA3MjUwMjJhMDM4MzQxYjcwOTlkNDhlZGM0OTQzNDRkY2EyOWUwNzdkZGM5ZWE0NGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2YjdlZTRlYmM1NzJiM2JlY2Y1MjczMmM5MzY3MzhhYjcyMjI3ODUxOGVkODlkNDcwMjA3MzUxYmI1YzZjNmQifQ"
+        },
+        {
+          "resource": "repo://package.json#L12-L13",
+          "version": "repo-lines-v1:sha256:aa446ad9487cdf894fa87af0242d2eb9b0dfab35d4fe203c6cdc82e8faf021d1:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTViOWFiMDFhYTNkZmIzYWI1ZTkzYWNlMjNhODQ0NmExMjE2MmVjZDAwOGY1MmEzZWNiOWFhZTNiZDY4NmE3YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjg2ZWMxM2RlYTE4YTMwMGZiYjQyMjI3M2YyODI0NjU3NDIwNDNmMjMyYWZhNTg2NmY5ZjNmOTk2ZTZkMTZmNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTRiMjkwYzJmMWVkNGU3MTFjMjUzYzQ1ZGQ0MmEyYmVjOTJkMjc1YjljNDQ1NzdiMDA2MTA4ODc3NzNiNDE3ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzlmYThlZGY4NDYwYzEzMzRmMzk2MDE3Mzg0ZTkxODA1ZDA3MjkzMGY0NWUxZjc4MjlhZTIxODcwOGQxZGEyNiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d89ef5def8eb4937b91e256a983039c1",
+      "statement": "工作流用 `concurrency: { group: deploy-production, cancel-in-progress: false }` 串行化部署：同一时间只跑一个部署，后来的排队而不是被取消，避免中断一次进行中的上传。",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L21-L24",
+          "version": "repo-lines-v1:sha256:5cb0b239fae8fe2b8f291c0cc162e88e106abce82b2e5ddb8bc19de74fefd79f:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTI0ZDgzZWUwMzFjMjg0MDlmZTZlZjcxZmE3MDhiYjViY2M4MWE5Y2M1ZTliOTdlMTFiZjMzMWI1N2E5ZjEzMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjRhMDFmMjhiNmIwNGQ0NWNhZDBmZTZiODYyZDFhODAyZDdjMWJjNWU3N2ViODg1ODAwYjhkOTFjZjdmNDQ4MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzRiYjU0NzZlZDNmZjAyNzM1NjNhZGJkNmU0ZjdlNTVlMjM5YzVmOWI2MDAyNWUwNjNhY2JjZjc1YThmZDljYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTAwMTRiYTNiODI4ODhhYTA4YzUzNjJhMDVjYmIzYTZhMGIwNWViZGRkOWRjZWNjZGUwY2VmYzNlYzk4NWYxYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_94cec39b8d15490dac1cc0a301380124",
+      "statement": "`edgeone makers deploy` 绝不能带路径参数：带路径会跳过本地构建并把整个源码目录上传由平台侧重装依赖，产物易超「单文件 25MiB」限制（实测 30MiB 被拒）；不带路径时 CLI 才本地构建进 `.edgeone/` 并只上传产物，平台日志出现 `Project only contains .edgeone directory, skipping build` 才是对的。",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L4-L6",
+          "version": "repo-lines-v1:sha256:f99340b6cec0ea4c88dd6b00363ebb01386babb29cee9043389aa7fcdb56ba22:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDVkMDA0YTJhOWI0MTk5ZjM2MDAxMTIzOWU1NzdjNTg5MGE2YTY5ODcxYjNlNWNlZmZiNWE1NDkxOTA5YzcxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQ2NjM4ZmVkZDAxOGY5NjJmOTBiY2ViMmNiZDA5YWZmODU2OGNiN2U3OTJjYmQ1ZjAxMDJjZGNhZGFmYmNkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjc4Y2I1NTIzMTcyN2RiOGU3MDZlOGUzY2E0MDk1Njk2M2MyMmZkZDI0ZTY4ZjFhOWMyYzA3NTI5NjM4ZWUzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGY2NzhkMmUyYzhmMTBiOGJiNzlkMmM4NmU3YzJkN2JjYmFlZWJiZWNjZTRhZjI5OWI0MDhjODI0ZDYyNTI3YiJ9"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L403-L409",
+          "version": "repo-lines-v1:sha256:b335b6c1317e64e3752a1bc31d320d1873346f364fd20f84134fb3a80e617995:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWE4NzY1ZGFiOTJkMTQyOTkyODNmZDFkYmE3MDJkNjVhNjY5NDU4MDFkOTkyYWNiYjQ4NDEwZWYyYjFiN2NjYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTQwNzFiZmI4NzRkZGNhYWI3MDUzMzAxZGQwYzFmZDkyYjM4ZGJhMjUzNjdlNWQ3NjYxZjE0OWZmNzM1ZWYyOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzJlZWE3ODY4OGIwMGQ3OTdjOTczMWFiNzQ5NTI4NTkzMGM1YzMwZDAyMTUxNDFiOWMxMWVlOWQ2ZjQ5MjcxZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTgzMmY3NTg4OTVhZGQ5Zjk4ODk3NDBhZDY5NzU5Y2JiNzBhZTM0NjYxYjBmMjQyMTlhNTA2YmI2ZTU4MmMwOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_067991bfe2474dfd90130c7a1f8ed910",
+      "statement": "CLI 部署完会在项目根留下打包 zip（`edgeone-agent-lab.zip`）且不清理，而它的静态资源收集不认识 `.zip`，下一轮构建会把上一轮的 zip 收进 `.edgeone/assets/` 导致超限并从此每次部署失败（自吞循环）；因此清理必须放在部署之前，两处都做了：工作流的 `rm -f edgeone-agent-lab.zip` 步骤与 `package.json` 的 `clean:zip`（被 `npm run deploy` 串在前面）。",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L49-L50",
+          "version": "repo-lines-v1:sha256:a5db0172ed60ea34e2413bba6d749985f0a27d93592893ba7ad93f705fe2a431:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzI0ZjA0NmYyOTczOWE4YWIxNTNlMDhiYmEzMWZiNDUwYzQwMWYxNmE5MDZkNWY0ZTUwNjI1YTg0MTkxNmU2MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGNlNzQ1ZGJlNTNhZGM0NTRmMzVjNTFmMTBjNmI3NmI2ZTc0NjRkYzM1YWUwODRkYjJmNTg0NjFhNzRhOWM2ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjlkNTNlOWIwMTBjZDE1M2QwNmJmZDRiOThmNGNkOGZkODhkZWExNmRiNTMyZTJiYTdjM2Q2MmYxMjY0ZDlkMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2EwZmQxZmNkMzg5MjEyMWIxN2FkNjk4YmFkYTIzZDcwYzQ2N2Q1NTVmMTA5Y2RjOTBiOGU3Mzg1Yzg0ZjlhZSJ9"
+        },
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L7-L8",
+          "version": "repo-lines-v1:sha256:5bb6135565b1eeab7ae417b81f04b2e3b4cebb8946fac9e11c9248d5c56522bf:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjlmNTg4MzUwNTI3OTkwMWUyNTYwN2VhMzhjZmUxMzBiMGUyNGU3M2RiNmIyNDI2NGJkYTFiM2Q2MjdjMzEwMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmQ0Nzg5YzMyOGRjZDUwZDUwOTA4MDRkYjdhNmE1ZjM3NmNiZWQyMzNiMzdiYTY4ODQ0MjUwMzI1NDZiYWI1NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjk5MzQwYjZjZWMwZWE0Yzg4ZGQ2YjAwMzYzZWJiMDEzODZiYWJiMjljZWU5MDQzMzg5YWE3ZmNkYjU2YmEyMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTc3YmI1MDMwYzJmMmZjNDhhNmYyZDI4MzFlNjVjOWYwZjJiOGEzYTgxMmFkMmJjZDRiNGYwMzI2NmQzYjhjYiJ9"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L410-L414",
+          "version": "repo-lines-v1:sha256:23c69f4ee956296539249699dcb3b41f047a1029fe24006958446fd72909b9c7:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRhMmYzMTY1NWIxZDc3ZGUyNDhhMjNiOGY0Mzk1MmE5MDBiZDY5NjA5NDQwMjdmNDY2ZDdiMzdmY2QxNDVmYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjNiMTRjZmM4N2ZlN2UyYTgzYzlhNThmN2RiZWViOGM5MDk5YmNhYzZkNzUyZDJkNzYyZDBiNGQyOGZmNjY1MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmE4ZGUyMjMyZjQxNjgzMDY2OGNiYmMxZDgyOTcwZDRjOWEyMTg5ZjEzNjRkNzM3ZTkzMDhkYmY4YjQzNmUzYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2M3ZWMzNjU2Zjc2MmU1NDhlMzNlYjA3ZTRlNWY4NGViNDY3MGI0MjEyYjI5N2Q5N2EyMmJlMDhmYzg2MTI5YiJ9"
+        },
+        {
+          "resource": "repo://package.json#L10-L11",
+          "version": "repo-lines-v1:sha256:dfe97caeb3041a438fcc2e4a453cc773c4f635b3b082d1b9938459879608016d:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmI5MTBkNDIzZjFjZDM3OTEzMmM4NTJjMjg5OWVkMDFlODc2Mjg3ZTc0NzM3NmRkYTE2MDQyMTkwZDdhYjFiYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTY0ZDQxNWE2MDBjOTQ3YmMyMzVjZjFjYzdhZTA5MTllMGI1NTYyODZhM2JjNGIxY2E2NGFkODE4ODUxZjY4MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTgwMTNiNzM4YjRmODUzNjlmMWZlYmE4YzVhOWZlNTNiMWY2NGRkOGYyODdmZjA2NjUzMjQ2ZDA4MWY0NThjMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGI4YjNmZWJjNzU3NTgxMTdjNjZkN2RhNGM5Nzc4ODEwZmE2MjRhMzkxYjc3YjA2NTc2NjRjYjYyYTg4ZGIwMSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f53ce1bccfee43acb54fab3a0e78f755",
+      "statement": "部署必须用 `-a overseas` 与项目创建时的加速区域一致，因为飞书 webhook 需要公网回调且自定义域名免备案；业务密钥（FEISHU_* 等）全在 EdgeOne 控制台的项目 env 里由部署快照自动携带，Actions 侧只有 `secrets.EDGEONE_API_TOKEN` 用于 CLI 认证。",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L53-L59",
+          "version": "repo-lines-v1:sha256:b608d21ff66e1abf3a28a9b9a7c0b705fc628ae867bfa205ff590df6b04220d4:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWJjMzBmOWNjYzVhOGFkYzMxOTMzMzUxYTlmMDM2NGZiODg2YjdmZDEyYTAyYmQ3MTE0ZWQwNDkzNzE2MGQyZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTZiNDA1ZjA0ZGE4N2IxNmVmZjNmMWEyYTQxYmU5NmZkMjEyY2RiOWFhMmJlNjc3MzlmMGIyZDU4YWQ4Yjc2MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDVjNWRiYmJmZTQ0NGJlOWIxNDViMjZmZDVkNzVhYjE2YTZiZjU2Y2ZlMDVhNjM1NjNiZjA1ZDNkNjE1MzUzYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://.github/workflows/deploy.yml#L9-L12",
+          "version": "repo-lines-v1:sha256:e34261bd89ed224abaea1378f11677b3c8c376ca4580d78e6b2527db12d7b998:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFmNTE0Yzg0YmFjNTEwNDA5NTdjZTFlMTg4MWUxZWVkZTZjNDAzNzlmZWQ1NGZmYjQxNDBjN2YzNjg1ODIxMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTk1YjE5YjY5ZDM1ODA1MjI2OTZjNjY1M2NlZjVjYjg4M2MyOTg5YzIyMDNkM2RlYzJjZjc5MjRiMGE1ZjNkZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTI0Yzk2MmQ4YzJjZDA1OTIxMmU4ZDZlM2VlYjI1NTlmMDhhYmM3NDZhODExNWJhZDY5Y2QxODRkZmQwOGNiMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDY2ZWJmZGNkYzljODkzNzMxMzg5MTVjYjgwYzUzZmZiM2MzNjZiMGRhM2I5NmI1Yzg2NTk4NmRmODA3NGM5NSJ9"
+        },
+        {
+          "resource": "repo://package.json#L10-L10",
+          "version": "repo-lines-v1:sha256:bb910d423f1cd379132c852c2899ed01e876287e747376dda16042190d7ab1bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmI5MTBkNDIzZjFjZDM3OTEzMmM4NTJjMjg5OWVkMDFlODc2Mjg3ZTc0NzM3NmRkYTE2MDQyMTkwZDdhYjFiYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmI5MTBkNDIzZjFjZDM3OTEzMmM4NTJjMjg5OWVkMDFlODc2Mjg3ZTc0NzM3NmRkYTE2MDQyMTkwZDdhYjFiYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTgwMTNiNzM4YjRmODUzNjlmMWZlYmE4YzVhOWZlNTNiMWY2NGRkOGYyODdmZjA2NjUzMjQ2ZDA4MWY0NThjMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTliZTJiMzQwOThkZGVmNDNmYmJiNDQ1MmE4ODZjOGE4NDc3NDFmYTMxZmEyZGQ3ZmQwZTNhNzJmNWNmNzYzMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_35328a9e1ea64125a4d377db94fa2208",
+      "statement": "本机手工部署时会因注入的 safe-delete shim（`NODE_OPTIONS=--require=.../node-language-shim.cjs`）在构建清理 `.edgeone/` 时弹 `SAFE_DELETE_BULK_CONFIRM_REQUIRED` 而静默挂住十几分钟（表现为日志停在 `Pre-build hook triggered`、`.edgeone/` mtime 不动），正确写法是 `env -u NODE_OPTIONS npm run deploy`，`dangerouslyDisableSandbox` 单独用不够；Actions runner 没有这个 shim，所以工作流不需要它。",
+      "evidence": [
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L415-L436",
+          "version": "repo-lines-v1:sha256:0c06c8fe41532719f205fb9699e055d4598a4c70d586c1cfa05e0dff7480c8cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0NmI3YzhkNGZlM2RiMzI3ZTJhYTRjMGY3MzMyMjE1N2JhMzI5MmQ1N2QyMTA0ZGJiYWQ5ZTg3YjdlOGIyN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4MWRjMzE2ZjZlNjYyMmU0NjFkYTFiNGMwZDhjNWNkYTc0ODBlMTQ5YTcwZDhkMTY4ODE0NmQ2M2YwZDQ3YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3Mzk0NzA5YTAyOGM3NmI0ZGI5MmRmNTY0YTRjNTFiMWY2ZTU3ODllOWYwOTAzYzJmYWVhZDI4MGI2NGU0ZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE4YzA4MmZkYzRiYzFmN2U4YTNhYTMyNmE0MWEyNTI5NTgzMGQ5NDUwOTliMWM1NzU5YTM0OWFiNjEyM2VlNmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_939805f9492645f880aff26d3097a94e",
+      "statement": "每次 `edgeone makers deploy` 都会执行 `[cli] Bound AI Gateway credentials to project`，把 `AI_GATEWAY_API_KEY` / `AI_GATEWAY_BASE_URL` / `AI_GATEWAY_MODEL` 覆盖回平台值（实测 setEnvs 写成功、listEnvs 回读一致，部署完就变回旧值；对照 `OPENCODE_SESSION` 自定义键从未被重置），因此任何自定义凭证必须放普通键，`AI_GATEWAY_*` 只作兜底。",
+      "evidence": [
+        {
+          "resource": "repo://.env.example#L9-L12",
+          "version": "repo-lines-v1:sha256:f7f006f1e7237af62e63b71fa3ef16f1e7494ed31602d721261209c2f9b7197c:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWU5ZmEwNzcxM2IxODU1ZGFkM2MzNmU5ZDE3YWVmYmMyNjM5ZDQ4NjNjYWYzMTQ1NWVhNTYyNTkyYWFkNmY0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTRhNjY2NTQ3NjgwNDQ0NmFmNGNhYWM1NzNiMDlmMmU0NDVhOTU0MDMwMTQzNTNmZDg0NWM0MmM2M2NlZmFlNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTcwNDVhZDE4NjQzNjhmNDY5YmFhYmI0NmNmOTBiMDY0NmFiYjc3MTJmYjM5ZDAwMDYxMjI2YzM3MjI4OWIyZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTk5NWYwYjliOTQ3NmZjNzExY2MwOGVhZGNmMTM5YjA3NjRmMzE3YzgxODVkOGE5MjQwZmUxZDE2ZmFkNmE4OSJ9"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L438-L440",
+          "version": "repo-lines-v1:sha256:1eebce97e1f0cab8f48cf8fcd03016ae47909629690ea0c38384e18cf15f53f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2UwYjgzNWE4YTZjZGU5YTBjNmFiMTg2YTk2NzI1MzBhMTg2OWM3MmYxMzg5ZjgzZWQ3ZTNiYTY0ZWI3MjBlNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWQ0NmMzOWQ5MGVmYjYzYmIwZDljOGE2YmM2YTE0YjMyOTNmN2NiNTUyNzNmMjdhNzdkYTcwZWJiMDYwODBhYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGI1NWNiZmUxNGMzM2FjMTEwMWQwMjE3ZTg2ZGJmYTg0MDJkOTZlNWNhMGJiMzAwYzQ2ZTZlOTBiOTBlMTg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTJkYWYxYTVjODdhMDBkODE1MjljYTAzZTk5MGVhOGNjOTIyZTBiOTgzNGU0MTYzNDAyMjYwOWJiYzQxMTBmMyJ9"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L526-L529",
+          "version": "repo-lines-v1:sha256:5816a46c892891963d36c1af8159c5b7e4bd3c9e4e2a6470ed6cbbd64d88b0d1:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzUwYzBlMWQ5NjkzNDZhNWQ5OTg5MjE3MWMwNDkzOTQzNTVjMWFlZGJlZTQ4ZTIyNjExMjM4MzAzM2JiNDAxNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjBhYWMyN2MzZmIxM2JjZjBiMmExY2E3NDUwYTVjZDIyZjA3YzVkYzJjMzllYjNiYjI0Yzc3Zjg4ODNiNGZjOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTA4ODlhMGQ2OWYyMWNlMWJkZWU3YzQ2YWY1NTA2Yzc2NWFiYWY4YTMzZGQ0NmFjNzI0YmRlYzg4ZTkyNWE1YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDM4NTVkZmUyNzY5MmNjZmRmOWJmMzQ4ZTI3OGE3ODI1YzhiM2Q4ZTY2NGNjMTJkODZmZDUxODBkM2Y1NTg5YSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b24e4e428b0848b3a22035a3178a8b36",
+      "statement": "部署上传的是**整个项目目录**并作为公网可读静态资源发布，`edgeone.json` 的 schema 没有 exclude/ignore 字段，`.gitignore` 只管 git 提交而**挡不住部署** —— 因此含密钥的文件（如 bridge 的 `.env`）一旦位于项目目录内即等于被公开：`https://<域名>/bridge/.env` 曾返回 200 使飞书 APP_SECRET / ENCRYPT_KEY / INTERNAL_TOKEN 明文暴露两天。",
+      "evidence": [
+        {
+          "resource": "repo://.gitignore#L1-L12",
+          "version": "repo-lines-v1:sha256:15379bdaad4510bc5c2cafffd284597be237c1c03ea64546e3aa8ece2b11185b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNTY5NTJiMGZiMTNiZjhmOWI2YzEzYTZkNGMzNGEwNzViYWMzYWY0NDc2MzZhMWRmNDMzNWQ3NTc2ZTJmOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjZmVmNWIzZTQ3YWUxNzc3ZmVlYjg0M2I2N2Y2ZDI5YTZmNDMxNTYwZTlmZWNiOTE3NzkwODUxZGY3NGE0YWYifQ"
+        },
+        {
+          "resource": "repo://.openwikiignore#L8-L12",
+          "version": "repo-lines-v1:sha256:8e0edc7228824b4fd0e16ce5e013e1b056c09ce273b219320a1664d544d3557f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQ4ZTEyZTMxYjMwZjI0ZTAyYzAyMzU5ZjczZjIwMTg4NTVlYzE1ZDA2YjNmMjUyOWI0ZjljMjgzZDFmNjA3NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzY2NWY0Mjc0OTY4MTZhNjQxMDU3MWEwN2JkZDk4ZGQ0NzJlZDhlZTNiMjIzMjI1ZGYxODZlMDMzYTM0NWU0YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGI4MzlkZGMzOWEzMTJhYmU1ZDFhZGEwYjIyMWY3ZWM1ZGNlNTNjZDNlNTQ5YjIwMDEwMmQ0YzBmNjYxZmM5ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWM5N2ZhYWU0NzE2YzA4ZDNjOGU2N2RjNjNhOGQ5NWQ2MWQ2NzhiYjIwMGZiMWU2ODNmNGQ3NDUyNTNhNjdiMiJ9"
+        },
+        {
+          "resource": "repo://bridge/README.md#L97-L102",
+          "version": "repo-lines-v1:sha256:0b98b0da9bc2a85a18bb4d21eef5a51d6044b01d819706ccb54b625920b059c2:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmRkMzExODhkZjhmZTdjYzIxYzIzOGM2MWE2NDYzZTAyNmVjZDY0NGZmN2U3ODI1OGUzNzQ3YzJhYTU4ODQ2OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjZiMDg0MDE3YzgyYmYxYzY2Y2IxODk0YzY0NTkwOWI5ODQyZDgyYzc5NjE5Zjg3MmI1NjlkYjkxZmY4ZGZhMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODRiMzEzZmNiZDA5MjFiZmRhY2Y5NTNmOGI2MDI2MDdjNjZkZWUyOWY4MDE3MmI3MDk3NzFhYmViZGMzN2U3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDNmZmNjNDk4OGQyYTEyZjliMWM2M2EwNmNiZjA0NGY2YzRlZmJlZmU1ZmY0OTczNzA1MDFkNzE1MzQzZWNkMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_cd9a5ed9afca4225b89367a731efce9a",
+      "statement": "同一个「整个项目目录被上传」的语义也让项目目录内的重依赖被打包：`bridge/node_modules`（47M）与 `bridge/.npm-cache`（445 文件）被完整上传，把 `.edgeone/assets/bridge/` 撑到 50M、上传 105 个批次后以 `ENOENT ... .edgeone/assets/bridge/.npm-cache/_cacache/...` 崩溃；把依赖移出项目目录后 assets 从 1673 文件 / 50M 降到 40 文件 / 600K，部署约 1 分钟完成。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L10-L38",
+          "version": "repo-lines-v1:sha256:9b67db9554c0b0152feb9d1cb929b61c08706c01edebd4663977696bfd242692:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2OTc1OTM3NTc1ZjVlNTU2ODFmZjIyY2RmNThjYWVmYjEwYzI1NWJhYWM4MDdhMjYyODJkNTdlOTcwMWMyMjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGY1OWUxZWU0MzRhOGFlZDI1ZTliOGVkNmRmNGQ4OThlYWU2YmRjMjhkYzZiMTM1YjNkYzg2ZDQ2MDMxMzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiNjcxYzIyZjYzYzlhNzQ5NjIyNzUxODVmYTI1YTU3NWE5N2JhNmYyMGEyYjgxZjIzYmM1ZWQzYjViMjdjMTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhY2Y0NGEwMDdlNmIzZjk4NTIwOGUyMTIwNGIxOWFlMWQ0NjcxNmZlZGFhM2IwYzliODcyMmY0MTc4OTAxMjUifQ"
+        },
+        {
+          "resource": "repo://bridge/README.md#L97-L102",
+          "version": "repo-lines-v1:sha256:0b98b0da9bc2a85a18bb4d21eef5a51d6044b01d819706ccb54b625920b059c2:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmRkMzExODhkZjhmZTdjYzIxYzIzOGM2MWE2NDYzZTAyNmVjZDY0NGZmN2U3ODI1OGUzNzQ3YzJhYTU4ODQ2OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjZiMDg0MDE3YzgyYmYxYzY2Y2IxODk0YzY0NTkwOWI5ODQyZDgyYzc5NjE5Zjg3MmI1NjlkYjkxZmY4ZGZhMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODRiMzEzZmNiZDA5MjFiZmRhY2Y5NTNmOGI2MDI2MDdjNjZkZWUyOWY4MDE3MmI3MDk3NzFhYmViZGMzN2U3MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDNmZmNjNDk4OGQyYTEyZjliMWM2M2EwNmNiZjA0NGY2YzRlZmJlZmU1ZmY0OTczNzA1MDFkNzE1MzQzZWNkMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_bc0a39e3faac4b5d8617ddd344885c16",
+      "statement": "任何运行时或域名改动之后都必须重跑后台执行探针：`?probe=start` 后隔约 16~17 秒打 `?probe=check`，两次请求必须带同一个 `Makers-Conversation-Id`（标记写在会话 state 里）；`phase: finished` 则保持 `FEISHU_DISPATCH_MODE=async`，`phase: started` 则改成 `sync` 并重新部署 —— 因为本地通过不代表线上通过，线上的实例回收策略可能不同。",
+      "evidence": [
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L103-L152",
+          "version": "repo-lines-v1:sha256:f2f259be25e9cf7ad51d66342b01d72d9e1167d776f244f535ac1e9df4ce7f6a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmMWQ5ZTA5MThkNmFkNTlkNTZiMzZiYjEwNGU3NzRiYTkxMWEzNDcyZWI2OWE1NWFiZjQwZDcwMmNiZjBlYzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1YTA2MDNjM2VmYWM0Nzc3YTRiNTJhZjRjYzRkNzBlYWI4M2M1ZTg5ZWZmZWJlM2QwYTkxZDVmOGY4OGQ2YWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2NjkwNDAxN2E3NGM5ZTk0YmYzMmRmYmExMzQyMjU1NmU3Y2ZlNjE0ZDEzZWVlMjIwMTYwNjg3NDVhZGRhMTcifQ"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L442-L443",
+          "version": "repo-lines-v1:sha256:2dda4580d3946d6af54e233b377d9b811e58de84911dee65db5f2255c88c493c:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWIwMGUzNzViMjM0ZTczZTY2NDQzYjI0YjQ3MTI0NzY5NDU3MTE0MjAwN2NlOTA2NWFjMThiMzE1MmY1MGJmNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2ViZjM5Nzg0MmU3YzgzNTdkMGExYzE0ZDg4OTkwOWU4ZWFhYmRhMjc4N2MxYzY0YzgzNmU2YTZjMTc3MDhmZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2YxNjk3ODM4MTAzZjRiNzUxN2MwMDBjM2JjMzRmZDdkODFkNzNhNGU4N2ZhODdmNDQxZTViZDIwOTNjZDY0NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f040e42892ae472d823861523006a3d8",
+      "statement": "后台执行探针需要 15 秒的后台睡眠才有效，因为时间太短任务可能在响应发出之前就跑完，测出来的只是「同步能跑」而不是「后台能跑」，属于假通过。",
+      "evidence": [
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L151-L152",
+          "version": "repo-lines-v1:sha256:4e2782424af10435add491c9fffa4ede0e2fe22bfe24272e057e22ecd225a893:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTU1ZmY5ZGQzNTBjYzcxYWNmOGJiNTNlNTI0ZTk1ODQzZjRiMjY0MmY4Yjc1NTkzMzY5NDFlMWU0MGRkODk2ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTVhMDYwM2MzZWZhYzQ3NzdhNGI1MmFmNGNjNGQ3MGVhYjgzYzVlODllZmZlYmUzZDBhOTFkNWY4Zjg4ZDZhZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDcwMGIzM2QwNzFiYmUxOGMxNGMyYzM3Njk3ZTRkYWE0NjA1Yzk3ODM4M2VkYzJhNDdjMDQyMDFlNDdlOTBjOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTY2OTA0MDE3YTc0YzllOTRiZjMyZGZiYTEzNDIyNTU2ZTdjZmU2MTRkMTNlZWUyMjAxNjA2ODc0NWFkZGExNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_50b712a7a03f4bc7a1a192d239ba7dd1",
+      "statement": "`bridge/` 与本机中继跑在部署运行时之外：EdgeOne 部署只认 `agents/` 与 `cloud-functions/`，所以这些组件不在部署产物里、不被冒烟测试覆盖、也不受部署回滚影响，反过来「部署成功」并不证明这两条链路正常。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L147-L149",
+          "version": "repo-lines-v1:sha256:6d5b831620d6b30c1847f8b2059a9bd4026bc718c44c82286aedd74d93e392da:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTNmNjI1MDQ2OGI1Yzk1NjAzZmJhZmFmYWQ2ZjE1MGNkMzBkNzYyZWVlNGE0MDUyMzlhZTY5OTFhYzZiYTA5NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjY3YzllMzRmMWRmNmI5MGQ1MWNiZjU5YjU3YzJmNGQ1YTI5OWFiNmIzY2IyMjFhZGQ3ODVjMjRkNDE1Y2QyNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGUxODNlOWFhY2EwYTZkNjA4ZWY1NmE4MWY5ZjA0MzllNzE4MzM5MDVjNjRhNDQ5Yzk1NGFlYTU1ZGU5ODg0MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://bridge/README.md#L49-L62",
+          "version": "repo-lines-v1:sha256:0c2099e938d05d035939ef03355c1ec07a54becb82e3e8146c5970899f9f13b8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjMzM1OTg3NzBjY2MwNjA5NzgxMWM5OWUwYTE1ZmMxMDNjM2QxOWRjZWE2MmNjMzQ1Y2JkZTc1MDRlN2I5YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4ZmYxM2Q2N2Q1MzQzOGUzNTFmMDNmNGVhZmRkYmU4YmMxY2M5M2I2NDJjYzU3NGJhNzU5OTQ2NDU2MGQ2OWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4ZDhlYTJkMWRmMjhjYzYxOTU3YzI4ZjIxMDc0M2IwZjUwMGMzYTA0MjlmMjllZmQ4ODMyYTNhYTliMTU0NWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a8b5373bd4b14621b5d425bca4b37fcc",
+      "statement": "`bridge/` 的源码目前仍在项目目录内因此公网可读（`https://<域名>/bridge/index.mjs` 返回 200），虽然不含密钥但没有理由公开；把整个 `bridge/` 移出项目目录是一个记录在 `docs/03-验证清单.md` 的待定目录布局决定。",
+      "evidence": [
+        {
+          "resource": "repo://bridge/README.md#L14-L24",
+          "version": "repo-lines-v1:sha256:5d4b6a1dae7a8834fa3da24f40eb26dfcd74a4f941a696e416192e6073f7d7fd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjZmY5MTAzMmQwOTMwNTFjM2Y5MDBlZjA5N2I1NjI1MDMyN2JjNmVhMDg5MTNjYzI0Yjc4NTk0YjI2NzgwYWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MjA5MzNjMzliM2Y5ZGQxNDcyZTc5MmJjOTQzNjg2Y2VhN2FmOWJlNjZhYWE5NDBhZDNhMWNlYmFiZjM5ZTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc5NmEwOGU5MzFiNTcxZWY0ODdlOTE1OGFkNTVhOTNjY2Y1MTMwNDBiM2Y0NmJkOTViMjM0ODc2OWY0ZWRkNDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzMDhjMDA2YzYwZjNkNGVhYzY5ZjViNmFmZDcxNGUwOTg4NzA5Y2VmM2EzMmJiOWE1YTYwMjUyZWQ0ZTcwZWEifQ"
+        },
+        {
+          "resource": "repo://bridge/README.md#L35-L38",
+          "version": "repo-lines-v1:sha256:bc9452fc697ba1d0ba46e4b137386500da9b3f41d0ae7e8013e6c1a6bc5172b1:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzllOWI4ZTUzYTExYmIzZTIwZDliMDJhMWYxZWI0NjkyODA3NDg0ZGE5ZWZlMzk5YmM4MzAzNjY2NTBkNWJhNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzE0ZjU5ZTFlZTQzNGE4YWVkMjVlOWI4ZWQ2ZGY0ZDg5OGVhZTZiZGMyOGRjNmIxMzViM2RjODZkNDYwMzEzOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWQ4NzM3YWRkYjYxNzBhYTY0ZTEyODQ0MmM2OWNjZjIyZmEzNjVjNzkyMjg0YTc3NmNkMWU5MDdkNjg5MDhhYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2FjZjQ0YTAwN2U2YjNmOTg1MjA4ZTIxMjA0YjE5YWUxZDQ2NzE2ZmVkYWEzYjBjOWI4NzIyZjQxNzg5MDEyNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c61045c68a03441e8c0cf64dc3818ad7",
+      "statement": "OpenWiki **不读** `.gitignore`，只读 `.openwikiignore`，而且读取的是**工作区**而不是 git 索引，所以即使 `.gitignore` 挡住了 `.env` 不让提交，OpenWiki 仍会把它当语料读进去并把密钥写进要提交的 `openwiki/` 页面（二次泄露）；因此 `.env` / `.env.local` / `.env.*.local` 必须显式写进 `.openwikiignore`。",
+      "evidence": [
+        {
+          "resource": "repo://.openwikiignore#L1-L20",
+          "version": "repo-lines-v1:sha256:36d6b40ba869ab78fbc22d8bd2cde815b5ed71d222e8bbcda4d7b82d1a2d40f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhNTNmNzllODBjN2Y3M2MyZWNhOGQwZWRjMDNjM2I4ODkzMzUwNGM5YjQ2YWM3YzU0ZDRmZDE3YWIxODg5MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5YWE3M2NmNWJjMzM3N2E3ZDk3ZjJlOGQyYmI3NzMxOTU4MTVlZmUyMjVhZjdmMWJlNmY1YjkzMDZiYmUxNGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwZDZkZGFhN2Y3YzQ3ZjEzMGE1YTc5YjJhNzYyOWE4NGVhYjIyNGZlYTU2NGM5NTE3M2FhOThjNzE5ZWJiODgifQ"
+        },
+        {
+          "resource": "repo://.openwikiignore#L24-L30",
+          "version": "repo-lines-v1:sha256:c4a04fa64c65e457c727a9eddfa482efd9472cf03312951532d7774adea80564:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2UxZDhjYTAyMjQ4NWMwMjVkNjk4MWIxNWM3YjE1YjAzODMyZGQ1NGU5MGVhNWM4ZTU4YTE5MmQwYzk1ZDM3MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjkwYWM5YTFjNGJkMmI1NzRjMmQ1NDI0NWYzYTlmODllNGM5ZTY1NWJiMTI3NzY2ZjE4MTlhMTZlOWNhMWRlMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTBkNmRkYWE3ZjdjNDdmMTMwYTVhNzliMmE3NjI5YTg0ZWFiMjI0ZmVhNTY0Yzk1MTczYWE5OGM3MTllYmI4OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGQ4MWU0N2JjYzFjNDQxNzk4ZGVmYWYyNjAyZThiMWRhYTUzY2QxMjQ3MTBiYTE3ZmRhYWI5YTI1MzAzYzRjNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6dba03aaa6c8402abac72406e720b871",
+      "statement": "`edgeone.json` 是唯一的部署描述：`framework: openai-agents-sdk` 决定平台用哪套适配包 `agents/` 路由，`agents.timeout: 900` 与 `sandbox.timeout: 900` 是长回合的前提，项目根静态文件自动托管；schema 里**没有** exclude/ignore 字段，这正是整个项目目录（含 `bridge/` 源码）被当静态资源上传的原因。",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L109-L120",
+          "version": "repo-lines-v1:sha256:ebf40a129dd06fbb7bf9fb810dfc1fd3ea911be82fa881f5a940acae35b65607:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5ZmE0ODRjNWNkMzJlMGJjNzhhM2VmNGIxN2I4ZjIyZGUwNzQ0MTBiZDJmNmY3ZGI1OGNmYTMwYWE3ZGY4ZTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhNGIxY2Q2OGQxNjVhMDViMjY0MjQzM2YyNGExNDVkMDBlZDIwMzk4MGVlMWU3YjM4ODA4NWRjZmI5OWUzMjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlMjkxNWU2MTA0ZGIyYTQzYzczZGY5ZGU5N2FmZjE5OWE4NjRlOGQxOGY4MTM4NGUyZWVjYWFlZTlhMDMxMmQifQ"
+        },
+        {
+          "resource": "repo://edgeone.json#L1-L13",
+          "version": "repo-lines-v1:sha256:60a7b79fcb9bbfc652c432ea34dde62c9581383ae867600f4118f0ff8911bed3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5b59cbd9836e49019b664baca575f5a7",
+      "statement": "改云端项目环境变量不会实时生效：跑着的 agent 用的是部署时打包进去的快照，所以刷新快照的最小动作是触发一次 `gh workflow run deploy.yml`（实测症状：改了 `INTERNAL_TOKEN` 后请求照样 401，光看控制台判断不出是「值不对」还是「没生效」）。",
+      "evidence": [
+        {
+          "resource": "repo://.env.example#L1-L6",
+          "version": "repo-lines-v1:sha256:18f1e594c5387101ae648a89e080099d9efbb80770501ba6d7fa2e07edf88336:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWQwYjg1MzUxMjMyYWYxMGRjNGM5MTk1ODVjMTM3ZWUxODgwODMyYTI1YTgzYjZiMjYwZWJkYTI4NTQ5NjRjOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWQwYjg1MzUxMjMyYWYxMGRjNGM5MTk1ODVjMTM3ZWUxODgwODMyYTI1YTgzYjZiMjYwZWJkYTI4NTQ5NjRjOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjBiZDcwNmI4MTcyMmUzNDZmZWE5MTE3NzIyYzJlNzc3YzY1MjA3ZGM3MjJiOWUwYzcyM2Y5YTQ1NWVkM2Q2OSJ9"
+        },
+        {
+          "resource": "repo://docs/03-%E9%AA%8C%E8%AF%81%E6%B8%85%E5%8D%95.md#L297-L300",
+          "version": "repo-lines-v1:sha256:c5f92e17d6a59c6848a052dc664bab4255659241bf2d9d7bb591d6afa8fc9f7d:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2RlMWQ1ZDVkZTE4N2NjMDliZWJjYzdmYTlhZjlmMDdiYWMxMWM1YWU1ZmRhMDRiMjcwZTVhNDkwZjkwNTA5YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTkyOGNiNDkxZDkwNGRlNjE2MjM5YTUyYzM4ZWQyNTUzYTYxOTc5ZmExODM1NGUyOTczZDVmYzRmOWRlYzU0NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjhkNGMzZTRlMGUyZmY1ZmUxZTc4MDk0M2UxN2Q0MWE2YjBmNTM2ZDFmOTkzM2Y2NWY1MDc4YmUyNzNkZjA4ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGFjZDIxNWJlYzY2OGUxMGMyMjljOTM4ZmUxZGU4NmZiOGFmNmU0MjNhZDhmMmJlOTE5YjFjNzdkMWFiNDAyMiJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.1",
+    "at": "2026-10-03T16:28:06.187Z"
+  }
+}

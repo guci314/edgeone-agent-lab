@@ -10,7 +10,7 @@
     "deploy": "npm run clean:zip && edgeone makers deploy",
     "clean:zip": "rm -f edgeone-agent-lab.zip",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types test/smoke.ts",
+    "test": "node --experimental-transform-types test/smoke.ts",
     "ask": "node tools/ask-bot.mjs",
     "verify:memory": "node tools/verify-memory.mjs",
     "verify:autocompact": "node tools/verify-autocompact.mjs",

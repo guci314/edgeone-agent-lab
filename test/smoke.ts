@@ -48,11 +48,16 @@ import {
   makeUserTokenStore,
   type UserTokenStore,
 } from "../src/feishu/user-token.ts";
-import { makeFeishuDocTools } from "../src/feishu/docs.ts";
-import { ghWorkspaceConfig } from "../src/ghworkspace/client.ts";
+import { authStateText, makeFeishuDocTools } from "../src/feishu/docs.ts";
+import { checkPath, ghWorkspaceConfig } from "../src/ghworkspace/client.ts";
 import { makeGithubTools } from "../src/ghworkspace/tools.ts";
 import { checkRepo, ghIssueConfig } from "../src/ghworkspace/issues.ts";
 import { makeGithubIssueTools } from "../src/ghworkspace/issue-tools.ts";
+// agents/feishu 的模块级纯函数（模型路由 + 工具结果摘要）。
+// 引 _host.ts 会连带引 openai / @openai/agents 和 streamer.ts（参数属性语法），
+// 所以 npm test 得用 --experimental-transform-types；这两个函数本身不碰网络
+import { resolveModelName, resolveModelRoute } from "../agents/feishu/_host.ts";
+import { summarizeToolOutput, toolFailed } from "../agents/feishu/_tools.ts";
 import {
   GlobalMemory,
   InMemoryMemoryBackend,
@@ -3091,6 +3096,155 @@ await describe("M. GitHub issue 工具族", async () => {
     ok(typeof r.error === "string", JSON.stringify(r));
     ok(r.error.includes("人去"), `要指明这是人该处理的：${r.error}`);
     ok(!r.error.includes(TOKEN), r.error);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// N. 模型路由与同级纯函数
+//
+// `agents/feishu/_host.ts` 的 resolveModelName / resolveModelRoute 各对应
+// 一次**真实线上事故**，但防线原先只写在函数注释里，谁改坏了都没人拦：
+//   · resolveModelRoute —— key 与 baseURL 跨源混配（key 是 OpenCode Go 的、
+//     地址指着 EdgeOne Gateway）→ 稳定 401 "API key not found"，看着像密钥失效。
+//     所以逻辑是「按来源成对取，半配当作未配」。
+//   · resolveModelName —— 两个网关的模型名规则**相反**（EdgeOne 要 @makers/ 前缀、
+//     OpenCode Go 要裸名），只换 baseURL 不摘前缀 → 404 像「模型不存在」。
+//     所以兜底必须是裸名，且 OPENCODE_MODEL 优先于平台托管、会被 deploy 重置的
+//     AI_GATEWAY_MODEL。
+//
+// 同节顺带钉住几个未测纯函数（issue 点名 / 注释里带「踩过」的优先）：
+// summarizeToolOutput + toolFailed（_tools.ts）、checkPath（ghworkspace/client.ts）、
+// authStateText（feishu/docs.ts）。
+//
+// 本节全部纯函数调用，不发任何请求；_host.ts 的 import 会连带 @openai/agents，
+// 但模块级没有副作用，不影响上面各节自己的 fetch stub。
+// ═══════════════════════════════════════════════════════════════════════
+
+await describe("N. 模型路由与同级纯函数", async () => {
+  const OAUTH_ENV = { FEISHU_APP_ID: "cli_x", FEISHU_APP_SECRET: "s" };
+
+  await it("resolveModelName：OPENCODE_MODEL > AI_GATEWAY_MODEL > 硬编码兜底（裸名）", () => {
+    // 三级取值，高一级在就压住低一级
+    eq(resolveModelName({ OPENCODE_MODEL: "kimi-k2", AI_GATEWAY_MODEL: "@makers/deepseek-v4.1-flash" }), "kimi-k2");
+    eq(resolveModelName({ AI_GATEWAY_MODEL: "@makers/deepseek-v4.1-flash" }), "@makers/deepseek-v4.1-flash");
+    // ⚠️ 兜底必须是**裸名**、不能带 @makers/ 前缀 —— 路由指向 OpenCode Go 时
+    // 带前缀就是 404（注释里那第二次事故）。这里钉住字符串本身
+    eq(resolveModelName({}), "deepseek-v4.1-flash");
+  });
+
+  await it("resolveModelRoute：OPENCODE_* 成对 → 整组用之，source 标正确（AI_GATEWAY_* 让位）", () => {
+    const r = resolveModelRoute({
+      OPENCODE_API_KEY: "oc-key",
+      OPENCODE_BASE_URL: "https://opencode.ai/zen/go/v1",
+      // 同一场合还配着 AI_GATEWAY_* 时必须被压下去 —— 后者平台托管，
+      // 每次部署都被 CLI 盖回平台值，指望不上；OPENCODE_* 是普通自定义键
+      AI_GATEWAY_API_KEY: "gw-key",
+      AI_GATEWAY_BASE_URL: "https://gateway.example/v1",
+    });
+    eq(r.source, "OPENCODE_*");
+    eq(r.apiKey, "oc-key");
+    eq(r.baseURL, "https://opencode.ai/zen/go/v1");
+  });
+
+  await it("⚠️ resolveModelRoute：key 半配 → 整个作废，**不许拿 AI_GATEWAY_ 的地址凑**", () => {
+    // 真实事故的形状：key 是 OpenCode Go 的、有 EdgeOne Gateway 的地址，于是
+    // 「key 打错了门」稳定 401。防线是：认不出完整的 OPENCODE_* 对，就**两个都
+    // 不给** —— 既不能拿 OpenCode 的 key 配 EdgeOne 的地址，也不能反过来。
+    const half = resolveModelRoute({
+      OPENCODE_API_KEY: "oc-key",
+      AI_GATEWAY_BASE_URL: "https://gateway.example/v1",
+      // （故意没有 OPENCODE_BASE_URL / AI_GATEWAY_API_KEY，凑不出任何同源的一对）
+    });
+    eq(half.apiKey, undefined, "跨源的一半必须整组作废");
+    eq(half.baseURL, undefined);
+    eq(half.source, "未配置");
+
+    // 值是纯空白也算没配（函数内部 trim）——配置面板留下几个空格很常见
+    const blank = resolveModelRoute({ OPENCODE_API_KEY: "  ", OPENCODE_BASE_URL: "u" });
+    eq(blank.source, "未配置");
+  });
+
+  await it("resolveModelRoute：AI_GATEWAY_* 成对 → 整组退回（key 和地址仍同源）；全缺 → 未配置", () => {
+    const r = resolveModelRoute({
+      // OpenCode 半配不碍事：缺的那一侧整体退到网关组，**不能**用 OpenCode 的 key
+      // 配网关的地址（那正是要防的混配）
+      OPENCODE_API_KEY: "oc-key",
+      AI_GATEWAY_API_KEY: "gw-key",
+      AI_GATEWAY_BASE_URL: "https://gateway.example/v1",
+    });
+    eq(r.source, "AI_GATEWAY_*");
+    eq(r.apiKey, "gw-key", "退回就是整组退回 —— key 也得是 AI_GATEWAY 的");
+    eq(r.baseURL, "https://gateway.example/v1");
+
+    // 两者皆缺 → 未配置。source 这个中文标记是给 ?probe=model 回显的
+    const none = resolveModelRoute({});
+    eq(none.apiKey, undefined);
+    eq(none.baseURL, undefined);
+    eq(none.source, "未配置");
+  });
+
+  // ── summarizeToolOutput / toolFailed（agents/feishu/_tools.ts）────────
+  // 注释原话：「分支顺序是踩出来的，不是想出来的」—— 最要紧的是 ok:false 那条：
+  // 平台沙箱工具失败时返回 {ok:false,status,stderr}、没有 error 字段，
+  // 只看 error 会判成成功，卡片上出现一个骗人的 ✅。
+  await it("summarizeToolOutput：先 error、再 ok:false（平台工具的失败没有 error 字段）", () => {
+    eq(summarizeToolOutput({ error: "网络炸了" }), "失败：网络炸了");
+    ok(summarizeToolOutput({ ok: false, status: 137 }).startsWith("失败："), "ok:false 必须判失败");
+    ok(!summarizeToolOutput({ ok: false, status: 137 }).includes("完成"), "ok:false 漏成 ✅ 正是这条防线");
+    // stdout 取首行
+    eq(summarizeToolOutput({ stdout: "第一行\n第二行" }), "第一行");
+    // ws_commit 的独有形状：改了 GitHub 上的东西，摘要要说清改了什么
+    eq(summarizeToolOutput({ commit: "abcdef1", path: "x.js" }), "已更新 x.js");
+    eq(summarizeToolOutput({ commit: "abcdef1", path: "x.js", deleted: true }), "已删除 x.js");
+  });
+
+  await it("toolFailed：同一套判据（\"error\" in o || ok === false），两处必须一起改", () => {
+    eq(toolFailed({ error: "x" }), true);
+    eq(toolFailed({ ok: false, status: 137 }), true);
+    eq(toolFailed({ stdout: "ok" }), false, "成功不该被判成失败");
+    eq(toolFailed("字符串结果"), false);
+  });
+
+  // ── checkPath（src/ghworkspace/client.ts，ws_* 全族共用）─────────────
+  await it("checkPath：归一化 ./ 与尾部斜杠，拦下穿越 / 空段 / 反斜杠 / 控制字符", () => {
+    eq(checkPath("./src/feishu/api.ts"), { path: "src/feishu/api.ts" }, "开头的 ./ 剪掉");
+    eq(checkPath("a/b/"), { path: "a/b" }, "尾部斜杠剪掉");
+    ok(checkPath("").error, "空 path 要拒");
+    ok(checkPath(undefined).error, "缺参当空 path 拒");
+    ok(checkPath("a/../b").error!.includes(".."), "穿越要拒");
+    ok(checkPath("a//b").error, "空段要拒");
+    ok(checkPath("a\\b").error, "反斜杠要拒（GitHub 上合法但我们的路径语义里只会造成歧义）");
+    ok(checkPath("a/b\tc").error, "控制字符要拒");
+  });
+
+  // ── authStateText（src/feishu/docs.ts，/status 与 /logout 共用）───────
+  await it("authStateText：没授权给 /login 这条路；授权了不摊完整 openId", async () => {
+    stubFetch(() => undefined); // peek 绝不该发请求，发了就会在这里炸
+    const openId = "ou_9f3c2a1b7e4d";
+    const noAuth = await authStateText(
+      new UserTokenManager({ store: makeUserTokenStore(new TokenKv(), openId), env: OAUTH_ENV, openId }),
+      openId,
+    );
+    ok(noAuth.includes("未授权"), noAuth);
+    ok(noAuth.includes("/login"), "没授权时的提示要指到唯一的一条路上：" + noAuth);
+
+    const kv = new TokenKv();
+    await makeUserTokenStore(kv, openId).set({
+      accessToken: "at-1",
+      refreshToken: "rt-1",
+      exp: Date.now() + 3600_000,
+      refreshExp: Date.now() + 86400_000,
+      openId,
+      scope: "",
+    });
+    const authed = await authStateText(
+      new UserTokenManager({ store: makeUserTokenStore(kv, openId), env: OAUTH_ENV, openId }),
+      openId,
+    );
+    ok(authed.includes("已授权"), authed);
+    ok(authed.includes("有刷新令牌"), authed);
+    ok(authed.includes("ou_9f3c2a1b7…"), "openId 只出前 12 位：" + authed);
+    ok(!authed.includes(openId), "完整 openId 别摊进 /status 文案里（群里人人可见）");
   });
 });
 

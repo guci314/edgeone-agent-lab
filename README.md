@@ -56,6 +56,7 @@ npm run verify:memory -- --keep  # 跑完不清记忆（想留在飞书里肉眼
 ## 上手
 
 前置：Node.js ≥ 22（冒烟测试用了 `--experimental-strip-types`）。
+动手改代码前先读 `AGENTS.md` —— 仓库契约：模块布局 / 依赖边界 / 测试门禁 / 禁改清单 / 风格。
 
 ```bash
 # 1. 装依赖
@@ -110,6 +111,7 @@ I 用户令牌管理 ｜ J 云文档读写工具族 ｜ K 跨会话记忆 ｜ L 
 
 ```
 edgeone-agent-lab/
+├── AGENTS.md                       # 仓库契约：布局 / 依赖边界 / 测试门禁 / 禁改清单 / 风格
 ├── edgeone.json                    # framework=openai-agents-sdk、超时、沙箱存活
 ├── index.html                      # 状态页 + 后台执行自测
 │

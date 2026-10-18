@@ -59,8 +59,9 @@ import { makeGithubTools } from "../src/ghworkspace/tools.ts";
 import { checkRepo, ghIssueConfig } from "../src/ghworkspace/issues.ts";
 import { makeGithubIssueTools } from "../src/ghworkspace/issue-tools.ts";
 // agents/feishu 的模块级纯函数（模型路由 + 工具结果摘要）。
-// 引 _host.ts 会连带引 openai / @openai/agents 和 streamer.ts（参数属性语法），
-// 所以 npm test 得用 --experimental-transform-types；这两个函数本身不碰网络
+// 引 _host.ts 会连带引 openai / @openai/agents 和 streamer.ts（参数属性语法，
+// Node 裸跑的 strip-only 模式不支持），所以 npm test 走 tsx（esbuild 全量
+// transform，不依赖 Node 版本自己的实验性 TS flag）；这两个函数本身不碰网络
 import { resolveModelName, resolveModelRoute } from "../agents/feishu/_host.ts";
 import { summarizeToolOutput, toolFailed } from "../agents/feishu/_tools.ts";
 import {

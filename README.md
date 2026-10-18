@@ -55,7 +55,7 @@ npm run verify:memory -- --keep  # 跑完不清记忆（想留在飞书里肉眼
 
 ## 上手
 
-前置：Node.js ≥ 22（冒烟测试用了 `--experimental-strip-types`）。
+前置：Node.js ≥ 22（冒烟测试经 `tsx` 运行，不依赖 Node 自带的实验性 TS flag）。
 动手改代码前先读 `AGENTS.md` —— 仓库契约：模块布局 / 依赖边界 / 测试门禁 / 禁改清单 / 风格。
 
 ```bash

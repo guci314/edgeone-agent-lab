@@ -64,8 +64,8 @@ export class UserTokenManager {
   private inflight: Promise<TokenResult> | null = null;
 
   constructor(opts: UserTokenManagerOpts) {
-    // 不用 TS 的构造函数参数属性：Node 的 --experimental-strip-types 是
-    // strip-only 模式，遇到参数属性直接报错。冒烟测试要在裸 Node 下跑。
+    // 不用 TS 的构造函数参数属性：EdgeOne 构建链对参数属性的支持没验证过，
+    // 显式赋值在哪都安全（同 FeishuStore）。
     this.store = opts.store;
     this.env = opts.env;
     this.openId = opts.openId;

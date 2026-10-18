@@ -96,7 +96,7 @@ npm run dev
 
 ### 为什么冒烟测试不依赖 EdgeOne
 
-`test/smoke.ts` 用**裸 Node** 跑，不启 EdgeOne、不连飞书、不发网络请求（`fetch` 被 stub 掉了）。
+`test/smoke.ts` 用 tsx 跑，不启 EdgeOne、不连飞书、不发网络请求（`fetch` 被 stub 掉了）。
 理由：这条链路里最容易错的东西 —— 验签与解密的**顺序**、去重窗口的判据、
 摘要写回的形状、那个 36 字符的 `conversation_id` —— **全都不依赖平台**。
 把它们从平台里剥出来单独测，改一行就能验证一次，不用等部署。
@@ -149,7 +149,7 @@ edgeone-agent-lab/
 │       └── types.ts       ➕ 新增   # FeishuQueueEvent 从 router.ts 挪出来
 │
 ├── test/
-│   └── smoke.ts                    # 冒烟测试：190 项，裸 Node 跑，不依赖 EdgeOne
+│   └── smoke.ts                    # 冒烟测试：190 项，tsx 跑，不依赖 EdgeOne
 │
 └── docs/
     ├── 01-架构与移植映射.md         # 逐模块对照、跨会话记忆、两个未知数、刻意没做的事

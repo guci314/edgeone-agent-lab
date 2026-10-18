@@ -103,9 +103,7 @@ export class FeishuStore {
 
   /**
    * ⚠️ 不用 TS 的构造函数参数属性（`constructor(private kv: StateKv)`）。
-   * Node 的 `--experimental-strip-types` 是 strip-only 模式，只剥类型不做代码生成，
-   * 遇到参数属性直接 `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`。冒烟测试要在裸 Node 下跑，
-   * 所以这里手写字段 + 赋值。EdgeOne 的构建链是否支持参数属性没验证过，显式赋值两边都安全。
+   * EdgeOne 的构建链是否支持参数属性没验证过，手写字段 + 赋值两边都安全。
    */
   private readonly kv: StateKv;
 

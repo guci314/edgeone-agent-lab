@@ -19,7 +19,12 @@
 //   I. token    —— 用户令牌：续期、轮换不丢 refresh_token、单飞、按人分槽
 //   J. doctools —— 云文档六个工具：身份兜底（应用优先/用户兜底）/ wiki 解引用 /
 //      翻页缓存 / 拍平 / 三个写工具
+//   K. memory   —— 跨会话记忆：键名归一 / 可见性 / 渲染 / 上限与工具
 //   L. ghws     —— 工作区仓库 ws_ls / ws_read / ws_write / ws_rm
+//   M. ghissue  —— GitHub issue 工具族：白名单、建 issue / 加评论、
+//      token 不外泄与凭证错误处理
+//   N. model    —— 模型路由纯函数（resolveModelName / resolveModelRoute）+
+//      同级纯函数：工具结果摘要 / checkPath / authStateText
 //
 // 2026-09-25：原来还有两节测「仓库语料导入」（`E. repo`）和
 // 「read / ls / find / grep 四个代码工具」（`F. tools`）。改成通用助手后

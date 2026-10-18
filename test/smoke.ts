@@ -3194,8 +3194,9 @@ await describe("N. 模型路由与同级纯函数", async () => {
   // 只看 error 会判成成功，卡片上出现一个骗人的 ✅。
   await it("summarizeToolOutput：先 error、再 ok:false（平台工具的失败没有 error 字段）", () => {
     eq(summarizeToolOutput({ error: "网络炸了" }), "失败：网络炸了");
-    ok(summarizeToolOutput({ ok: false, status: 137 }).startsWith("失败："), "ok:false 必须判失败");
-    ok(!summarizeToolOutput({ ok: false, status: 137 }).includes("完成"), "ok:false 漏成 ✅ 正是这条防线");
+    const sandboxFail = summarizeToolOutput({ ok: false, status: 137 });
+    ok(sandboxFail.startsWith("失败："), "ok:false 必须判失败");
+    ok(!sandboxFail.includes("完成"), "ok:false 漏成 ✅ 正是这条防线");
     // stdout 取首行
     eq(summarizeToolOutput({ stdout: "第一行\n第二行" }), "第一行");
     // ws_commit 的独有形状：改了 GitHub 上的东西，摘要要说清改了什么
